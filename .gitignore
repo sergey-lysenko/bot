@@ -1,0 +1,12 @@
+/bin/
+/.classpath
+/.project
+/.settings
+/target/*
+/allure-results/*
+#/profile/*
+.idea/*
+*.iml
+/target/
+/_env.bash
+/_**.bash
