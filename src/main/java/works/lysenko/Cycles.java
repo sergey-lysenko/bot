@@ -4,6 +4,10 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import works.lysenko.scenarios.Scenario;
+import works.lysenko.scenarios.Scenarios;
+import works.lysenko.utils.Color;
+
 public class Cycles extends Common {
 
 	public int cycles;
@@ -19,16 +23,16 @@ public class Cycles extends Common {
 
 	public void execute() {
 		if (cycles == 0)
-			r.problem("[WARNING] No test cycles were perfomed");
+			l.logProblem("[WARNING] No test cycles were perfomed");
 		while (cycles > 0) {
 			scenarios.execute();
-			logln();
+			l.logln();
 			if (--cycles > 0)
-				log("Cycles to go: " + colorize(String.valueOf(cycles), Color.YELLOW_BOLD));
+				l.log("Cycles to go: " + Color.colorize(String.valueOf(cycles), Color.YELLOW_BOLD));
 		}
-		Run.writeDefConf(defConf(), Constants.GENERATED_CONFIG_FILE);
+		r.writeDefConf(defConf(), Constants.GENERATED_CONFIG_FILE);
 		if (r.propEmpty())
-			r.problem("[NOTICE] Template of Test Run Properties file '" + Constants.GENERATED_CONFIG_FILE
+			l.logProblem("[NOTICE] Template of Test Run Properties file '" + Constants.GENERATED_CONFIG_FILE
 					+ "' was updated");
 	}
 
@@ -39,7 +43,8 @@ public class Cycles extends Common {
 				return s1.compareToIgnoreCase(s2);
 			}
 		}));
-		c.add("cycles = " + Constants.DEFAULT_CYCLES_COUNT);
+		c.add("_cycles = " + Constants.DEFAULT_CYCLES_COUNT);
+		c.add("_pervasive = " + Constants.DEFAULT_PERVASIVE_WEIGHT);
 		scenarios.defConf().forEach((s) -> {
 			c.add(s);
 		});

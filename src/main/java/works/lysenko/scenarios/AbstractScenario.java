@@ -1,6 +1,11 @@
-package works.lysenko;
+package works.lysenko.scenarios;
 
 import java.util.Set;
+
+import works.lysenko.Common;
+import works.lysenko.Constants;
+import works.lysenko.Run;
+import works.lysenko.utils.Color;
 
 /**
  * This is basic implementation of Scenario interface
@@ -29,8 +34,8 @@ public class AbstractScenario extends Common implements Scenario {
 	 */
 	public void execute() {
 		r.current = this;
-		logln();
-		log(0, colorize(name(), Color.BLUE_BOLD_BRIGHT) + " : " + r.count(name(), weight()));
+		l.logln();
+		l.log(0, Color.colorize(name(), Color.BLUE_BOLD_BRIGHT) + " : " + r.count(name(), weight()));
 	}
 
 	/**
@@ -114,5 +119,9 @@ public class AbstractScenario extends Common implements Scenario {
 		if (null == r.minDepth)
 			r.minDepth = depth;
 		return depth - r.minDepth;
+	}
+
+	public double pervasive() {
+		return 0;
 	}
 }

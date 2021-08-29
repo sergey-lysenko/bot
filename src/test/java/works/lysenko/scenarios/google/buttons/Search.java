@@ -1,8 +1,8 @@
 package works.lysenko.scenarios.google.buttons;
 
-import works.lysenko.AbstractLeafScenario;
 import works.lysenko.C;
 import works.lysenko.Run;
+import works.lysenko.scenarios.AbstractLeafScenario;
 
 public class Search extends AbstractLeafScenario {
 	public Search(Run r) {

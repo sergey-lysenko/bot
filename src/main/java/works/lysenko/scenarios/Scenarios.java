@@ -1,4 +1,4 @@
-package works.lysenko;
+package works.lysenko.scenarios;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -11,6 +11,10 @@ import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.exception.NotPositiveException;
 import org.apache.commons.math3.util.Pair;
+
+import works.lysenko.Common;
+import works.lysenko.Constants;
+import works.lysenko.Run;
 
 /**
  * This class used for managing of nested scenarios of Abstract Node Scenario
@@ -80,11 +84,17 @@ public class Scenarios extends Common {
 	public void execute() {
 		int retries = this.retries;
 		if (!scenarios.isEmpty()) {
-			section("Selecting scenario to execute among " + list(scenarios, false));
+			section("Selecting scenario to execute among " + list(scenarios, r.pervasive()));
 			// Cloning scenarios into candidates
 			List<Pair<Scenario, Double>> candidates = new LinkedList<Pair<Scenario, Double>>();
 			for (Pair<Scenario, Double> pair : scenarios) {
-				Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(pair.getKey(), pair.getValue());
+				Scenario k = pair.getKey();
+				Double v = pair.getValue();
+				if (r.pervasive()) {
+					v = v + k.pervasive();
+				}
+				Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k,
+						(v == Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : v);
 				candidates.add(newPair);
 			}
 			AbstractScenario s = null;
@@ -93,7 +103,7 @@ public class Scenarios extends Common {
 				try {
 					s = (AbstractScenario) new EnumeratedDistribution<Scenario>(candidates).sample();
 				} catch (MathArithmeticException e) {
-					r.problem("[WARNING] " + "Unable to select a scenario among " + list(candidates, true)
+					l.logProblem("[WARNING] " + "Unable to select a scenario among " + list(candidates, true)
 							+ ": union weight is zero");
 					break;
 				} catch (NotPositiveException e) {
@@ -102,7 +112,7 @@ public class Scenarios extends Common {
 				}
 				sufficed = s.sufficed(); // to eliminate triple call
 				if (!sufficed) {
-					r.problem("[NOTICE] " + s.name() + " is not sufficed");
+					l.logProblem("[NOTICE] " + s.name() + " is not sufficed");
 					Pair<Scenario, Double> toBeRemoved = null;
 					for (Pair<Scenario, Double> pair : candidates) {
 						if (pair.getKey() == s)
@@ -113,16 +123,16 @@ public class Scenarios extends Common {
 			} while (!sufficed && retries-- > 0 && !candidates.isEmpty());
 			AbstractScenario parent = r.current;
 			if (sufficed) {
-				log(0, s.name() + " sufficed");
+				l.log(0, s.name() + " sufficed");
 				s.execute();
-				log(0, s.name() + " done");
+				l.log(0, s.name() + " done");
 			}
 			r.current = parent;
 			if (candidates.isEmpty())
-				r.problem("[WARNING] " + "Unable to suffice a scenario among " + list(scenarios, false)
+				l.logProblem("[WARNING] " + "Unable to suffice a scenario among " + list(scenarios, false)
 						+ ": all scenarios have unmet requirements");
 			if (!(retries > 0))
-				r.problem("[WARNING] " + "Scenario selection took more than " + this.retries + " retries");
+				l.logProblem("[WARNING] " + "Scenario selection took more than " + this.retries + " retries");
 		}
 	}
 
@@ -219,8 +229,17 @@ public class Scenarios extends Common {
 	 * @param r
 	 * @return weight coefficient for defined scenario
 	 */
-	private double weight(Scenario s, Run r) {
+	private static double weight(Scenario s, Run r) {
 		Double d = Double.valueOf(r.prop(s.getClass().getName(), Constants.DEFAULT_SCENARIO_WEIGHT));
 		return d.equals(Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : d;
+	}
+
+	public Double pervasive() {
+		Double p = 0.0;
+		for (Pair<Scenario, Double> s : scenarios) {
+			p = p + s.getValue(); // weight of a scenario
+			p = p + s.getKey().pervasive(); // weight of underlying
+		}
+		return p;
 	}
 }

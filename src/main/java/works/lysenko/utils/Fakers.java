@@ -1,6 +1,8 @@
-package works.lysenko;
+package works.lysenko.utils;
 
 import com.github.javafaker.Faker;
+
+import works.lysenko.Common;
 
 /**
  * This is a set of wrapper routines of com.github.javafaker library
@@ -14,7 +16,7 @@ public class Fakers {
 	 */
 	public static String quote() {
 		String quote = null;
-		int c = Routines.integer(1, 21);
+		int c = Common.integer(1, 21);
 		switch (c) {
 		case 1:
 			quote = new Faker().backToTheFuture().quote();
@@ -91,7 +93,7 @@ public class Fakers {
 	 */
 	public static String character() {
 		String quote = null;
-		int c = Routines.integer(1, 19);
+		int c = Common.integer(1, 19);
 		switch (c) {
 		case 1:
 			quote = new Faker().backToTheFuture().character();

@@ -8,6 +8,7 @@ public class Constants {
 	public static final String GENERATED_CONFIG_FILE = "target/generated-sources/generated.properties";
 
 	public static final String DEFAULT_CYCLES_COUNT = "0";
+	public static final String DEFAULT_PERVASIVE_WEIGHT = "true";
 	public static final String DEFAULT_SCENARIO_WEIGHT = "0.0";
 	public static final int DEFAULT_SUFFICIENCY_RETRIES = 5; // 7, 11, 13, 17
 

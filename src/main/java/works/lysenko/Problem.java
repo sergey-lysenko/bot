@@ -4,10 +4,10 @@ public class Problem {
 	public long time;
 	public String text;
 
-	public Problem(long time, String text) {
+	public Problem(long tm, String tx) {
 		super();
-		this.time = time;
-		this.text = text;
+		this.time = tm;
+		this.text = tx;
 	}
 
 	public String toString() {

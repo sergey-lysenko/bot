@@ -1,4 +1,4 @@
-package works.lysenko;
+package works.lysenko.utils;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 

@@ -2,9 +2,9 @@ package works.lysenko.scenarios.google.buttons;
 
 import org.openqa.selenium.Keys;
 
-import works.lysenko.AbstractLeafScenario;
 import works.lysenko.C;
 import works.lysenko.Run;
+import works.lysenko.scenarios.AbstractLeafScenario;
 
 public class Enter extends AbstractLeafScenario {
 	public Enter(Run r) {

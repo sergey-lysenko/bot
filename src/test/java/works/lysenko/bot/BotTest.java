@@ -1,10 +1,9 @@
 package works.lysenko.bot;
 
 import works.lysenko.Run;
+import works.lysenko.Cycles;
 import works.lysenko.scenarios.Google;
 import works.lysenko.C;
-import works.lysenko.Constants;
-import works.lysenko.Cycles;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

@@ -1,8 +1,11 @@
-package works.lysenko;
+package works.lysenko.scenarios;
 
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
+
+import works.lysenko.Constants;
+import works.lysenko.Run;
 
 public class AbstractLeafScenario extends AbstractScenario {
 	public AbstractLeafScenario(Run r) {

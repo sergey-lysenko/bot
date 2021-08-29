@@ -2,13 +2,13 @@ package works.lysenko.scenarios.google;
 
 import java.util.Set;
 
-import works.lysenko.AbstractNodeScenario;
 import works.lysenko.C;
-import works.lysenko.Fakers;
 import works.lysenko.Run;
+import works.lysenko.scenarios.AbstractNodeScenario;
 import works.lysenko.scenarios.google.buttons.Enter;
 import works.lysenko.scenarios.google.buttons.Lucky;
 import works.lysenko.scenarios.google.buttons.Search;
+import works.lysenko.utils.Fakers;
 
 public class Quote extends AbstractNodeScenario {
 	public Quote(Run r) {

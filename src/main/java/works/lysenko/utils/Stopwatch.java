@@ -1,4 +1,4 @@
-package works.lysenko;
+package works.lysenko.utils;
 
 public class Stopwatch {
     private long start;

@@ -1,8 +1,11 @@
-package works.lysenko;
+package works.lysenko.scenarios;
 
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
+
+import works.lysenko.Constants;
+import works.lysenko.Run;
 
 /**
  * This is abstract implementation of Node Scenario, which have defined both
@@ -65,5 +68,9 @@ public class AbstractNodeScenario extends AbstractScenario {
 	 */
 	public boolean sufficed() {
 		return true;
+	}
+	
+	public double pervasive() {
+		return scenarios.pervasive();
 	}
 }

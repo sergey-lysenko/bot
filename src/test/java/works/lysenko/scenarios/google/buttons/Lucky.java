@@ -1,8 +1,8 @@
 package works.lysenko.scenarios.google.buttons;
 
-import works.lysenko.AbstractLeafScenario;
 import works.lysenko.C;
 import works.lysenko.Run;
+import works.lysenko.scenarios.AbstractLeafScenario;
 
 public class Lucky extends AbstractLeafScenario {
 	public Lucky(Run r) {

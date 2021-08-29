@@ -1,7 +1,6 @@
 package works.lysenko;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -12,14 +11,19 @@ import java.time.Duration;
 import java.util.TreeMap;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import works.lysenko.logs.LogRecord;
+import works.lysenko.scenarios.AbstractScenario;
+import works.lysenko.utils.Browser;
+import works.lysenko.utils.Color;
+import works.lysenko.utils.Stopwatch;
+import works.lysenko.utils.WebDrivers;
 
 /**
  * This class represent single bot execution information
@@ -29,66 +33,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  */
 public class Run extends Common {
 
-	public WebDriverWait wait;
-	public WebDriver driver;
-	public Set<String> logs;
-	public Properties data;
-	public AbstractScenario current;
-	protected Cycles cycles = null;
-	protected Integer minDepth = null;
-	protected Integer logCount = 0;
-	private Properties prop;
-	private Map<String, Result> results;
-	private Stopwatch timer;
-	private BufferedWriter logWriter;
-
-	public Run(int implicitWait, int explicitWait, Set<String> logs, String name) {
-		super();
-		this.r = this;
-		// now when you are bored, you can do
-		// r.r.r.r.r.r.r.r.r.r.driver.getTitle();
-		timer = new Stopwatch();
-		current = null;
-		this.driver = WebDrivers.get(Browser.CHROME, false);
-		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitWait));
-		this.wait = new WebDriverWait(driver, Duration.ofSeconds(explicitWait));
-		this.logs = (null == logs) ? new HashSet<String>() : logs;
-		results = new HashMap<String, Result>();
-		data = new Properties();
-
-		// Reading properties file
-		String propertiesFile = Constants.DEFAULT_PROPERTIES_LOCATION + name + ".properties";
-		FileInputStream fis = null;
-		prop = new Properties();
-		try {
-			new File(Constants.DEFAULT_RUNS_LOCATION).mkdirs();
-			logWriter = new BufferedWriter(new FileWriter(Constants.DEFAULT_RUNS_LOCATION
-					+ Routines.fill(Constants.RUN_LOG_FILENAME, String.valueOf(timer.startedAt()))));
-		} catch (IOException e) {
-			throw new RuntimeException("Unable to open log file for writting");
-		}
-		try {
-			fis = new FileInputStream(propertiesFile);
-		} catch (FileNotFoundException e) {
-			problem("[SEVERE] Requested Test Run Properties file '" + propertiesFile + "' not found");
-		}
-		try {
-			if (null != fis)
-				prop.load(fis);
-			else
-				problem("[WARNING] Test run properties were not loaded");
-		} catch (IOException e) {
-			throw new IllegalArgumentException("Unable to load requested test properties file");
-		}
-
-	}
-
-	public int currentCycle() {
-		return cycles() - cycles.cycles + 1;
-	}
-
-	public int cycles() {
-		return Integer.valueOf(prop.getProperty("cycles", Constants.DEFAULT_CYCLES_COUNT));
+	/**
+	 * @return true if current execution is performed in an environment with CI
+	 *         variable set to any value. This is common way of determining
+	 *         execution inside GitHUB actions and other pipelines
+	 */
+	public static Boolean insideCI() {
+		return System.getenv().containsKey("CI");
 	}
 
 	/**
@@ -103,13 +54,46 @@ public class Run extends Common {
 		return null;
 	}
 
-	/**
-	 * @return true if current execution is performed in an environment with CI
-	 *         variable set to any value. This is common way of determining
-	 *         execution inside GitHUB actions and other pipelines
-	 */
-	public static Boolean insideCI() {
-		return System.getenv().containsKey("CI");
+	public Properties data;
+	public AbstractScenario current;
+	public Cycles cycles = null;
+	public Integer minDepth = null;
+	protected Stopwatch timer;
+	private Properties prop;
+	private Map<String, Result> results;
+
+	public Run(int implicitWait, int explicitWait, Set<String> logs, String name) {
+		super();
+		timer = new Stopwatch();
+		this.r = this;
+		// now when you are bored, you can do
+		// r.r.r.r.r.r.r.r.r.r.driver.getTitle();
+		l = new Logger(logs, this);
+		d = WebDrivers.get(Browser.CHROME, false);
+		d.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitWait));
+		w = new WebDriverWait(d, Duration.ofSeconds(explicitWait));
+		current = null;
+		results = new HashMap<String, Result>();
+		data = new Properties();
+
+		// Reading properties file
+		String propertiesFile = Constants.DEFAULT_PROPERTIES_LOCATION + name + ".properties";
+		FileInputStream fis = null;
+		prop = new Properties();
+		try {
+			fis = new FileInputStream(propertiesFile);
+		} catch (FileNotFoundException e) {
+			l.logProblem("[SEVERE] Requested Test Run Properties file '" + propertiesFile + "' not found");
+		}
+		try {
+			if (null != fis)
+				prop.load(fis);
+			else
+				l.logProblem("[WARNING] Test run properties were not loaded");
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Unable to load requested test properties file");
+		}
+
 	}
 
 	/**
@@ -130,78 +114,43 @@ public class Run extends Common {
 	 */
 	public void conditionalClose() {
 		try {
-			logWriter.close();
+			l.logWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		if (insideDocker() || insideCI())
-			driver.quit();
+			d.quit();
 	}
 
 	/**
 	 * Count in test execution (in later versions there will be collection of more
 	 * execution data then just times of execution)
 	 * 
-	 * @param s      tag of test execution
-	 * @param weight current weight coefficient (TODO: implement dynamic weight
-	 *               coefficients)
+	 * @param s tag of test execution
+	 * @param w current weight coefficient (TODO: implement dynamic weight
+	 *          coefficients)
 	 * @return copy of added test execution data
 	 */
-	public Result count(String s, double weight) {
+	public Result count(String s, double w) {
 		Result r = results.getOrDefault(s, new Result());
 		{
-			r.weight = weight; // base for future dynamic weight modification;
+			r.weight = w; // base for future dynamic weight modification;
 			++r.executions;
 		}
 		results.put(s, r);
 		return r;
 	}
 
-	/**
-	 * @param s line to be written to test execution text log
-	 */
-	public void logWrite(String s) {
-		try {
-			if (null == logWriter)
-				Routines.log(0, colorize("[SEVERE] Log Writer is not initialised, unable to write log"));
-			else
-				logWriter.write(s + System.lineSeparator());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public int currentCycle() {
+		return cycles() - cycles.cycles + 1;
 	}
 
-	/**
-	 * Write test execution statistics only to console
-	 */
-	public void stats() {
-		Routines.logln();
-		Routines.log(0, "= Execution statistics =");
-		TreeMap<String, Result> sorted = sortedCounters();
-		if (sorted.entrySet().isEmpty())
-			Routines.log(0, colorize("[WARNING] No Test Execution Data available"));
-		else
-			for (Map.Entry<String, Result> e : sorted.entrySet()) {
-				Routines.log(0, e.getKey() + " : " + e.getValue().toString());
-			}
-		Routines.logln();
+	public int cycles() {
+		return Integer.valueOf(prop.getProperty("_cycles", Constants.DEFAULT_CYCLES_COUNT));
 	}
 
-	/**
-	 * Sort scenario classes ignoring the case which produces more "tree-like" order
-	 * of items and improves readability
-	 * 
-	 * @return execution counters sorted properly
-	 */
-	private TreeMap<String, Result> sortedCounters() {
-		TreeMap<String, Result> sorted = new TreeMap<String, Result>((new Comparator<String>() {
-			@Override
-			public int compare(String s1, String s2) {
-				return s1.compareToIgnoreCase(s2);
-			}
-		}));
-		sorted.putAll(this.results);
-		return sorted;
+	public boolean pervasive() {
+		return Boolean.valueOf(prop.getProperty("_pervasive", Constants.DEFAULT_PERVASIVE_WEIGHT));
 	}
 
 	/**
@@ -214,7 +163,7 @@ public class Run extends Common {
 		BufferedWriter w;
 		try {
 			w = new BufferedWriter(new FileWriter(Constants.DEFAULT_RUNS_LOCATION
-					+ Routines.fill(Constants.RUN_JSON_FILENAME, String.valueOf(timer.startedAt()))));
+					+ fill(Constants.RUN_JSON_FILENAME, String.valueOf(timer.startedAt()))));
 			w.write("{\"startAt\":" + timer.startedAt() + ",\"run\":[");
 			int i = sorted.size();
 			for (Entry<String, Result> s : sorted.entrySet()) {
@@ -248,35 +197,20 @@ public class Run extends Common {
 	}
 
 	/**
-	 * @return amount of milliseconds since start of test execution
+	 * This routine stores the information about a problem in the execution results
 	 */
-	public Long timer() {
-		return timer.millis();
+	public void problem(LogRecord lr) {
+		if (null != current)
+			results.get(current.name()).problems.add(new Problem(lr.time(), lr.text()));
 	}
 
 	/**
-	 * This routine displays a problem in console, writes to log file, and stores it
-	 * in the execution results
-	 */
-	public void problem(String s) {
-		Long time = this.timer();
-		this.logWrite(Routines.renderTime(time) + " " + colorize(s));
-		if (null == current) {
-			log(0, colorize(s));
-			// Routines.logConsole(Routines.renderLog(0, 0, colorize(s), time));
-		} else {
-			Routines.logConsole(Routines.renderLog(current.depth(), 0, colorize(s), time));
-			results.get(current.name()).problems.add(new Problem(time, s));
-		}
-	}
-
-	/**
-	 * @param name of run property
-	 * @param def  ..ault value of run property
+	 * @param n name of run property
+	 * @param d default value of run property
 	 * @return value of requested property
 	 */
-	public String prop(String name, String def) {
-		return prop.getProperty(name, def);
+	public String prop(String n, String d) {
+		return prop.getProperty(n, d);
 	}
 
 	/**
@@ -287,12 +221,51 @@ public class Run extends Common {
 	}
 
 	/**
+	 * Sort scenario classes ignoring the case which produces more "tree-like" order
+	 * of items and improves readability
+	 * 
+	 * @return execution counters sorted properly
+	 */
+	private TreeMap<String, Result> sortedCounters() {
+		TreeMap<String, Result> sorted = new TreeMap<String, Result>((new Comparator<String>() {
+			@Override
+			public int compare(String s1, String s2) {
+				return s1.compareToIgnoreCase(s2);
+			}
+		}));
+		sorted.putAll(this.results);
+		return sorted;
+	}
+
+	/**
+	 * Write test execution statistics only to console
+	 */
+	public void stats() {
+		l.log(0, "= Execution statistics =");
+		TreeMap<String, Result> sorted = sortedCounters();
+		if (sorted.entrySet().isEmpty())
+			l.log(0, Color.colorize("[WARNING] No Test Execution Data available"));
+		else
+			for (Map.Entry<String, Result> e : sorted.entrySet()) {
+				l.log(0, e.getKey() + " : " + e.getValue().toString());
+			}
+		l.logln();
+	}
+
+	/**
+	 * @return amount of milliseconds since start of test execution
+	 */
+	public Long timer() {
+		return timer.millis();
+	}
+
+	/**
 	 * Write default configuration to a file
 	 * 
 	 * @param defConf
 	 * @param fileName
 	 */
-	public static void writeDefConf(Set<String> defConf, String fileName) {
-		Routines.writeToFile(null, defConf, fileName);
+	public void writeDefConf(Set<String> defConf, String fileName) {
+		writeToFile(null, defConf, fileName);
 	}
 }
