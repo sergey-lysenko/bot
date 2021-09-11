@@ -1,29 +1,25 @@
 package works.lysenko.scenarios;
 
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
+import static works.lysenko.Constants.LEAF_SCENARIO_MARKER;
 
-import works.lysenko.Constants;
-import works.lysenko.Run;
+import java.util.Set;
+
+import works.lysenko.Execution;
+import works.lysenko.utils.SortedStringSet;
 
 public class AbstractLeafScenario extends AbstractScenario {
-	public AbstractLeafScenario(Run r) {
-		super(r);
+
+	public AbstractLeafScenario(Execution x) {
+		super(x);
+		marker(LEAF_SCENARIO_MARKER);
 	}
 
-	/**
-	 * Returns a set of string for default property file for tests configuration
-	 * related to this scenario
-	 */
-	public final Set<String> defConf() {
-		Set<String> c = new TreeSet<String>((new Comparator<String>() {
-			@Override
-			public int compare(String s1, String s2) {
-				return s1.compareToIgnoreCase(s2);
-			}
-		}));
-		c.add(this.getClass().getName() + " = " + Constants.DEFAULT_SCENARIO_WEIGHT);
+	public Set<String> list(boolean shortened, boolean decorated) {
+		Set<String> c = new SortedStringSet();
+		if (shortened)
+			c.add(this.shortName(decorated));
+		else
+			c.add(this.name(decorated));
 		return c;
 	}
 
@@ -40,5 +36,6 @@ public class AbstractLeafScenario extends AbstractScenario {
 		super.execute();
 		action();
 		finals();
+		done();
 	}
 }

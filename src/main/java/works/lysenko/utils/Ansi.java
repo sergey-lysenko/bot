@@ -1,6 +1,6 @@
 package works.lysenko.utils;
 
-public enum Color {
+public enum Ansi {
 	RESET("\033[0m"),
 
 	BLACK("\033[0;30m"), RED("\033[0;31m"), GREEN("\033[0;32m"), YELLOW("\033[0;33m"), BLUE("\033[0;34m"),
@@ -31,7 +31,7 @@ public enum Color {
 
 	private final String code;
 
-	Color(String code) {
+	Ansi(String code) {
 		this.code = code;
 	}
 
@@ -40,7 +40,7 @@ public enum Color {
 	}
 
 	/**
-	 * Execute {@link Color#colorize(s)} based on content of the provided sting.
+	 * Execute {@link Ansi#colorize(s)} based on content of the provided sting.
 	 * Contents - to - color mapping defined in {@link works.lysenko.utils.Severity}
 	 * 
 	 * @param s string to be colored
@@ -60,8 +60,8 @@ public enum Color {
 	 * @param c color escape sequence to be applied
 	 * @return string surrounded by defined color sequence and RESET
 	 */
-	public static String colorize(String s, Color c) {
-		return (c == null) ? s : c.code() + s + Color.RESET.code();
+	public static String colorize(String s, Ansi c) {
+		return (c == null) ? s : c.code() + s + Ansi.RESET.code();
 	}
 
 }

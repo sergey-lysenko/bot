@@ -1,5 +1,8 @@
 package works.lysenko;
 
+import static works.lysenko.Constants.DEFAULT_RUNS_LOCATION;
+import static works.lysenko.Constants.RUN_LOG_FILENAME;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -14,28 +17,32 @@ import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 
 import works.lysenko.logs.AbstractLogData;
+import works.lysenko.logs.KnownIssue;
 import works.lysenko.logs.LineFeed;
 import works.lysenko.logs.Log;
 import works.lysenko.logs.LogRecord;
 import works.lysenko.logs.Notice;
 import works.lysenko.logs.Severe;
 import works.lysenko.logs.Warning;
-import works.lysenko.utils.Color;
+import works.lysenko.utils.Ansi;
+import works.lysenko.utils.Severity;
 
 public class Logger {
 
-	public Run r;
+	public Execution x;
 	public Set<String> logsToRead;
 	public PriorityQueue<LogRecord> log;
 	protected BufferedWriter logWriter;
+	private long prev = 0;
+	private int length = 5;
 
-	public Logger(Set<String> logsToRead, Run r) {
+	public Logger(Execution x, Set<String> logsToRead) {
 		super();
-		this.r = r;
+		this.x = x;
 		try {
-			new File(Constants.DEFAULT_RUNS_LOCATION).mkdirs();
-			logWriter = new BufferedWriter(new FileWriter(Constants.DEFAULT_RUNS_LOCATION
-					+ Common.fill(Constants.RUN_LOG_FILENAME, String.valueOf(r.timer.startedAt()))));
+			new File(DEFAULT_RUNS_LOCATION).mkdirs();
+			logWriter = new BufferedWriter(new FileWriter(
+					DEFAULT_RUNS_LOCATION + Common.fill(RUN_LOG_FILENAME, String.valueOf(x.t.startedAt()))));
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to open log file for writting");
 		}
@@ -74,45 +81,53 @@ public class Logger {
 	 * @param s string of text to be written to log
 	 * @param t redefined time of event, or it can be set to null for measurement by
 	 *          this method
-	 * @param r
+	 * @param x
 	 */
 	public void log(int l, String s, Long t) {
 		LogEntries ls;
 		LogRecord lr;
-		long time = (null == t) ? r.timer() : t;
-		int depth = (null == r.current) ? 0 : r.current.depth();
-		// TODO: rework that to cycle over LogType
+		int depth = x.currentDepth();
+
 		if (logsToRead.contains(LogType.BROWSER)) {
-			ls = r.d.manage().logs().get(LogType.BROWSER);
+			ls = x.d.manage().logs().get(LogType.BROWSER);
+			long time = ((null == t) ? x.timer() : t);
 			for (LogEntry e : ls) {
-				log.add(problem(time, depth, "[BROWSER] " + e.toString()));
+				long timestamp = e.getTimestamp() - x.t.startedAt(); // since test start
+				long difference = time - timestamp; // since capturing
+				log.add(problem(timestamp, depth, "[" + difference + "]" + " [BROWSER] " + e.toString()));
 			}
 		}
+
 		if (logsToRead.contains(LogType.CLIENT)) {
-			ls = r.d.manage().logs().get(LogType.CLIENT);
+			ls = x.d.manage().logs().get(LogType.CLIENT);
+			long time = ((null == t) ? x.timer() : t);
 			for (LogEntry e : ls) {
 				log.add(problem(time, depth, "[CLIENT] " + e.toString()));
 			}
 		}
+
 		if (logsToRead.contains(LogType.DRIVER)) {
-			ls = r.d.manage().logs().get(LogType.DRIVER);
+			ls = x.d.manage().logs().get(LogType.DRIVER);
+			long time = ((null == t) ? x.timer() : t);
 			for (LogEntry e : ls) {
 				log.add(problem(time, depth, "[DRIVER] " + e.toString()));
 			}
 		}
-		// TODO: figure out unavailability of these three types of logs
-		// (run.logs.contains(LogType.PERFORMANCE))
-		// if (run.logs.contains(LogType.PROFILER))
-		// if (run.logs.contains(LogType.SERVER))
-		AbstractLogData ld = new Log((null == r.current) ? 0 : r.current.depth(), l, s);
-		lr = new LogRecord(((null == t) ? r.timer() : t), ld);
+
+		AbstractLogData ld = new Log(x.currentDepth(), l, s);
+		long time = ((null == t) ? x.timer() : t);
+		lr = new LogRecord(time, ld);
 		log.add(lr);
 		process();
 	}
 
-	public void logProblem(String s) {
-		int depth = (null == r.current) ? 0 : r.current.depth();
-		log.add(problem(r.timer(), depth, s));
+	public void logProblem(Severity se, String st) {
+		int depth = x.currentDepth();
+		log.add(problem(x.timer(), depth, se.tag() + " " + st));
+	}
+
+	public void logKnownIssue(String s) {
+		logProblem(Severity.SK, s);
 	}
 
 	private static void logConsole(String s) {
@@ -122,7 +137,7 @@ public class Logger {
 	private void logFile(String s) {
 		try {
 			if (null == logWriter)
-				log(0, Color.colorize("[SEVERE] Log Writer is not initialised, unable to write log"));
+				log(0, Ansi.colorize("[SEVERE] Log Writer is not initialised, unable to write log"));
 			else
 				logWriter.write(s + System.lineSeparator());
 		} catch (IOException e) {
@@ -144,7 +159,7 @@ public class Logger {
 
 	public void logln() {
 		LogRecord lr;
-		lr = new LogRecord(r.timer(), new LineFeed());
+		lr = new LogRecord(x.timer(), new LineFeed());
 		log.add(lr);
 	}
 
@@ -152,24 +167,37 @@ public class Logger {
 		LogRecord lr;
 		// TODO: rework that to cycle over Severity
 		if (p.contains("[SEVERE]")) {
-			lr = new LogRecord(t, new Severe(d, p.replaceAll("\\s+\\[SEVERE]\\s+", " ")));
+			lr = new LogRecord(t, new Severe(d, p));
 		} else if (p.contains("[WARNING]")) {
-			lr = new LogRecord(t, new Warning(d, p.replaceAll("\\s+\\[WARNING\\]\\s+", " ")));
+			lr = new LogRecord(t, new Warning(d, p));
 		} else if (p.contains("[NOTICE]")) {
-			lr = new LogRecord(t, new Notice(d, p.replaceAll("\\s+\\[NOTICE\\]\\s+", " ")));
+			lr = new LogRecord(t, new Notice(d, p));
+		} else if (p.contains("[KNOWN-ISSUE]")) {
+			lr = new LogRecord(t, new KnownIssue(d, p));
 		} else {
 			lr = new LogRecord(t, new Notice(d, p));
 		}
-		r.problem(lr);
+		x.r.problem(lr);
 		return lr;
 	}
 
 	private void process() {
 		while (!log.isEmpty()) {
-			String line = log.poll().render();
-			logConsole(line);
-			logFile(line);
+			long since = 0;
+			String debug = "";
+			LogRecord r = log.poll();
+			Long time = r.time();
+			String line = r.render();
+			if (x.debug()) {
+				since = time - prev;
+				int thisLength = String.valueOf(since).length();
+				if (thisLength > length)
+					length = thisLength;
+				debug = "[" + String.format("%1$" + length + "s", time - prev) + "]";
+			}
+			logConsole(debug + line);
+			logFile(debug + line);
+			prev = time;
 		}
-
 	}
 }

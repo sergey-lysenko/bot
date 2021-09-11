@@ -1,41 +1,43 @@
 package works.lysenko.bot;
 
-import works.lysenko.Run;
 import works.lysenko.Cycles;
+import works.lysenko.Execution;
 import works.lysenko.scenarios.Google;
 import works.lysenko.C;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.logging.LogType;
 
 import java.util.Set;
 
-public class BotTest {
+@Disabled
+public class GoogleTest {
 
-	private static Run r;
+	private static Execution x;
 	private static Cycles cycles;
 	private static Set<String> logs = Set.of(LogType.BROWSER, LogType.CLIENT, LogType.DRIVER, LogType.PERFORMANCE,
 			LogType.PROFILER, LogType.SERVER);
 
 	@BeforeAll
 	public static void setupTest() {
-		r = new Run(1, 30, logs, C.TEST);
-		cycles = new Cycles(Set.of(new Google(r)), r);
+		x = new Execution(1, 30, logs, C.TEST);
+		cycles = new Cycles(Set.of(new Google(x)), x);
 	}
 
 	@AfterAll
 	public static void quit() {
-		r.complete();
+		x.complete();
 	}
 
-	public static void init(Run run) {
+	public static void init(Execution xun) {
 	}
 
 	@Test
 	public void test() throws InterruptedException {
-		init(r);
+		init(x);
 		cycles.execute();
 	}
 }

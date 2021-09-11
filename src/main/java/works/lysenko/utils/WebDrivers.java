@@ -11,7 +11,6 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 
 public class WebDrivers {
 
-
 	public static WebDriver get(Browser browser) {
 		return get(browser, null, false);
 	}
@@ -47,6 +46,8 @@ public class WebDrivers {
 		options.addArguments("disable-dev-shm-usage");
 		options.addArguments("disable-setuid-sandbox");
 		options.addArguments("disable-infobars");
+		options.addArguments("enable-logging");
+		options.addArguments("v=1");
 		if (null != profile)
 			options.addArguments("user-data-dir=" + profile);
 		return options;

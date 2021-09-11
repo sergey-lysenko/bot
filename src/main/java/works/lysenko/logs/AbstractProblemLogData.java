@@ -1,6 +1,6 @@
 package works.lysenko.logs;
 
-import works.lysenko.utils.Color;
+import works.lysenko.utils.Ansi;
 import works.lysenko.utils.Severity;
 
 public abstract class AbstractProblemLogData extends AbstractLogData {
@@ -15,7 +15,7 @@ public abstract class AbstractProblemLogData extends AbstractLogData {
 	}
 
 	public String render() {
-		return LogData.renderLog(depth, 0, Color.colorize(text, Severity.byCode(tag).color()));
+		return LogData.renderLog(depth, 0, Ansi.colorize(text, Severity.byCode(tag).color()));
 	}
 
 }

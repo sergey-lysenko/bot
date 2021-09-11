@@ -1,6 +1,10 @@
 package works.lysenko.scenarios;
 
-import java.util.Comparator;
+import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
+import static works.lysenko.Constants.DEFAULT_SUFFICIENCY_RETRIES;
+import static works.lysenko.utils.Severity.S2;
+import static works.lysenko.utils.Severity.S3;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +17,8 @@ import org.apache.commons.math3.exception.NotPositiveException;
 import org.apache.commons.math3.util.Pair;
 
 import works.lysenko.Common;
-import works.lysenko.Constants;
-import works.lysenko.Run;
+import works.lysenko.Execution;
+import works.lysenko.utils.SortedStringSet;
 
 /**
  * This class used for managing of nested scenarios of Abstract Node Scenario
@@ -24,11 +28,26 @@ import works.lysenko.Run;
  */
 public class Scenarios extends Common {
 
+	private static Pair<Scenario, Double> pair(Scenario c, double d) {
+		return new Pair<Scenario, Double>(c, d);
+	}
+
+	/**
+	 * @param s Scenario
+	 * @param r
+	 * @return weight coefficient for defined scenario
+	 */
+	private static double weight(Scenario s, Execution x) {
+		Double d = Double.valueOf(x.prop(s.getClass().getName(), DEFAULT_SCENARIO_WEIGHT));
+		return d.equals(Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : d;
+	}
+
 	private List<Pair<Scenario, Double>> scenarios;
+
 	private int retries;
 
-	public Scenarios(Run r) {
-		this(Constants.DEFAULT_SUFFICIENCY_RETRIES, r);
+	public Scenarios(Execution x) {
+		this(DEFAULT_SUFFICIENCY_RETRIES, x);
 	}
 
 	/**
@@ -37,14 +56,74 @@ public class Scenarios extends Common {
 	 * @param sufficiencyRetries number of retries while trying to select a scenario
 	 *                           to be executed
 	 */
-	public Scenarios(int sufficiencyRetries, Run r) {
-		super(r);
+	public Scenarios(int sufficiencyRetries, Execution x) {
+		super(x);
 		scenarios = new LinkedList<Pair<Scenario, Double>>();
 		retries = sufficiencyRetries;
 	}
 
-	private static Pair<Scenario, Double> pair(Scenario c, double d) {
-		return new Pair<Scenario, Double>(c, d);
+	/**
+	 * Add map of scenarios with weights defined per scenario
+	 * 
+	 * @param m map of Scenarios and their weights
+	 */
+	public void add(Map<Scenario, Double> m) {
+		m.forEach((k, v) -> {
+			scenarios.add(Scenarios.pair(k, v));
+		});
+	}
+
+	/**
+	 * Add single scenario with defined weight
+	 * 
+	 * @param s scenario to be added
+	 * @param d weight coefficient for this scenario
+	 */
+	public void add(Scenario s, double d) {
+		scenarios.add(Scenarios.pair(s, d));
+	}
+
+	/**
+	 * Add single scenario and read it's weight from properties file
+	 * 
+	 * @param s Scenario to be adder
+	 * @param r
+	 */
+	public void add(Scenario s, Execution x) {
+		add(s, weight(s, x));
+	}
+
+	/**
+	 * Add set of scenarios with same defined weight
+	 * 
+	 * @param ss set of Scenarios to be added
+	 * @param d  [same] weight of all scenarios of this set
+	 */
+	public void add(Set<Scenario> ss, double d) {
+		ss.forEach((s) -> {
+			scenarios.add(Scenarios.pair(s, d));
+		});
+	}
+
+	/**
+	 * Add set of scenarios and read their weights from properties
+	 * 
+	 * @param ss Set of Scenarios to be added
+	 * @param r
+	 */
+	public void add(Set<Scenario> ss, Execution x) {
+		if (null != ss)
+			ss.forEach((s) -> {
+				scenarios.add(Scenarios.pair(s, weight(s, x)));
+			});
+	}
+
+	public int combinations(boolean onlyConfigured) {
+		int c = 0;
+		for (Pair<Scenario, Double> s : scenarios) {
+			c = c + s.getKey().combinations(onlyConfigured);
+		}
+		return c;
 	}
 
 	/**
@@ -83,15 +162,18 @@ public class Scenarios extends Common {
 	 */
 	public void execute() {
 		int retries = this.retries;
+		double pervasiveWeight = 0.0;
+		double permeativeWeight = 0.0;
 		if (!scenarios.isEmpty()) {
-			section("Selecting scenario to execute among " + list(scenarios, r.pervasive()));
+			section("Selecting scenario to execute among " + list(scenarios, (x._pervasive() || x._permeative())));
 			// Cloning scenarios into candidates
 			List<Pair<Scenario, Double>> candidates = new LinkedList<Pair<Scenario, Double>>();
 			for (Pair<Scenario, Double> pair : scenarios) {
 				Scenario k = pair.getKey();
 				Double v = pair.getValue();
-				if (r.pervasive()) {
-					v = v + k.pervasive();
+				if (x._pervasive()) {
+					pervasiveWeight = k.pervasive();
+					v = v + pervasiveWeight;
 				}
 				Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k,
 						(v == Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : v);
@@ -100,19 +182,43 @@ public class Scenarios extends Common {
 			AbstractScenario s = null;
 			boolean sufficed = false;
 			do {
+				boolean doubleBreak = false;
 				try {
 					s = (AbstractScenario) new EnumeratedDistribution<Scenario>(candidates).sample();
 				} catch (MathArithmeticException e) {
-					l.logProblem("[WARNING] " + "Unable to select a scenario among " + list(candidates, true)
-							+ ": union weight is zero");
-					break;
+					if (x._permeative()) {
+						// Cloning candidates into permeates with same default weight
+						List<Pair<Scenario, Double>> permeates = new LinkedList<Pair<Scenario, Double>>();
+						for (Pair<Scenario, Double> pair : candidates) {
+							Scenario k = pair.getKey();
+							permeativeWeight = permeative(k);
+							Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k, permeativeWeight);
+							permeates.add(newPair);
+							try {
+								s = (AbstractScenario) new EnumeratedDistribution<Scenario>(permeates).sample();
+							} catch (MathArithmeticException e1) {
+								l.logProblem(S2, "Unable to select a scenario among " + list(candidates, true)
+										+ ": out of upstream");
+								doubleBreak = true;
+								break;
+							}
+						}
+					} else {
+						l.logProblem(S2,
+								"Unable to select a scenario among " + list(candidates, true)
+										+ (x._permeative() ? " and all nestested scenarios" : "")
+										+ ": combined weight is zero");
+						break;
+					}
 				} catch (NotPositiveException e) {
 					throw new IllegalStateException("Unable to select a scenario among " + list(candidates, true)
 							+ ": negative weights are not allowed");
 				}
+				if (doubleBreak)
+					break;
 				sufficed = s.sufficed(); // to eliminate triple call
 				if (!sufficed) {
-					l.logProblem("[NOTICE] " + s.name() + " is not sufficed");
+					l.logProblem(S3, s.name() + " is not sufficed");
 					Pair<Scenario, Double> toBeRemoved = null;
 					for (Pair<Scenario, Double> pair : candidates) {
 						if (pair.getKey() == s)
@@ -120,76 +226,33 @@ public class Scenarios extends Common {
 					}
 					candidates.remove(toBeRemoved);
 				}
-			} while (!sufficed && retries-- > 0 && !candidates.isEmpty());
-			AbstractScenario parent = r.current;
+			} while (!sufficed && --retries >= 0 && !candidates.isEmpty());
+			sleep(1, true); // tiny holdup in order to avoid having warnings sorted up above retry message
 			if (sufficed) {
-				l.log(0, s.name() + " sufficed");
+				l.log(0, s.name() + " sufficed, executing ...");
 				s.execute();
-				l.log(0, s.name() + " done");
 			}
-			r.current = parent;
 			if (candidates.isEmpty())
-				l.logProblem("[WARNING] " + "Unable to suffice a scenario among " + list(scenarios, false)
+
+				l.logProblem(S2, "Unable to suffice a scenario among " + list(scenarios, false)
 						+ ": all scenarios have unmet requirements");
-			if (!(retries > 0))
-				l.logProblem("[WARNING] " + "Scenario selection took more than " + this.retries + " retries");
+			if (!(retries >= 0)) {
+				l.logProblem(S2, "Scenario selection exausted after " + this.retries + " retries");
+			}
+		} else {
+			l.logProblem(S3, "Current Node scenario have no nested scenarios. Is it just a Leaf scenario?");
 		}
 	}
 
-	/**
-	 * Add single scenario with defined weight
-	 * 
-	 * @param s scenario to be added
-	 * @param d weight coefficient for this scenario
-	 */
-	public void add(Scenario s, double d) {
-		scenarios.add(Scenarios.pair(s, d));
+	public List<Pair<Scenario, Double>> get() {
+		return scenarios;
 	}
 
-	/**
-	 * Add map of scenarios with weights defined per scenario
-	 * 
-	 * @param m map of Scenarios and their weights
-	 */
-	public void add(Map<Scenario, Double> m) {
-		m.forEach((k, v) -> {
-			scenarios.add(Scenarios.pair(k, v));
-		});
-	}
-
-	/**
-	 * Add set of scenarios with same defined weight
-	 * 
-	 * @param ss set of Scenarios to be added
-	 * @param d  [same] weight of all scenarios of this set
-	 */
-	public void add(Set<Scenario> ss, double d) {
-		ss.forEach((s) -> {
-			scenarios.add(Scenarios.pair(s, d));
-		});
-	}
-
-	/**
-	 * Add single scenario and read it's weight from properties file
-	 * 
-	 * @param s Scenario to be adder
-	 * @param r
-	 */
-	public void add(Scenario s, Run r) {
-		add(s, weight(s, r));
-	}
-
-	/**
-	 * Add set of scenarios and read their weights from properties
-	 * 
-	 * @param ss Set of Scenarios to be added
-	 * @param r
-	 */
-	public void add(Set<Scenario> ss, Run r) {
-		if (null != ss)
-			ss.forEach((s) -> {
-				scenarios.add(Scenarios.pair(s, weight(s, r)));
-			});
+	public Set<String> list(boolean shortened, boolean decorated) {
+		Set<String> c = new SortedStringSet();
+		for (Pair<Scenario, Double> s : scenarios)
+			c.addAll(s.getKey().list(shortened, decorated));
+		return c;
 	}
 
 	private String list(Iterable<Pair<Scenario, Double>> list, boolean includeZeroWeight) {
@@ -208,30 +271,8 @@ public class Scenarios extends Common {
 		return packagePart + c.toString();
 	}
 
-	/**
-	 * @return default configuration for all nested scenarios
-	 */
-	public Set<String> defConf() {
-		Set<String> c = new TreeSet<String>((new Comparator<String>() {
-			@Override
-			public int compare(String s1, String s2) {
-				return s1.compareToIgnoreCase(s2);
-			}
-		}));
-		scenarios.forEach((s) -> {
-			c.addAll(s.getKey().defConf());
-		});
-		return c;
-	}
-
-	/**
-	 * @param s Scenario
-	 * @param r
-	 * @return weight coefficient for defined scenario
-	 */
-	private static double weight(Scenario s, Run r) {
-		Double d = Double.valueOf(r.prop(s.getClass().getName(), Constants.DEFAULT_SCENARIO_WEIGHT));
-		return d.equals(Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : d;
+	private Double permeative(Scenario k) {
+		return x.permeative(k);
 	}
 
 	public Double pervasive() {

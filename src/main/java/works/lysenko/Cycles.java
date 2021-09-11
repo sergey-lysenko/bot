@@ -1,53 +1,73 @@
 package works.lysenko;
 
-import java.util.Comparator;
+import static works.lysenko.Constants.CONFIGURATION_CONJOINT;
+import static works.lysenko.Constants.CONFIGURATION_CYCLES;
+import static works.lysenko.Constants.CONFIGURATION_PERMEATIVE;
+import static works.lysenko.Constants.CONFIGURATION_PERVASIVE;
+import static works.lysenko.Constants.DEFAULT_CONJOINT;
+import static works.lysenko.Constants.DEFAULT_CYCLES;
+import static works.lysenko.Constants.DEFAULT_PERMEATIVE;
+import static works.lysenko.Constants.DEFAULT_PERVASIVE;
+import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
+import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
+import static works.lysenko.utils.Severity.S2;
+import static works.lysenko.utils.Severity.S3;
+
 import java.util.Set;
-import java.util.TreeSet;
 
 import works.lysenko.scenarios.Scenario;
 import works.lysenko.scenarios.Scenarios;
-import works.lysenko.utils.Color;
+import works.lysenko.utils.Ansi;
+import works.lysenko.utils.SortedStringSet;
 
-public class Cycles extends Common {
+public class Cycles {
 
-	public int cycles;
-	private static Scenarios scenarios;
+	public Execution x;
+	public int cyclesToDo;
+	protected Scenarios scenarios;
 
-	public Cycles(Set<Scenario> ss, Run r) {
-		super(r);
-		scenarios = new Scenarios(r);
-		scenarios.add(ss, r);
-		cycles = r.cycles();
-		r.cycles = this;
+	public Cycles(Set<Scenario> ss, Execution x) {
+		super();
+		this.x = x;
+		scenarios = new Scenarios(x);
+		scenarios.add(ss, x);
+		cyclesToDo = x._cycles();
+		x.cycles = this;
+	}
+
+	private String y(Object s) {
+		return Ansi.colorize(String.valueOf(s), Ansi.YELLOW_BOLD);
 	}
 
 	public void execute() {
-		if (cycles == 0)
-			l.logProblem("[WARNING] No test cycles were perfomed");
-		while (cycles > 0) {
+		if (cyclesToDo == 0)
+			x.l.logProblem(S2, "No test cycles were perfomed");
+		x.l.log(0, "Executing " + y(cyclesToDo) + " cycles of " + y(x.name) + " on " + y(x.domain));
+		while (cyclesToDo-- > 0) {
 			scenarios.execute();
-			l.logln();
-			if (--cycles > 0)
-				l.log("Cycles to go: " + Color.colorize(String.valueOf(cycles), Color.YELLOW_BOLD));
+			x.l.logln();
+			if (cyclesToDo > 0)
+				x.l.log(0, "Cycles to do: " + y(cyclesToDo));
 		}
-		r.writeDefConf(defConf(), Constants.GENERATED_CONFIG_FILE);
-		if (r.propEmpty())
-			l.logProblem("[NOTICE] Template of Test Run Properties file '" + Constants.GENERATED_CONFIG_FILE
-					+ "' was updated");
+		x.o.writeDefConf(defConf());
+		if (x.propEmpty())
+			x.l.logProblem(S3, "Test properties are absent. Wrong configuration? Template of Test Run Properties file '"
+					+ GENERATED_CONFIG_FILE + "' was updated");
 	}
 
 	public Set<String> defConf() {
-		Set<String> c = new TreeSet<String>((new Comparator<String>() {
-			@Override
-			public int compare(String s1, String s2) {
-				return s1.compareToIgnoreCase(s2);
-			}
-		}));
-		c.add("_cycles = " + Constants.DEFAULT_CYCLES_COUNT);
-		c.add("_pervasive = " + Constants.DEFAULT_PERVASIVE_WEIGHT);
-		scenarios.defConf().forEach((s) -> {
-			c.add(s);
+		Set<String> c = new SortedStringSet();
+		c.add("_" + CONFIGURATION_CYCLES + " = " + DEFAULT_CYCLES);
+		c.add("_" + CONFIGURATION_CONJOINT + " = " + DEFAULT_CONJOINT);
+		c.add("_" + CONFIGURATION_PERVASIVE + " = " + DEFAULT_PERVASIVE);
+		c.add("_" + CONFIGURATION_PERMEATIVE + " = " + DEFAULT_PERMEATIVE);
+		scenarios.list(false, false).forEach((s) -> {
+			c.add(s + " = " + DEFAULT_SCENARIO_WEIGHT);
 		});
 		return c;
+	}
+
+	protected Set<String> scenariosList(boolean shortened, boolean decorated) {
+		return scenarios.list(shortened, decorated);
 	}
 }

@@ -9,26 +9,32 @@ public class LogRecord {
 
 	public LogRecord(long time, AbstractLogData data) {
 		super();
-		this.time = time;
 		this.data = data;
+		this.time = time;
 	}
 
 	public LogRecord(long time, Notice data) {
 		super();
-		this.time = time;
 		this.data = data;
+		this.time = time;
 	}
 
 	public LogRecord(long time, Severe data) {
 		super();
-		this.time = time;
 		this.data = data;
+		this.time = time;
 	}
 
 	public LogRecord(long time, Warning data) {
 		super();
-		this.time = time;
 		this.data = data;
+		this.time = time;
+	}
+
+	public LogRecord(long time, KnownIssue data) {
+		super();
+		this.data = data;
+		this.time = time;
 	}
 
 	public String text() {
@@ -48,11 +54,10 @@ public class LogRecord {
 	}
 
 	public String toString() {
-		return "LogRecord [time=" + time + ", data=" + data + "]";
+		return "LogRecord [data=" + data + "time=" + time + "]";
 	}
 
 	public static String renderTime(Long t) {
 		return "[" + new DecimalFormat("0000000.000").format(Double.valueOf(t) / 1000) + "]";
 	}
-
 }

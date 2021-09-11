@@ -2,17 +2,17 @@ package works.lysenko.utils;
 
 public enum Severity {
 
-	S1("[SEVERE]", Color.RED), S2("[WARNING]", Color.YELLOW), S3("[NOTICE]", Color.CYAN);
+	S1("[SEVERE]", Ansi.RED), S2("[WARNING]", Ansi.YELLOW), S3("[NOTICE]", Ansi.CYAN), SK("[KNOWN-ISSUE]", Ansi.MAGENTA);
 
 	private final String tag;
-	private final Color color;
+	private final Ansi color;
 
-	Severity(String tag, Color color) {
+	Severity(String tag, Ansi color) {
 		this.tag = tag;
 		this.color = color;
 	}
 
-	public static Severity byColor(Color c) {
+	public static Severity byColor(Ansi c) {
 		for (Severity e : Severity.values())
 			if (e.color().equals(c))
 				return e;
@@ -30,7 +30,7 @@ public enum Severity {
 		return tag;
 	}
 
-	public Color color() {
+	public Ansi color() {
 		return color;
 	}
 }

@@ -1,11 +1,12 @@
 package works.lysenko.scenarios;
 
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
+import static works.lysenko.Constants.NODE_SCENARIO_MARKER;
 
-import works.lysenko.Constants;
-import works.lysenko.Run;
+import java.util.Set;
+
+import org.apache.commons.math3.util.Pair;
+
+import works.lysenko.Execution;
 
 /**
  * This is abstract implementation of Node Scenario, which have defined both
@@ -23,25 +24,25 @@ public class AbstractNodeScenario extends AbstractScenario {
 	 * @param ss set of child scenarios with weight coefficient defined within ..
 	 * @param r  instance of Run object
 	 */
-	public AbstractNodeScenario(Set<Scenario> ss, Run r) {
-		super(r);
-		scenarios = new Scenarios(r);
-		scenarios.add(ss, r);
+	public AbstractNodeScenario(Set<Scenario> ss, Execution x) {
+		super(x);
+		marker(NODE_SCENARIO_MARKER);
+		scenarios = new Scenarios(x);
+		scenarios.add(ss, x);
+		pervWeight = scenarios.pervasive();
 	}
 
-	/**
-	 * Returns a set of strings for default property tests configuration file
-	 * related to this scenario and all it's nested scenarios
-	 */
-	public Set<String> defConf() {
-		Set<String> c = new TreeSet<String>((new Comparator<String>() {
-			@Override
-			public int compare(String s1, String s2) {
-				return s1.compareToIgnoreCase(s2);
-			}
-		}));
-		c.add(this.getClass().getName() + " = " + Constants.DEFAULT_SCENARIO_WEIGHT);
-		c.addAll(scenarios.defConf());
+	public int combinations(boolean onlyConfigured) {
+		int c = 0;
+		for (Pair<Scenario, Double> s : scenarios.get()) {
+			c = c + s.getKey().combinations(onlyConfigured);
+		}
+		return c;
+	}
+
+	public Set<String> list(boolean shortened, boolean decorated) {
+		Set<String> c = super.list(shortened, decorated);
+		c.addAll(scenarios.list(shortened, decorated));
 		return c;
 	}
 
@@ -61,16 +62,17 @@ public class AbstractNodeScenario extends AbstractScenario {
 		action();
 		scenarios.execute();
 		finals();
+		done();
 	}
 
 	/**
 	 * @return whether this scenario meets it's prerequisites
 	 */
 	public boolean sufficed() {
-		return true;
+		return false;
 	}
-	
+
 	public double pervasive() {
-		return scenarios.pervasive();
+		return pervWeight;
 	}
 }

@@ -1,4 +1,4 @@
-package works.lysenko.scenarios.google.buttons;
+package works.lysenko.scenarios.google.quote;
 
 import org.openqa.selenium.Keys;
 

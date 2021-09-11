@@ -1,12 +1,17 @@
 package works.lysenko;
 
+import static works.lysenko.Constants.DEFAULT_SHOTS_LOCATION;
+import static works.lysenko.Constants.SILENT_SLEEPING_TRESHHOLD;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -19,10 +24,11 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import works.lysenko.utils.Color;
+import works.lysenko.utils.Ansi;
 
 public class Common {
 
@@ -42,6 +48,17 @@ public class Common {
 	}
 
 	/**
+	 * Generate {@link org.openqa.selenium.By} object corresponding to given string
+	 * locator
+	 * 
+	 * @param lc array of strings with either xpath or css locator
+	 * @return proper locator object based on contents of source string contents
+	 */
+	public static By by(String[] lc) {
+		return by(selectSomeElementFrom(lc));
+	}
+
+	/**
 	 * Generate random integer in the defined range
 	 * 
 	 * @param l minimum value
@@ -52,22 +69,31 @@ public class Common {
 		return new RandomDataGenerator().nextInt(l, u);
 	}
 
-	public WebDriver d;
+	public Output o;
 	public Logger l;
-	public Run r;
-
+	public Results r;
+	public Execution x;
+	public WebDriver d;
 	public WebDriverWait w;
 
 	public Common() {
 		super();
 	}
 
-	public Common(Run r) {
+	public Common(Execution x) {
 		super();
-		this.r = r;
-		this.l = r.l;
-		this.d = r.d;
-		this.w = r.w;
+		this.x = x;
+		this.d = x.d;
+		this.l = x.l;
+		this.o = x.o;
+		this.r = x.r;
+		this.w = x.w;
+	}
+
+	public void clear(String lc) {
+		l.log("Clearing " + lc);
+		find(lc, true).clear();
+		; // Silent find during clear
 	}
 
 	/**
@@ -75,6 +101,14 @@ public class Common {
 	 */
 	public void click(String lc) {
 		l.log("Clicking " + lc);
+		find(lc, true).click(); // Silent find during click
+	}
+
+	/**
+	 * @param lc array of string locator of element to be clicked on
+	 */
+	public void click(String[] lc) {
+		l.log("Clicking on either of " + Arrays.toString(lc));
 		find(lc, true).click(); // Silent find during click
 	}
 
@@ -118,7 +152,22 @@ public class Common {
 	public WebElement find(String lc, boolean silent) {
 		if (!silent)
 			l.log("Finding " + lc);
-		return d.findElement(by(lc));
+		WebElement e = d.findElement(by(lc));
+		return find(e);
+	}
+
+	private WebElement find(WebElement e) {
+		Actions actions = new Actions(d);
+		actions.moveToElement(e);
+		actions.perform();
+		return e;
+	}
+
+	public WebElement find(String[] lc, boolean silent) {
+		if (!silent)
+			l.log("Finding one of " + lc);
+		WebElement e = d.findElement(by(lc));
+		return find(e);
 	}
 
 	/**
@@ -141,7 +190,7 @@ public class Common {
 	 * @return list of located element references
 	 */
 	public List<WebElement> findS(String lc) {
-		l.log("Finding all " + l + " elements");
+		l.log("Finding all " + lc + " elements");
 		return d.findElements(by(lc));
 	}
 
@@ -179,24 +228,24 @@ public class Common {
 
 	/**
 	 * Produce a full-screen PNG Screenshot and save it in a location defined by
-	 * Constants.DEFAULT_SHOTS_LOCATION
+	 * DEFAULT_SHOTS_LOCATION
 	 * 
 	 * @param n of the screenshot
 	 */
 	public void makeScreenshot(String n) {
-		makeScreenshot(null, Constants.DEFAULT_SHOTS_LOCATION, n);
+		makeScreenshot(null, DEFAULT_SHOTS_LOCATION, n);
 	}
 
 	/**
 	 * Produce a framed PNG Screenshot of defined element and save it in a location
-	 * defined by Constants.DEFAULT_SHOTS_LOCATION
+	 * defined by DEFAULT_SHOTS_LOCATION
 	 * 
 	 * @param element to be used for local framed screenshot
 	 * @param name    of the screenshot
-	 * @param r
+	 * @param x
 	 */
 	public void makeScreenshot(WebElement element, String name) {
-		makeScreenshot(element, Constants.DEFAULT_SHOTS_LOCATION, name);
+		makeScreenshot(element, DEFAULT_SHOTS_LOCATION, name);
 	}
 
 	private void makeScreenshot(WebElement element, String path, String name) {
@@ -214,14 +263,14 @@ public class Common {
 
 	/**
 	 * Simultaneously make a full-screen screenshot and a copy of page html code and
-	 * save in a location defined by Constants.DEFAULT_SHOTS_LOCATION
+	 * save in a location defined by DEFAULT_SHOTS_LOCATION
 	 * 
 	 * @param f name of snapshot
-	 * @param r
+	 * @param x
 	 */
 	public void makeSnapshot(String f) {
-		makeScreenshot(null, Constants.DEFAULT_SHOTS_LOCATION, f);
-		makeCodeshot(Constants.DEFAULT_SHOTS_LOCATION, f);
+		makeScreenshot(null, DEFAULT_SHOTS_LOCATION, f);
+		makeCodeshot(DEFAULT_SHOTS_LOCATION, f);
 	}
 
 	/**
@@ -240,7 +289,7 @@ public class Common {
 	 * Open a page defined by domain using https:// protocol
 	 * 
 	 * @param u domain
-	 * @param r
+	 * @param x
 	 */
 	public void openDomain(String u) {
 		l.log("Opening https://" + u);
@@ -256,6 +305,28 @@ public class Common {
 	public String read(String lc) {
 		l.log("Reading from " + lc);
 		return d.findElement(by(lc)).getText();
+	}
+
+	/**
+	 * Read contents of the element defined by string locator
+	 * 
+	 * @param lc string locator of an element
+	 * @return result of .getText() for this element
+	 */
+	public String read(WebElement we) {
+		l.log("Reading from a web element " + we.getAccessibleName());
+		return we.getText();
+	}
+
+	/**
+	 * Read contents of the element defined by string locator
+	 * 
+	 * @param lc string locator of an element
+	 * @return result of .getText() for this element
+	 */
+	public String readInput(String lc) {
+		l.log("Reading from " + lc);
+		return d.findElement(by(lc)).getAttribute("value");
 	}
 
 	/**
@@ -288,7 +359,7 @@ public class Common {
 	 * @param s string to be added as section title
 	 */
 	public void section(String s) {
-		l.log(0, Color.colorize("= " + s + " =", Color.BLUE_BOLD_BRIGHT));
+		l.log(0, Ansi.colorize("= " + s + " =", Ansi.BLUE_BOLD_BRIGHT));
 	}
 
 	/**
@@ -322,10 +393,20 @@ public class Common {
 	 * @param s set to select from
 	 * @return random Object from a set
 	 */
-	public static Object selectSomeElementFromSet(Set<?> s) {
+	public static Object selectSomeElementFrom(Set<?> s) {
 		// Only applicable for small sets, otherwise creates a big overhead
 		// TODO: optimize
 		return s.toArray()[new Random().nextInt(s.size())];
+	}
+
+	/**
+	 * Select random element from an array
+	 * 
+	 * @param s an array to select from
+	 * @return random String from a set
+	 */
+	public static String selectSomeElementFrom(String[] s) {
+		return s[new Random().nextInt(Array.getLength(s))];
 	}
 
 	/**
@@ -348,16 +429,24 @@ public class Common {
 		find(lc).sendKeys(s);
 	}
 
+	public void sleep(long ms) {
+		sleep(ms, null);
+	}
+
 	/**
 	 * Sleep during defined amount of milliseconds with record in the test log
 	 * 
 	 * @param ms amount of milliseconds to pause for
 	 */
-	public void sleep(long ms) {
-		if (ms < Constants.SILENT_SLEEPING_TRESHHOLD)
-			l.log(0, Color.colorize("[WARNING]: " + "Sleeping for less then " + Constants.SILENT_SLEEPING_TRESHHOLD
+	public void sleep(long ms, String s) {
+		if (ms < SILENT_SLEEPING_TRESHHOLD)
+			l.log(0, Ansi.colorize("[WARNING]: " + "Sleeping for less then " + SILENT_SLEEPING_TRESHHOLD
 					+ " ms is better to be perfomed in silent mode"));
-		sleep(ms, false);
+		sleep(ms, s, false);
+	}
+
+	public void sleep(long ms, boolean silent) {
+		sleep(ms, null, silent);
 	}
 
 	/**
@@ -367,10 +456,10 @@ public class Common {
 	 * @param ms     amount of milliseconds to pause for
 	 * @param silent whether to bypass output to test log. Useful for short delays
 	 */
-	public void sleep(long ms, boolean silent) {
+	public void sleep(long ms, String s, boolean silent) {
 		try {
 			if (!silent)
-				l.log("Sleeping " + ms + " ms");
+				l.log((null == s) ? "Sleeping " + ms + " ms" : s);
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -455,7 +544,7 @@ public class Common {
 		} else {
 			char[] chars = c.toCharArray();
 			for (char ch : chars) {
-				sleep(integer(5, 75), true); // silent sleep
+				sleep(integer(0, 50), true); // silent sleep
 				e.sendKeys(String.valueOf(ch));
 			}
 			return false;
@@ -484,6 +573,15 @@ public class Common {
 	 * 
 	 * @param lc string locator of an element to be waited for
 	 */
+	public void wait(String[] lc) {
+		waitVisibility(lc);
+	}
+
+	/**
+	 * Wait for appearance of the defined element
+	 * 
+	 * @param lc string locator of an element to be waited for
+	 */
 	public void wait(String lc) {
 		waitVisibility(lc);
 	}
@@ -493,7 +591,17 @@ public class Common {
 	 * 
 	 * @param lc string locator of an element to be waited for
 	 */
-	public void waitClick(String lc) {
+	public void waitThenClick(String[] lc) {
+		wait(lc);
+		click(lc);
+	}
+
+	/**
+	 * Wait for appearance of the defined element and the click on it
+	 * 
+	 * @param lc string locator of an element to be waited for
+	 */
+	public void waitThenClick(String lc) {
 		wait(lc);
 		click(lc);
 	}
@@ -547,7 +655,7 @@ public class Common {
 	 * @return value after the detected change
 	 */
 	public String waitValueNot(String lc, String s) {
-		l.log("Waiting while " + l + " still have value '" + s + "'");
+		l.log("Waiting while " + lc + " still have value '" + s + "'");
 		w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), s)));
 		return read(lc);
 	}
@@ -559,9 +667,19 @@ public class Common {
 	 * @return value after the detected change
 	 */
 	public String waitValueNotEmpty(String lc) {
-		l.log("Waiting while " + l + " is still empty");
+		l.log("Waiting while " + lc + " is still empty");
 		w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), "")));
 		return read(lc);
+	}
+
+	/**
+	 * Wait for appearance of the defined element
+	 * 
+	 * @param lc string locator of an element to be waited for
+	 */
+	public void waitVisibility(String[] lc) {
+		l.log("Waiting for visibility of one of " + Arrays.toString(lc));
+		w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
 	}
 
 	/**
