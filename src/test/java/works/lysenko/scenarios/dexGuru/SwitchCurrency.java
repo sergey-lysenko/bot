@@ -1,11 +1,17 @@
 package works.lysenko.scenarios.dexGuru;
 
+import static works.lysenko.C.ETH;
+import static works.lysenko.C.ETH_SIGN;
+import static works.lysenko.C.LIQUIDITY;
+import static works.lysenko.C.USD;
+import static works.lysenko.C.USD_SIGN;
+import static works.lysenko.C.VOLUME;
+
 import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.WebElement;
 
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;
-import static works.lysenko.C.*;
 
 public class SwitchCurrency extends AbstractLeafScenario {
 
@@ -13,6 +19,7 @@ public class SwitchCurrency extends AbstractLeafScenario {
 		super(x);
 	}
 
+	@Override
 	public void action() {
 
 		String sign;
@@ -36,6 +43,7 @@ public class SwitchCurrency extends AbstractLeafScenario {
 		Assertions.assertTrue(read(find(VOLUME, sign)).contains(text));
 	}
 
+	@Override
 	public boolean sufficed() {
 		return true;
 	}

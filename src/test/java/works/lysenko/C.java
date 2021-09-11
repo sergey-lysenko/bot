@@ -30,9 +30,13 @@ public class C { // C for Constants & Common
 	public final static String ETH = "//button[@data-currency='ETH']";
 
 	public final static String LIQUIDITY = "//aside[@class='dashboard__sidebar dashboard__sidebar--left']/div[@class='sidebar sidebar--left  open']/div[@class='sidebar__wrapper']/div[@class='sidebar__header']/div[@class='chart-sidebar']/div[@class='sum']/span[@class='sign-sum']";
-	public final static String VOLUME =    "//aside[@class='dashboard__sidebar dashboard__sidebar--right']/div[@class='sidebar sidebar--right  open']/div[@class='sidebar__wrapper']/div[@class='sidebar__header']/div[@class='chart-sidebar']/div[@class='sum']/span[@class='sign-sum']";
+	public final static String VOLUME = "//aside[@class='dashboard__sidebar dashboard__sidebar--right']/div[@class='sidebar sidebar--right  open']/div[@class='sidebar__wrapper']/div[@class='sidebar__header']/div[@class='chart-sidebar']/div[@class='sum']/span[@class='sign-sum']";
 	public final static String USD_SIGN = "./span[1]";
 	public final static String ETH_SIGN = "./span[2]";
+
+	public final static String SEARCH = "//input[@class='omnibox-search__query']";
+	public final static String ROW = "//tr[@class='dropdown-search__trow token']";
+
 
 	public static final boolean quoteShortEnough(Execution x) {
 		return (null == x.data.get("quote")) ? true : (Integer) x.data.get("quote") < C.MAX_QUOTE_LENGHT_FOR_BUTTONS;

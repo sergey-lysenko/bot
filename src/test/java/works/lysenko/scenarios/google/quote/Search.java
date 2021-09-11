@@ -1,6 +1,8 @@
 package works.lysenko.scenarios.google.quote;
 
-import works.lysenko.C;
+import static works.lysenko.C.GOOGLE_SEARCH_BUTTON;
+import static works.lysenko.C.quoteShortEnough;
+
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;
 
@@ -9,13 +11,15 @@ public class Search extends AbstractLeafScenario {
 		super(x);
 	}
 
+	@Override
 	public void action() {
 		section("Pressing 'Search' button");
-		waitThenClick(C.GOOGLE_SEARCH_BUTTON);
+		waitThenClick(GOOGLE_SEARCH_BUTTON);
 		makeScreenshot("cycle" + x.currentCycle() + "-" + name());
 	}
 
+	@Override
 	public boolean sufficed() {
-		return C.quoteShortEnough(x);
+		return quoteShortEnough(x);
 	}
 }

@@ -21,6 +21,7 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -55,7 +56,18 @@ public class Common {
 	 * @return proper locator object based on contents of source string contents
 	 */
 	public static By by(String[] lc) {
-		return by(selectSomeElementFrom(lc));
+		return by((String) selectOne(lc));
+	}
+
+	/**
+	 * Shortcut for {@link java.lang.String#format(t, v)}
+	 * 
+	 * @param t template
+	 * @param v value
+	 * @return filled in string template
+	 */
+	public static String fill(String t, Object... v) {
+		return String.format(t, v);
 	}
 
 	/**
@@ -69,11 +81,132 @@ public class Common {
 		return new RandomDataGenerator().nextInt(l, u);
 	}
 
+	/**
+	 * Return 'true' with defined probability, or 'false' otherwise
+	 * 
+	 * @param d probability of 'true' selection
+	 * @return random boolean value
+	 */
+	public static boolean isTrue(double d) {
+		return new Random().nextFloat() < d;
+	}
+
+	/**
+	 * Repeat defined key given number of times
+	 * 
+	 * @param k key to be repeated
+	 * @param t times to repeat
+	 * @return requested sequence
+	 */
+	public static String repeat(Keys k, int t) {
+		String sequence = "";
+		for (int i = 0; i < t; i++)
+			sequence = sequence + k;
+		return sequence;
+	}
+
+	/**
+	 * Get an element from a list of WebElement objects.
+	 * 
+	 * @param l list of WebElement objects to select from
+	 * @return a WebElement object from a list
+	 */
+	public static WebElement select3One(List<WebElement> l) {
+		return l.get(new Random().nextInt(l.size()));
+	}
+
+	/**
+	 * @param <T>
+	 * @param l
+	 * @return
+	 */
+	public static <T> T selectOne(List<T> l) {
+		return l.get(new Random().nextInt(l.size()));
+	}
+
+	public static Object selectOne(Object[] s) {
+		return s[new Random().nextInt(Array.getLength(s))];
+	}
+
+	public static <T> Object selectOne(Set<T> s) {
+		// TODO: optimize
+		return s.toArray()[new Random().nextInt(s.size())];
+	}
+
+	/**
+	 * Get an element from a list of strings different from defined one. There is no
+	 * check that a list contains defined string, only the exclusion of defined
+	 * value is performed.
+	 * 
+	 * @param e string to be excluded from selection
+	 * @param l list of string to select from
+	 * @return an element from a list of strings which differs from specified one
+	 */
+	public static String selectOther(String e, List<String> l) {
+		List<String> copy = new ArrayList<>(l);
+		copy.remove(e);
+		return selectOne(copy);
+	}
+
+	/**
+	 * Generate equally probable true or false value
+	 * 
+	 * @return 'true' or 'false' with equal probability
+	 */
+	public static boolean trueOrFalse() {
+		return isTrue(.5);
+	}
+
+	/**
+	 * Supply visual representation for non-printable character
+	 * 
+	 * @param k key to be screened
+	 * @return
+	 */
+	public static String visualize(Keys k) {
+		switch (k) {
+		case ARROW_DOWN:
+			return "↓";
+		case ARROW_UP:
+			return "↑";
+		default:
+			return k.toString();
+		}
+	}
+
+	/**
+	 * Write lines of the provided a set to a file
+	 * 
+	 * @param fl optional first line of the text to be added to a file (title)
+	 * @param ss set of lines to be stored in a file
+	 * @param fn name of the file to be written
+	 */
+	public static void writeToFile(String fl, Set<String> ss, String fn) {
+		BufferedWriter writer;
+		try {
+			new File(fn).getParentFile().mkdirs(); // Create parent directory
+			writer = new BufferedWriter(new FileWriter(fn));
+			if (null != fl)
+				writer.write(fl + System.lineSeparator());
+			for (String s : ss) {
+				writer.write(s + System.lineSeparator());
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public Output o;
+
 	public Logger l;
+
 	public Results r;
+
 	public Execution x;
+
 	public WebDriver d;
+
 	public WebDriverWait w;
 
 	public Common() {
@@ -112,23 +245,26 @@ public class Common {
 		find(lc, true).click(); // Silent find during click
 	}
 
-	/**
-	 * @param e element to be clicked on
-	 */
 	public void click(WebElement e) {
-		l.log("Clicking " + e.getTagName() + " element");
-		e.click();
+		click(e, true);
 	}
 
 	/**
-	 * Shortcut for {@link java.lang.String#format(t, v)}
-	 * 
-	 * @param t template
-	 * @param v value
-	 * @return filled in string template
+	 * @param e element to be clicked on
 	 */
-	public static String fill(String t, Object... v) {
-		return String.format(t, v);
+	public void click(WebElement e, boolean geometry) {
+		l.log("Clicking " + describe(e, true));
+		e.click();
+	}
+
+	private String describe(Rectangle r) {
+		return "h" + r.height + " w" + r.width + " @ " + "x" + r.x + " y" + r.y;
+	}
+
+	private String describe(WebElement e, boolean geometry) {
+		String an = e.getAccessibleName();
+		String tg = e.getTagName();
+		return tg + ((an.isEmpty()) ? "" : "'" + an + "'") + ((geometry) ? (" @ " + describe(e.getRect())) : "");
 	}
 
 	/**
@@ -156,20 +292,6 @@ public class Common {
 		return find(e);
 	}
 
-	private WebElement find(WebElement e) {
-		Actions actions = new Actions(d);
-		actions.moveToElement(e);
-		actions.perform();
-		return e;
-	}
-
-	public WebElement find(String[] lc, boolean silent) {
-		if (!silent)
-			l.log("Finding one of " + lc);
-		WebElement e = d.findElement(by(lc));
-		return find(e);
-	}
-
 	/**
 	 * Single-step location of an element by locator of it's parent and it's own
 	 * relative locator to this parent element
@@ -183,6 +305,20 @@ public class Common {
 		return d.findElement(by(pr)).findElement(by(ch));
 	}
 
+	public WebElement find(String[] lc, boolean silent) {
+		if (!silent)
+			l.log("Finding one of " + lc);
+		WebElement e = d.findElement(by(lc));
+		return find(e);
+	}
+
+	private WebElement find(WebElement e) {
+		Actions actions = new Actions(d);
+		actions.moveToElement(e);
+		actions.perform();
+		return e;
+	}
+
 	/**
 	 * Find all elements defined by string locator
 	 * 
@@ -192,16 +328,6 @@ public class Common {
 	public List<WebElement> findS(String lc) {
 		l.log("Finding all " + lc + " elements");
 		return d.findElements(by(lc));
-	}
-
-	/**
-	 * Return 'true' with defined probability, or 'false' otherwise
-	 * 
-	 * @param d probability of 'true' selection
-	 * @return random boolean value
-	 */
-	public static boolean isTrue(double d) {
-		return new Random().nextFloat() < d;
 	}
 
 	/**
@@ -307,15 +433,19 @@ public class Common {
 		return d.findElement(by(lc)).getText();
 	}
 
+	public String read(WebElement e) {
+		return read(e, true);
+	}
+
 	/**
 	 * Read contents of the element defined by string locator
 	 * 
 	 * @param lc string locator of an element
 	 * @return result of .getText() for this element
 	 */
-	public String read(WebElement we) {
-		l.log("Reading from a web element " + we.getAccessibleName());
-		return we.getText();
+	public String read(WebElement e, boolean geometry) {
+		l.log("Reading from " + describe(e, geometry));
+		return e.getText();
 	}
 
 	/**
@@ -327,20 +457,6 @@ public class Common {
 	public String readInput(String lc) {
 		l.log("Reading from " + lc);
 		return d.findElement(by(lc)).getAttribute("value");
-	}
-
-	/**
-	 * Repeat defined key given number of times
-	 * 
-	 * @param k key to be repeated
-	 * @param t times to repeat
-	 * @return requested sequence
-	 */
-	public static String repeat(Keys k, int t) {
-		String sequence = "";
-		for (int i = 0; i < t; i++)
-			sequence = sequence + k;
-		return sequence;
 	}
 
 	/**
@@ -363,63 +479,6 @@ public class Common {
 	}
 
 	/**
-	 * Get an element from a list of strings different from defined one. There is no
-	 * check that a list contains defined string, only the exclusion of defined
-	 * value is performed.
-	 * 
-	 * @param e string to be excluded from selection
-	 * @param l list of string to select from
-	 * @return an element from a list of strings which differs from specified one
-	 */
-	public static String selectOtherStringFromList(String e, List<String> l) {
-		List<String> copy = new ArrayList<>(l);
-		copy.remove(e);
-		return selectSomeStringFromList(copy);
-	}
-
-	/**
-	 * Get an element from a list of WebElement objects.
-	 * 
-	 * @param l list of WebElement objects to select from
-	 * @return a WebElement object from a list
-	 */
-	public static WebElement selectSomeElementFromList(List<WebElement> l) {
-		return l.get(new Random().nextInt(l.size()));
-	}
-
-	/**
-	 * Select random element from a set
-	 * 
-	 * @param s set to select from
-	 * @return random Object from a set
-	 */
-	public static Object selectSomeElementFrom(Set<?> s) {
-		// Only applicable for small sets, otherwise creates a big overhead
-		// TODO: optimize
-		return s.toArray()[new Random().nextInt(s.size())];
-	}
-
-	/**
-	 * Select random element from an array
-	 * 
-	 * @param s an array to select from
-	 * @return random String from a set
-	 */
-	public static String selectSomeElementFrom(String[] s) {
-		return s[new Random().nextInt(Array.getLength(s))];
-	}
-
-	/**
-	 * Get an element from a list of strings.
-	 * 
-	 * @param l list of string to select from
-	 * @return an element from a list of strings
-	 */
-	public static String selectSomeStringFromList(List<String> l) {
-		return l.get(new Random().nextInt(l.size()));
-	}
-
-	/**
 	 * Send keys to the element defined by string locator
 	 * 
 	 * @param lc string locator of target input element
@@ -433,6 +492,10 @@ public class Common {
 		sleep(ms, null);
 	}
 
+	public void sleep(long ms, boolean silent) {
+		sleep(ms, null, silent);
+	}
+
 	/**
 	 * Sleep during defined amount of milliseconds with record in the test log
 	 * 
@@ -443,10 +506,6 @@ public class Common {
 			l.log(0, Ansi.colorize("[WARNING]: " + "Sleeping for less then " + SILENT_SLEEPING_TRESHHOLD
 					+ " ms is better to be perfomed in silent mode"));
 		sleep(ms, s, false);
-	}
-
-	public void sleep(long ms, boolean silent) {
-		sleep(ms, null, silent);
 	}
 
 	/**
@@ -477,23 +536,14 @@ public class Common {
 	}
 
 	/**
-	 * Generate equally probable true or false value
-	 * 
-	 * @return 'true' or 'false' with equal probability
-	 */
-	public static boolean trueOrFalse() {
-		return isTrue(.5);
-	}
-
-	/**
 	 * Simulate typing of a text into the input field defined by string locator
 	 * 
 	 * @param lc string locator of target input element
 	 * @param s  string to type in
 	 * @return whether pasting was used or not
 	 */
-	public boolean typeIn(String lc, String s) {
-		return typeIn(lc, s, 0, false);
+	public boolean typeInto(String lc, String s) {
+		return typeInto(lc, s, 0, false);
 	}
 
 	/**
@@ -506,8 +556,8 @@ public class Common {
 	 * @param secret hide text in log (useful for password)
 	 * @return whether pasting was used or not
 	 */
-	public boolean typeIn(String lc, String s, boolean secret) {
-		return typeIn(lc, s, 0, secret);
+	public boolean typeInto(String lc, String s, boolean secret) {
+		return typeInto(lc, s, 0, secret);
 	}
 
 	/**
@@ -518,8 +568,8 @@ public class Common {
 	 * @param pp probability of instant input (pasting from clipboard simulation)
 	 * @return whether pasting was used or not
 	 */
-	public boolean typeIn(String lc, String s, double pp) {
-		return typeIn(lc, s, pp, false);
+	public boolean typeInto(String lc, String s, double pp) {
+		return typeInto(lc, s, pp, false);
 	}
 
 	/**
@@ -534,7 +584,7 @@ public class Common {
 	 * @param secret hide text in log
 	 * @return whether pasting was used or not
 	 */
-	public boolean typeIn(String lc, String c, double pp, boolean secret) {
+	public boolean typeInto(String lc, String c, double pp, boolean secret) {
 		WebElement e = find(lc);
 		l.log("Typing '" + ((secret) ? "•".repeat(c.length()) : c) + "' into '" + lc);
 		if (isTrue(pp)) {
@@ -552,32 +602,6 @@ public class Common {
 	}
 
 	/**
-	 * Supply visual representation for non-printable character
-	 * 
-	 * @param k key to be screened
-	 * @return
-	 */
-	public static String visualize(Keys k) {
-		switch (k) {
-		case ARROW_DOWN:
-			return "↓";
-		case ARROW_UP:
-			return "↑";
-		default:
-			return k.toString();
-		}
-	}
-
-	/**
-	 * Wait for appearance of the defined element
-	 * 
-	 * @param lc string locator of an element to be waited for
-	 */
-	public void wait(String[] lc) {
-		waitVisibility(lc);
-	}
-
-	/**
 	 * Wait for appearance of the defined element
 	 * 
 	 * @param lc string locator of an element to be waited for
@@ -587,23 +611,12 @@ public class Common {
 	}
 
 	/**
-	 * Wait for appearance of the defined element and the click on it
+	 * Wait for appearance of the defined element
 	 * 
 	 * @param lc string locator of an element to be waited for
 	 */
-	public void waitThenClick(String[] lc) {
-		wait(lc);
-		click(lc);
-	}
-
-	/**
-	 * Wait for appearance of the defined element and the click on it
-	 * 
-	 * @param lc string locator of an element to be waited for
-	 */
-	public void waitThenClick(String lc) {
-		wait(lc);
-		click(lc);
+	public void wait(String[] lc) {
+		waitVisibility(lc);
 	}
 
 	/**
@@ -634,6 +647,26 @@ public class Common {
 	public void waitSeleted(String lc) {
 		l.log("Waiting for " + lc + "to be selected");
 		w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
+	}
+
+	/**
+	 * Wait for appearance of the defined element and the click on it
+	 * 
+	 * @param lc string locator of an element to be waited for
+	 */
+	public void waitThenClick(String lc) {
+		wait(lc);
+		click(lc);
+	}
+
+	/**
+	 * Wait for appearance of the defined element and the click on it
+	 * 
+	 * @param lc string locator of an element to be waited for
+	 */
+	public void waitThenClick(String[] lc) {
+		wait(lc);
+		click(lc);
 	}
 
 	/**
@@ -677,8 +710,8 @@ public class Common {
 	 * 
 	 * @param lc string locator of an element to be waited for
 	 */
-	public void waitVisibility(String[] lc) {
-		l.log("Waiting for visibility of one of " + Arrays.toString(lc));
+	public void waitVisibility(String lc) {
+		l.log("Waiting for visibility of " + lc);
 		w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
 	}
 
@@ -687,32 +720,9 @@ public class Common {
 	 * 
 	 * @param lc string locator of an element to be waited for
 	 */
-	public void waitVisibility(String lc) {
-		l.log("Waiting for visibility of " + lc);
+	public void waitVisibility(String[] lc) {
+		l.log("Waiting for visibility of one of " + Arrays.toString(lc));
 		w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
-	}
-
-	/**
-	 * Write lines of the provided a set to a file
-	 * 
-	 * @param fl optional first line of the text to be added to a file (title)
-	 * @param ss set of lines to be stored in a file
-	 * @param fn name of the file to be written
-	 */
-	public static void writeToFile(String fl, Set<String> ss, String fn) {
-		BufferedWriter writer;
-		try {
-			new File(fn).getParentFile().mkdirs(); // Create parent directory
-			writer = new BufferedWriter(new FileWriter(fn));
-			if (null != fl)
-				writer.write(fl + System.lineSeparator());
-			for (String s : ss) {
-				writer.write(s + System.lineSeparator());
-			}
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 }
