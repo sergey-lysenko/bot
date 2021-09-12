@@ -36,7 +36,14 @@ public class C { // C for Constants & Common
 
 	public final static String SEARCH = "//input[@class='omnibox-search__query']";
 	public final static String ROW = "//tr[@class='dropdown-search__trow token']";
+	
+	public final static String _BUY_ = "//div[@class='tradeform-tab tradeform-tab--buy']";
+	public final static String _SELL_ = "//div[@class='tradeform-tab tradeform-tab--sell']";
 
+	public final static String FROM = ".//div[@class='tradeform-field tradeform-field--from']";
+	public final static String TO = ".//div[@class='tradeform-field tradeform-field--to']";
+
+	public final static String INPUT = ".//input[@class='tradeform-field__input']";
 
 	public static final boolean quoteShortEnough(Execution x) {
 		return (null == x.data.get("quote")) ? true : (Integer) x.data.get("quote") < C.MAX_QUOTE_LENGHT_FOR_BUTTONS;

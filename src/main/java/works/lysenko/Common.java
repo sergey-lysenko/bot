@@ -77,7 +77,7 @@ public class Common {
 	 * @param u maximum value
 	 * @return random integer
 	 */
-	public static int integer(int l, int u) {
+	public static Integer integer(int l, int u) {
 		return new RandomDataGenerator().nextInt(l, u);
 	}
 
@@ -223,26 +223,18 @@ public class Common {
 		this.w = x.w;
 	}
 
-	public void clear(String lc) {
-		l.log("Clearing " + lc);
-		find(lc, true).clear();
+	public void clear(String... lc) {
+		l.log("Clearing " + describe(lc));
+		find(true, lc).clear();
 		; // Silent find during clear
 	}
 
 	/**
 	 * @param lc string locator of element to be clicked on
 	 */
-	public void click(String lc) {
-		l.log("Clicking " + lc);
-		find(lc, true).click(); // Silent find during click
-	}
-
-	/**
-	 * @param lc array of string locator of element to be clicked on
-	 */
-	public void click(String[] lc) {
-		l.log("Clicking on either of " + Arrays.toString(lc));
-		find(lc, true).click(); // Silent find during click
+	public void click(String... lc) {
+		l.log("Clicking " + describe(lc));
+		find(true, lc).click(); // Silent find during click
 	}
 
 	public void click(WebElement e) {
@@ -261,58 +253,44 @@ public class Common {
 		return "h" + r.height + " w" + r.width + " @ " + "x" + r.x + " y" + r.y;
 	}
 
+	private String describe(String[] lc) {
+		if (lc.length == 0)
+			return "";
+		if (lc.length == 1)
+			return lc[0];
+		if (lc.length > 1)
+			return Arrays.toString(lc);
+		return null;
+	}
+
 	private String describe(WebElement e, boolean geometry) {
 		String an = e.getAccessibleName();
 		String tg = e.getTagName();
 		return tg + ((an.isEmpty()) ? "" : "'" + an + "'") + ((geometry) ? (" @ " + describe(e.getRect())) : "");
 	}
 
-	/**
-	 * Find an element by the provided String locator
-	 * 
-	 * @param lc string locator of target element
-	 * @return located element reference
-	 */
-	public WebElement find(String lc) {
-		return find(lc, false);
-	}
-
-	/**
-	 * Find an element by the provided String locator, with optional omitting of log
-	 * message creation
-	 * 
-	 * @param lc     string locator of target element
-	 * @param silent whether to omit log output or not
-	 * @return located element reference
-	 */
-	public WebElement find(String lc, boolean silent) {
-		if (!silent)
-			l.log("Finding " + lc);
-		WebElement e = d.findElement(by(lc));
+	public WebElement find(boolean silent, String... lc) {
+		WebElement e = null;
+		if (!silent && lc.length > 0)
+			l.log("Finding " + lc[0]);
+		if (lc.length == 0)
+			e = d.findElement(by("//body"));
+		if (lc.length > 0)
+			e = d.findElement(by(lc[0]));
+		if (lc.length > 1)
+			for (int i = 1; i < lc.length; i++) {
+				if (!silent)
+					l.log(" ... and child " + lc[i]);
+				e = e.findElement(by(lc[i]));
+			}
 		return find(e);
 	}
 
-	/**
-	 * Single-step location of an element by locator of it's parent and it's own
-	 * relative locator to this parent element
-	 * 
-	 * @param pr string absolute locator of parent element
-	 * @param ch string relative locator of child element
-	 * @return located element reference
-	 */
-	public WebElement find(String pr, String ch) {
-		l.log("Finding parent " + pr + " and child " + ch);
-		return d.findElement(by(pr)).findElement(by(ch));
+	public WebElement find(String... lc) {
+		return find(false, lc);
 	}
 
-	public WebElement find(String[] lc, boolean silent) {
-		if (!silent)
-			l.log("Finding one of " + lc);
-		WebElement e = d.findElement(by(lc));
-		return find(e);
-	}
-
-	private WebElement find(WebElement e) {
+	public WebElement find(WebElement e) {
 		Actions actions = new Actions(d);
 		actions.moveToElement(e);
 		actions.perform();
@@ -536,63 +514,136 @@ public class Common {
 	}
 
 	/**
-	 * Simulate typing of a text into the input field defined by string locator
+	 * Call {@link Common#typeInto(String, Object, double, boolean)} with
+	 * {@code pasteProbability} set to {@value 0} and {@code secret} set to
+	 * {@value false}
 	 * 
-	 * @param lc string locator of target input element
-	 * @param s  string to type in
-	 * @return whether pasting was used or not
+	 * @param lc single String locator. To facilitate multilevel search, use
+	 *           {@code typeInto(find(str1, str2, ...), ...);}
+	 * @param c  Content to type, Object.toString() in used to get string
+	 *           representation
+	 * @return true of direct copy was used, false otherwise
 	 */
-	public boolean typeInto(String lc, String s) {
-		return typeInto(lc, s, 0, false);
+	public boolean typeInto(String lc, Object c) {
+		return typeInto(lc, c, 0, false);
 	}
 
 	/**
-	 * Simulate typing of a text into the input field defined by string locator,
-	 * with optional screening of typed characters in logs (useful for passwords or
-	 * other sensitive data)
+	 * Call {@link Common#typeInto(String, Object, double, boolean)} with
+	 * {@code pasteProbability} set to {@value 0}
 	 * 
-	 * @param lc     string locator of target input element
-	 * @param s      string to type in
-	 * @param secret hide text in log (useful for password)
-	 * @return whether pasting was used or not
+	 * @param lc     single String locator. To facilitate multilevel search, use
+	 *               {@code typeInto(find(str1, str2, ...), ...);}
+	 * @param c      Content to type, Object.toString() in used to get string
+	 *               representation
+	 * @param secret whether to screen content in the log by '•' symbols (as in
+	 *               passwords)
+	 * @return true of direct copy was used, false otherwise
 	 */
-	public boolean typeInto(String lc, String s, boolean secret) {
-		return typeInto(lc, s, 0, secret);
+	public boolean typeInto(String lc, Object c, boolean secret) {
+		return typeInto(lc, c, 0, secret);
 	}
 
 	/**
-	 * Simulate typing of a text into the input field defined by string locator
+	 * Call {@link Common#typeInto(String, Object, double, boolean)} with
+	 * {@code secret} set to {@value false}
 	 * 
-	 * @param lc string locator of target input element
-	 * @param s  string to type in
-	 * @param pp probability of instant input (pasting from clipboard simulation)
-	 * @return whether pasting was used or not
+	 * @param lc single String locator. To facilitate multilevel search, use
+	 *           {@code typeInto(find(str1, str2, ...), ...);}
+	 * @param c  Content to type, Object.toString() in used to get string
+	 *           representation
+	 * @param pp Probability in range [0.0 - 1.0] of using direct copy to simulate
+	 *           pasting from clipboard;
+	 * @return true of direct copy was used, false otherwise
 	 */
-	public boolean typeInto(String lc, String s, double pp) {
-		return typeInto(lc, s, pp, false);
+	public boolean typeInto(String lc, Object c, double pp) {
+		return typeInto(lc, c, pp, false);
 	}
 
 	/**
-	 * Simulate typing of a text or pasting if from clipboard into the input field
-	 * defined by string locator, with optional screening of typed characters in
-	 * logs (useful for passwords or other sensitive data)
+	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
+	 * WebElement defined by String locator
 	 * 
-	 * @param lc     string locator of target input element
-	 * @param s      string to type in
-	 * @param pp     probability of instant input (pasting from clipboard
-	 *               simulation)
-	 * @param secret hide text in log
-	 * @return whether pasting was used or not
+	 * @param lc     single String locator. To facilitate multilevel search, use
+	 *               {@code typeInto(find(str1, str2, ...), ...);}
+	 * @param c      Content to type, Object.toString() in used to get string
+	 *               representation
+	 * @param pp     Probability in range [0.0 - 1.0] of using direct copy to
+	 *               simulate pasting from clipboard;
+	 * @param secret whether to screen content in the log by '•' symbols (as in
+	 *               passwords)
+	 * @return true of direct copy was used, false otherwise
 	 */
-	public boolean typeInto(String lc, String c, double pp, boolean secret) {
+	public boolean typeInto(String lc, Object c, double pp, boolean secret) {
 		WebElement e = find(lc);
-		l.log("Typing '" + ((secret) ? "•".repeat(c.length()) : c) + "' into '" + lc);
+		return typeInto(e, c, pp, secret);
+	}
+
+	/**
+	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
+	 * {@code pasteProbability} set to {@value 0} and {@code secret} set to
+	 * {@value false}
+	 * 
+	 * @param e WebElement to type into
+	 * @param c Content to type, Object.toString() in used to get string
+	 *          representation
+	 * @return true of direct copy was used, false otherwise
+	 */
+	public boolean typeInto(WebElement e, Object c) {
+		return typeInto(e, c, 0, false);
+	}
+
+	/**
+	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
+	 * {@code pasteProbability} set to {@value 0}
+	 * 
+	 * @param e      WebElement to type into
+	 * @param c      Content to type, Object.toString() in used to get string
+	 *               representation
+	 * @param secret whether to screen content in the log by '•' symbols (as in
+	 *               passwords)
+	 * @return true of direct copy was used, false otherwise
+	 */
+	public boolean typeInto(WebElement e, Object c, boolean secret) {
+		return typeInto(e, c, 0, secret);
+	}
+
+	/**
+	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
+	 * {@code secret} set to {@value false}
+	 * 
+	 * @param e  WebElement to type into
+	 * @param c  Content to type, Object.toString() in used to get string
+	 *           representation
+	 * @param pp Probability in range [0.0 - 1.0] of using direct copy to simulate
+	 *           pasting from clipboard;
+	 * @return true of direct copy was used, false otherwise
+	 */
+	public boolean typeInto(WebElement e, Object c, double pp) {
+		return typeInto(e, c, pp, false);
+	}
+
+	/**
+	 * Simulate typing the value into the WebElement
+	 * 
+	 * @param e      WebElement to type into
+	 * @param c      Content to type, Object.toString() in used to get string
+	 *               representation
+	 * @param pp     Probability in range [0.0 - 1.0] of using direct copy to
+	 *               simulate pasting from clipboard;
+	 * @param secret whether to screen content in the log by '•' symbols (as in
+	 *               passwords)
+	 * @return true of direct copy was used, false otherwise
+	 */
+	public boolean typeInto(WebElement e, Object c, double pp, boolean secret) {
+		CharSequence symbols = String.valueOf(c);
+		l.log("Typing '" + ((secret) ? "•".repeat(symbols.length()) : c) + "' into " + describe(e, true));
 		if (isTrue(pp)) {
 			// simulation of pasting from clipboard by instant addition of all content
-			e.sendKeys(c);
+			e.sendKeys(symbols);
 			return true;
 		} else {
-			char[] chars = c.toCharArray();
+			char[] chars = symbols.toString().toCharArray();
 			for (char ch : chars) {
 				sleep(integer(0, 50), true); // silent sleep
 				e.sendKeys(String.valueOf(ch));
