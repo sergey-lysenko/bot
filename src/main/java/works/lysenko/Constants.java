@@ -23,6 +23,8 @@ public class Constants {
 
 	public static final int SILENT_SLEEPING_TRESHHOLD = 10;
 
+	public static final String FILENAME = "%1$s.%2$s.%3$s";
+	public static final String JSON_FILENAME = "%1$s.%2$s.json";
 	public static final String RUN_LOG_FILENAME = "%1$s.run.log";
 	public static final String RUN_JSON_FILENAME = "%1$s.run.json";
 	public static final String RUN_SVG_FILENAME = "%1$s.run.svg";

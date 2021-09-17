@@ -29,7 +29,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import works.lysenko.scenarios.AbstractScenario;
 import works.lysenko.scenarios.Scenario;
-import works.lysenko.scenarios.Scenarios;
 import works.lysenko.utils.Browser;
 import works.lysenko.utils.Severity;
 import works.lysenko.utils.Stopwatch;

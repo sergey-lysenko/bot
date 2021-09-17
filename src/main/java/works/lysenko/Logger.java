@@ -1,6 +1,7 @@
 package works.lysenko;
 
 import static works.lysenko.Constants.DEFAULT_RUNS_LOCATION;
+import static works.lysenko.Constants.FILENAME;
 import static works.lysenko.Constants.RUN_LOG_FILENAME;
 
 import java.io.BufferedWriter;
@@ -29,11 +30,15 @@ import works.lysenko.utils.Severity;
 
 public class Logger {
 
+	private static void logConsole(String s) {
+		System.out.println(s);
+	}
 	public Execution x;
 	public Set<String> logsToRead;
 	public PriorityQueue<LogRecord> log;
 	protected BufferedWriter logWriter;
 	private long prev = 0;
+
 	private int length = 5;
 
 	public Logger(Execution x, Set<String> logsToRead) {
@@ -121,17 +126,16 @@ public class Logger {
 		process();
 	}
 
-	public void logProblem(Severity se, String st) {
-		int depth = x.currentDepth();
-		log.add(problem(x.timer(), depth, se.tag() + " " + st));
-	}
-
-	public void logKnownIssue(String s) {
-		logProblem(Severity.SK, s);
-	}
-
-	private static void logConsole(String s) {
-		System.out.println(s);
+	/**
+	 * Write a string of text into the test execution log with logical level 1, for
+	 * example:
+	 * 
+	 * • This is the level 1 record
+	 * 
+	 * @param s string of text to be written to log
+	 */
+	public void log(String s) {
+		log(1, s);
 	}
 
 	private void logFile(String s) {
@@ -145,22 +149,43 @@ public class Logger {
 		}
 	}
 
-	/**
-	 * Write a string of text into the test execution log with logical level 1, for
-	 * example:
-	 * 
-	 * • This is the level 1 record
-	 * 
-	 * @param s string of text to be written to log
-	 */
-	public void log(String s) {
-		log(1, s);
+	public void logFile(String s, String n, String ex) {
+		String location = DEFAULT_RUNS_LOCATION + x.t.startedAt() + "/";
+		BufferedWriter writer = null;
+		try {
+			new File(location).mkdirs();
+			writer = new BufferedWriter(
+					new FileWriter(location + Common.fill(FILENAME, String.format("%013d", x.t.millis()), n, ex)));
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to open a file for writting");
+		}
+		try {
+			writer.write(s);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		try {
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public void logKnownIssue(String s) {
+		logProblem(Severity.SK, s);
 	}
 
 	public void logln() {
 		LogRecord lr;
 		lr = new LogRecord(x.timer(), new LineFeed());
 		log.add(lr);
+	}
+
+	public void logProblem(Severity se, String st) {
+		int depth = x.currentDepth();
+		log.add(problem(x.timer(), depth, se.tag() + " " + st));
 	}
 
 	private LogRecord problem(long t, int d, String p) {

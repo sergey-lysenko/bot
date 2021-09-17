@@ -24,6 +24,9 @@
 		<commons-collections4.version>4.4</commons-collections4.version>
 		<javafaker.version>1.0.2</javafaker.version>
 		<org.jfree.version>5.0.1</org.jfree.version>
+		<guava.version>30.1.1-jre</guava.version>
+		<reflections.version>0.9.12</reflections.version>
+		<json.version>20210307</json.version>
 
 		<!-- Maven plugins versions -->
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
@@ -86,6 +89,21 @@
 			<artifactId>org.jfree.svg</artifactId>
 			<version>${org.jfree.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>${reflections.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${json.version}</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -121,12 +139,6 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.0.0-M5</version>
 				<configuration>
-					<properties>
-						<property>
-							<name>listener</name>
-							<value>io.qameta.allure.junit5.AllureJunit5</value>
-						</property>
-					</properties>
 					<argLine>
 						-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
 					</argLine>

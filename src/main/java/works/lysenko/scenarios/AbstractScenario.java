@@ -5,6 +5,8 @@ import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.json.JSONObject;
+
 import works.lysenko.Common;
 import works.lysenko.Execution;
 import works.lysenko.ScenarioType;
@@ -142,10 +144,11 @@ public class AbstractScenario extends Common implements Scenario {
 	}
 
 	/**
-	 * Shortcut for getting a data from the common test data container, with optional default
+	 * Shortcut for getting a data from the common test data container, with
+	 * optional default
 	 * 
 	 * @param field of test data to be retrieved
-	 * @param def default value 
+	 * @param def   default value
 	 * @return copy of test data
 	 */
 	public Object get(Object field, Object def) {
@@ -154,7 +157,7 @@ public class AbstractScenario extends Common implements Scenario {
 			log(3, "get(" + field + ")>" + o + " " + x.data.toString());
 		return o;
 	}
-	
+
 	public Set<String> list(boolean shortened, boolean decorated) {
 		Set<String> c = new SortedStringSet();
 		if (shortened)
@@ -201,8 +204,11 @@ public class AbstractScenario extends Common implements Scenario {
 	 */
 	public void put(Object field, Object value) {
 		Object o = x.data.put(field, value);
-		if (x.debug())
-			log(3, "put(" + field + ")<" + o + " " + x.data.toString());
+		if (x.debug()) {
+			JSONObject json = new JSONObject(x.data);
+			log(3, "put(" + field + ")<" + o + " " + json.toString());
+			l.logFile(json.toString(), "data", "json");
+		}
 	}
 
 	/**
