@@ -32,17 +32,30 @@ public class AbstractNodeScenario extends AbstractScenario {
 		pervWeight = scenarios.pervasive();
 	}
 
+	/**
+	 * @param ss name of package to load child scenarios from with weight
+	 *           coefficient defined within ..
+	 * @param r  instance of Run object
+	 */
+	public AbstractNodeScenario(String s, Execution x) {
+		super(x);
+		marker(NODE_SCENARIO_MARKER);
+		scenarios = new Scenarios(x);
+		scenarios.add((Set<Scenario>) ScenarioLoader.read(s, x), x);
+		pervWeight = scenarios.pervasive();
+	}
+	
+	/**
+	 * @param onlyConfigured whether to include all available paths or only ones
+	 *                       currently configured for execution
+	 * 
+	 * @return calculated amount of possible execution paths of underlying scenarios
+	 */
 	public int combinations(boolean onlyConfigured) {
 		int c = 0;
 		for (Pair<Scenario, Double> s : scenarios.get()) {
 			c = c + s.getKey().combinations(onlyConfigured);
 		}
-		return c;
-	}
-
-	public Set<String> list(boolean shortened, boolean decorated) {
-		Set<String> c = super.list(shortened, decorated);
-		c.addAll(scenarios.list(shortened, decorated));
 		return c;
 	}
 
@@ -66,13 +79,29 @@ public class AbstractNodeScenario extends AbstractScenario {
 	}
 
 	/**
+	 * Returns the set with names of all underlying  
+	 * 
+	 * @param shortened or not by removing the common part of package names
+	 * @param decorated or not by scenario type marker
+	 * @return set object with name of this scenario as single element
+	 */
+	public Set<String> list(boolean shortened, boolean decorated) {
+		Set<String> c = super.list(shortened, decorated);
+		c.addAll(scenarios.list(shortened, decorated));
+		return c;
+	}
+
+	/**
+	 * @return calculated pervasive weight of this scenario
+	 */
+	public double pervasive() {
+		return pervWeight;
+	}
+
+	/**
 	 * @return whether this scenario meets it's prerequisites
 	 */
 	public boolean sufficed() {
 		return false;
-	}
-
-	public double pervasive() {
-		return pervWeight;
 	}
 }

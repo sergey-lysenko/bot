@@ -165,8 +165,10 @@ public class Logger {
 
 	private LogRecord problem(long t, int d, String p) {
 		LogRecord lr;
-		// TODO: rework that to cycle over Severity
-		if (p.contains("[SEVERE]")) {
+		Set<String> ki = x.getKnownIssue(p);
+		if (ki.size() > 0) {
+			lr = new LogRecord(t, new KnownIssue(d, "[KNOWN-ISSUE]:" + ki.toString() + ":" + p));
+		} else if (p.contains("[SEVERE]")) {
 			lr = new LogRecord(t, new Severe(d, p));
 		} else if (p.contains("[WARNING]")) {
 			lr = new LogRecord(t, new Warning(d, p));
@@ -177,6 +179,7 @@ public class Logger {
 		} else {
 			lr = new LogRecord(t, new Notice(d, p));
 		}
+
 		x.r.problem(lr);
 		return lr;
 	}

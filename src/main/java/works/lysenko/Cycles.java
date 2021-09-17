@@ -16,6 +16,7 @@ import static works.lysenko.utils.Severity.S3;
 import java.util.Set;
 
 import works.lysenko.scenarios.Scenario;
+import works.lysenko.scenarios.ScenarioLoader;
 import works.lysenko.scenarios.Scenarios;
 import works.lysenko.utils.Ansi;
 import works.lysenko.utils.SortedStringSet;
@@ -31,6 +32,15 @@ public class Cycles {
 		this.x = x;
 		scenarios = new Scenarios(x);
 		scenarios.add(ss, x);
+		cyclesToDo = x._cycles();
+		x.cycles = this;
+	}
+
+	public Cycles(String s, Execution x) {
+		super();
+		this.x = x;
+		scenarios = new Scenarios(x);
+		scenarios.add(ScenarioLoader.read(s, x), x);
 		cyclesToDo = x._cycles();
 		x.cycles = this;
 	}

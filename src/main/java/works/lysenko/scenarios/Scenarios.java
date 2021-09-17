@@ -175,9 +175,12 @@ public class Scenarios extends Common {
 					pervasiveWeight = k.pervasive();
 					v = v + pervasiveWeight;
 				}
-				Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k,
-						(v == Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : v);
-				candidates.add(newPair);
+				if (k.executable()) {
+					Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k,
+							(v == Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : v);
+					candidates.add(newPair);
+				} else
+					l.logProblem(S3, k.name() + " is not executable");
 			}
 			AbstractScenario s = null;
 			boolean sufficed = false;
@@ -216,8 +219,9 @@ public class Scenarios extends Common {
 				}
 				if (doubleBreak)
 					break;
-				sufficed = s.sufficed(); // to eliminate triple call
-				if (!sufficed) {
+				if (null != s)
+					sufficed = s.sufficed(); // to eliminate triple call
+				if (!sufficed && null != s) {
 					l.logProblem(S3, s.name() + " is not sufficed");
 					Pair<Scenario, Double> toBeRemoved = null;
 					for (Pair<Scenario, Double> pair : candidates) {
@@ -233,9 +237,8 @@ public class Scenarios extends Common {
 				s.execute();
 			}
 			if (candidates.isEmpty())
-
 				l.logProblem(S2, "Unable to suffice a scenario among " + list(scenarios, false)
-						+ ": all scenarios have unmet requirements");
+						+ ": all scenarios have unmet requirements or are not executable");
 			if (!(retries >= 0)) {
 				l.logProblem(S2, "Scenario selection exausted after " + this.retries + " retries");
 			}

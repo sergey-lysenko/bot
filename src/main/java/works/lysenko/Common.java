@@ -303,7 +303,7 @@ public class Common {
 	 * @param lc locator of 1-n elements to be found
 	 * @return list of located element references
 	 */
-	public List<WebElement> findS(String lc) {
+	public List<WebElement> findAll(String lc) {
 		l.log("Finding all " + lc + " elements");
 		return d.findElements(by(lc));
 	}

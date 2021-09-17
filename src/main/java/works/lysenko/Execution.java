@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -28,6 +29,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import works.lysenko.scenarios.AbstractScenario;
 import works.lysenko.scenarios.Scenario;
+import works.lysenko.scenarios.Scenarios;
 import works.lysenko.utils.Browser;
 import works.lysenko.utils.Severity;
 import works.lysenko.utils.Stopwatch;
@@ -71,6 +73,7 @@ public class Execution extends Common {
 	public Integer minDepth = null;
 	protected Stopwatch t;
 	private Properties prop;
+	private Properties know;
 	public Properties data;
 
 	public String name;
@@ -79,7 +82,7 @@ public class Execution extends Common {
 	public Execution(int implicitWait, int explicitWait, Set<String> logsToRead, String name) {
 		this(implicitWait, explicitWait, logsToRead, name, null);
 	}
-	
+
 	public Execution(int implicitWait, int explicitWait, Set<String> logsToRead, String name, String domain) {
 		super();
 		this.x = this;
@@ -98,6 +101,7 @@ public class Execution extends Common {
 		// Properties
 		data = new Properties();
 		prop = readProperties(name);
+		know = readProperties("_knownIssues");
 
 		// Information
 		this.name = name;
@@ -232,5 +236,15 @@ public class Execution extends Common {
 			}
 		}
 		return null;
+	}
+
+	public Set<String> getKnownIssue(String p) {
+		HashSet<String> knownIssues = new HashSet<String>();
+		know.forEach((k, v) -> {
+			if (p.contains((String) v)) {
+				knownIssues.add((String) k);
+			}
+		});
+		return knownIssues;
 	}
 }

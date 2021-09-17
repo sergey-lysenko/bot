@@ -1,21 +1,30 @@
 package works.lysenko.scenarios;
 
-import static works.lysenko.Constants.LEAF_SCENARIO_MARKER;
+import static works.lysenko.Constants.MONO_SCENARIO_MARKER;
 
 import java.util.Set;
 
 import works.lysenko.Execution;
 import works.lysenko.utils.SortedStringSet;
 
-public class AbstractLeafScenario extends AbstractScenario {
+public class AbstractMonoScenario extends AbstractScenario {
 
-	public AbstractLeafScenario(Execution x) {
+	private boolean executed = false;
+
+	public AbstractMonoScenario(Execution x) {
 		super(x);
-		marker(LEAF_SCENARIO_MARKER);
+		marker(MONO_SCENARIO_MARKER);
 	}
 
 	/**
-	 * For a Leaf Scenario, execution consist of
+	 * @return whether this scenario still runnable or it had been executed already
+	 */
+	public boolean executable() {
+		return !executed;
+	}
+
+	/**
+	 * For a Mono Scenario, execution consist of
 	 * 
 	 * 1) default execution code defined in super class
 	 * 
@@ -28,6 +37,7 @@ public class AbstractLeafScenario extends AbstractScenario {
 		action();
 		finals();
 		done();
+		executed = true;
 	}
 
 	/**

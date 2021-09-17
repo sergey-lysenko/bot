@@ -95,6 +95,13 @@ public class AbstractScenario extends Common implements Scenario {
 	}
 
 	/**
+	 * @return whether this scenario is able to be executed
+	 */
+	public boolean executable() {
+		return true;
+	}
+
+	/**
 	 * Default common code for a scenario execution
 	 */
 	public void execute() {
@@ -134,6 +141,20 @@ public class AbstractScenario extends Common implements Scenario {
 		return o;
 	}
 
+	/**
+	 * Shortcut for getting a data from the common test data container, with optional default
+	 * 
+	 * @param field of test data to be retrieved
+	 * @param def default value 
+	 * @return copy of test data
+	 */
+	public Object get(Object field, Object def) {
+		Object o = x.data.getOrDefault(field, def);
+		if (x.debug())
+			log(3, "get(" + field + ")>" + o + " " + x.data.toString());
+		return o;
+	}
+	
 	public Set<String> list(boolean shortened, boolean decorated) {
 		Set<String> c = new SortedStringSet();
 		if (shortened)

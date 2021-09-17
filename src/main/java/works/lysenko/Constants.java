@@ -37,7 +37,8 @@ public class Constants {
 	public static final String _CHILD_WITH_TEXT = ".//%1$s[text()='%2$s']";
 
 	public static final String FULLWIDTH_QUOTATION_MARK = "＂";
-	
+
 	public static final String NODE_SCENARIO_MARKER = "▷";
 	public static final String LEAF_SCENARIO_MARKER = "◆";
+	public static final String MONO_SCENARIO_MARKER = "◼";
 }
