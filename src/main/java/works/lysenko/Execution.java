@@ -199,16 +199,15 @@ public class Execution extends Common {
 		try {
 			fis = new FileInputStream(propertiesFile);
 		} catch (FileNotFoundException e) {
-			l.logProblem(Severity.S1, "Requested Test Run Properties file '" + propertiesFile + "' not found");
+			l.logProblem(Severity.S1, "Requested properties file '" + propertiesFile + "' not found");
 		}
 		try {
 			if (null != fis)
 				prop.load(fis);
 			else
-				l.logProblem(Severity.S2,
-						"No Test Run Properties were defined. Only initialization routine will be executed.");
+				l.logProblem(Severity.S2, "Unable to read properties from '" + propertiesFile + "'");
 		} catch (IOException e) {
-			throw new IllegalArgumentException("Unable to load requested test properties file");
+			throw new IllegalArgumentException("Unable to load requested properties file");
 		}
 		return prop;
 	}
@@ -239,11 +238,12 @@ public class Execution extends Common {
 
 	public Set<String> getKnownIssue(String p) {
 		HashSet<String> knownIssues = new HashSet<String>();
-		know.forEach((k, v) -> {
-			if (p.contains((String) v)) {
-				knownIssues.add((String) k);
-			}
-		});
+		if (null != know)
+			know.forEach((k, v) -> {
+				if (p.contains((String) v)) {
+					knownIssues.add((String) k);
+				}
+			});
 		return knownIssues;
 	}
 }

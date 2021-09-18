@@ -21,8 +21,8 @@ public class C { // C for Constants & Common
 	public final static String LOADER_AVATAR = "//div[@class='loader-guru__avatar']";
 	public final static String GRAPH = "//div[@class='graph']";
 	public final static String WALLET = "//div[@class='wallet__icon']";
-	public final static String BUY = "//button[@class='button button--xl button--buy']";
-	public final static String SELL = "//button[@class='button button--xl button--sell']";
+	public final static String BUY = "//button[@class='button button--xl tradeform-button tradeform-button--buy']";
+	public final static String SELL = "//button[@class='button button--xl tradeform-button tradeform-button--sell']";
 	public final static String PROVIDER_MENU = "//div[@class='provider-menu']";
 	public final static String PROVIDER_ITEM = "//button[@class='provider-menu-providers__button']/span[@class='name'][text()='%1$s']";
 
