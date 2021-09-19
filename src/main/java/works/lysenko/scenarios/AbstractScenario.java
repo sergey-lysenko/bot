@@ -205,7 +205,7 @@ public class AbstractScenario extends Common implements Scenario {
 	public void put(Object field, Object value) {
 		Object o = x.data.put(field, value);
 		if (x.debug()) {
-			String j = new Gson().toJson(x.data);
+			String j = x.gson().toJson(x.data);
 			log(3, "put(" + field + ")<" + o + " " + j);
 			l.logFile(j, "data", "json");
 		}

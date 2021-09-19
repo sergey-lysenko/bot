@@ -1,7 +1,6 @@
 package works.lysenko;
 
 import static works.lysenko.Constants.DEFAULT_RUNS_LOCATION;
-import static works.lysenko.Constants.FULLWIDTH_QUOTATION_MARK;
 import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
 import static works.lysenko.Constants.RUN_JSON_FILENAME;
 import static works.lysenko.Constants.RUN_SVG_FILENAME;
@@ -96,7 +95,7 @@ public class Output {
 	 * template defined by RUN_JSON_FILENAME
 	 */
 	protected void jsonStats() {
-		// TODO: migrate to Gson
+		// TODO: migrate to Gson (?)
 		TreeMap<String, Result> sorted = x.r.getSorted();
 		BufferedWriter w;
 		try {
@@ -132,7 +131,7 @@ public class Output {
 						}
 						w.write("\"type\":\"" + type + "\",");
 						w.write("\"text\":\"");
-						w.write(text.replaceAll("\n", " ").replace("\"", FULLWIDTH_QUOTATION_MARK));
+						w.write(text.replaceAll("\n", " ").replace("\"", "\\\""));
 						w.write("\"}");
 						if (j-- > 1)
 							w.write(",");

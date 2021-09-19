@@ -27,6 +27,9 @@ import java.util.Stack;
 
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import works.lysenko.scenarios.AbstractScenario;
 import works.lysenko.scenarios.Scenario;
 import works.lysenko.utils.Browser;
@@ -71,6 +74,8 @@ public class Execution extends Common {
 
 	public Integer minDepth = null;
 	protected Stopwatch t;
+
+	public GsonBuilder gsonBuilder = new GsonBuilder();
 	private Properties prop;
 	private Properties know;
 	public Properties data;
@@ -105,6 +110,22 @@ public class Execution extends Common {
 		// Information
 		this.name = name;
 		this.domain = domain;
+	}
+
+	public boolean _conjoint() {
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_CONJOINT, DEFAULT_CONJOINT));
+	}
+
+	public int _cycles() {
+		return Integer.valueOf(prop.getProperty("_" + CONFIGURATION_CYCLES, DEFAULT_CYCLES));
+	}
+
+	public boolean _permeative() {
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_PERMEATIVE, DEFAULT_PERMEATIVE));
+	}
+
+	public boolean _pervasive() {
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_PERVASIVE, DEFAULT_PERVASIVE));
 	}
 
 	/**
@@ -146,16 +167,36 @@ public class Execution extends Common {
 		return current.empty() ? null : current.peek();
 	}
 
-	public boolean _conjoint() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_CONJOINT, DEFAULT_CONJOINT));
+	public boolean debug() {
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DEBUG, DEFAULT_DEBUG));
 	}
 
-	public int _cycles() {
-		return Integer.valueOf(prop.getProperty("_" + CONFIGURATION_CYCLES, DEFAULT_CYCLES));
+	public Set<String> getKnownIssue(String p) {
+		HashSet<String> knownIssues = new HashSet<String>();
+		if (null != know)
+			know.forEach((k, v) -> {
+				if (p.contains((String) v)) {
+					knownIssues.add((String) k);
+				}
+			});
+		return knownIssues;
 	}
 
-	public boolean _permeative() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_PERMEATIVE, DEFAULT_PERMEATIVE));
+	public Set<Scenario> getScenarios() {
+		for (Entry<Object, Object> p : prop.entrySet()) {
+			String key = (String) p.getKey();
+			if (!(key.charAt(0) == '_')) {
+				/*
+				 * if (s.getClass().getName().toLowerCase().contains(key.toLowerCase())) {
+				 * Double v = Double.valueOf((String) p.getValue()); s.permeative(v); return v;
+				 */
+			}
+		}
+		return null;
+	}
+
+	public Gson gson() {
+		return gsonBuilder.create();
 	}
 
 	public Double permeative(Scenario s) {
@@ -170,10 +211,6 @@ public class Execution extends Common {
 			}
 		}
 		return 0.0;
-	}
-
-	public boolean _pervasive() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_PERVASIVE, DEFAULT_PERVASIVE));
 	}
 
 	/**
@@ -217,33 +254,5 @@ public class Execution extends Common {
 	 */
 	public Long timer() {
 		return t.millis();
-	}
-
-	public boolean debug() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DEBUG, DEFAULT_DEBUG));
-	}
-
-	public Set<Scenario> getScenarios() {
-		for (Entry<Object, Object> p : prop.entrySet()) {
-			String key = (String) p.getKey();
-			if (!(key.charAt(0) == '_')) {
-				/*
-				 * if (s.getClass().getName().toLowerCase().contains(key.toLowerCase())) {
-				 * Double v = Double.valueOf((String) p.getValue()); s.permeative(v); return v;
-				 */
-			}
-		}
-		return null;
-	}
-
-	public Set<String> getKnownIssue(String p) {
-		HashSet<String> knownIssues = new HashSet<String>();
-		if (null != know)
-			know.forEach((k, v) -> {
-				if (p.contains((String) v)) {
-					knownIssues.add((String) k);
-				}
-			});
-		return knownIssues;
 	}
 }
