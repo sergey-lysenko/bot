@@ -16,8 +16,10 @@ public class Search extends AbstractLeafScenario {
 
 	@Override
 	public void action() {
-		typeInto(SEARCH, RandomStringUtils.randomAlphabetic(2));
+		String query = RandomStringUtils.randomAlphabetic(2);
+		typeInto(SEARCH, query);
 		click(selectOne(findAll(ROW)));
+		put("last-query", query);
 	}
 
 	@Override

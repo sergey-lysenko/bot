@@ -5,7 +5,7 @@ import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
 import java.util.Arrays;
 import java.util.Set;
 
-import org.json.JSONObject;
+import com.google.gson.Gson;
 
 import works.lysenko.Common;
 import works.lysenko.Execution;
@@ -205,9 +205,9 @@ public class AbstractScenario extends Common implements Scenario {
 	public void put(Object field, Object value) {
 		Object o = x.data.put(field, value);
 		if (x.debug()) {
-			JSONObject json = new JSONObject(x.data);
-			log(3, "put(" + field + ")<" + o + " " + json.toString());
-			l.logFile(json.toString(), "data", "json");
+			String j = new Gson().toJson(x.data);
+			log(3, "put(" + field + ")<" + o + " " + j);
+			l.logFile(j, "data", "json");
 		}
 	}
 

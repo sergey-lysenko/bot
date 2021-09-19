@@ -96,6 +96,7 @@ public class Output {
 	 * template defined by RUN_JSON_FILENAME
 	 */
 	protected void jsonStats() {
+		// TODO: migrate to Gson
 		TreeMap<String, Result> sorted = x.r.getSorted();
 		BufferedWriter w;
 		try {
@@ -131,7 +132,7 @@ public class Output {
 						}
 						w.write("\"type\":\"" + type + "\",");
 						w.write("\"text\":\"");
-						w.write(text.replace("\"", FULLWIDTH_QUOTATION_MARK));
+						w.write(text.replaceAll("\n", " ").replace("\"", FULLWIDTH_QUOTATION_MARK));
 						w.write("\"}");
 						if (j-- > 1)
 							w.write(",");
