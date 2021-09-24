@@ -7,8 +7,17 @@ import java.util.Set;
 import works.lysenko.Execution;
 import works.lysenko.utils.SortedStringSet;
 
+/**
+ * @author Sergii Lysenko
+ *
+ */
 public class AbstractLeafScenario extends AbstractScenario {
 
+	/**
+	 * Abstract constructor of Leaf Scenario
+	 * 
+	 * @param x reference to Execution object
+	 */
 	public AbstractLeafScenario(Execution x) {
 		super(x);
 		marker(LEAF_SCENARIO_MARKER);
@@ -28,6 +37,15 @@ public class AbstractLeafScenario extends AbstractScenario {
 		action();
 		finals();
 		done();
+	}
+
+	/**
+	 * This is a stub implementation of empty finals() routine which is to be
+	 * redefined in scenarios as needed
+	 */
+	@Override
+	public void finals() {
+		
 	}
 
 	/**

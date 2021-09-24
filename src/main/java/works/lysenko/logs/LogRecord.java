@@ -2,6 +2,7 @@ package works.lysenko.logs;
 
 import java.text.DecimalFormat;
 
+@SuppressWarnings("javadoc")
 public class LogRecord {
 
 	long time;

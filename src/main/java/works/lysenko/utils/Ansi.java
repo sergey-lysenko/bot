@@ -1,5 +1,9 @@
 package works.lysenko.utils;
 
+/**
+ * @author Sergii Lysenko
+ */
+@SuppressWarnings("javadoc")
 public enum Ansi {
 	RESET("\033[0m"),
 
@@ -35,6 +39,9 @@ public enum Ansi {
 		this.code = code;
 	}
 
+	/**
+	 * @return ANSI code for color
+	 */
 	public String code() {
 		return code;
 	}

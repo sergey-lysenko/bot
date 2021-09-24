@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 
 import works.lysenko.Execution;
 
+/**
+ * @author Sergii Lysenko
+ */
 public class ScenarioLoader {
 
 	/**
@@ -23,7 +26,6 @@ public class ScenarioLoader {
 	public static Set<Scenario> read(String s, Execution x) {
 		Set<Class<?>> zz = findAll(s);
 		Set<Scenario> ss = new HashSet<Scenario>();
-
 		for (Class<?> z : zz) {
 			try {
 

@@ -21,34 +21,59 @@ public class AbstractNodeScenario extends AbstractScenario {
 	private Scenarios scenarios;
 
 	/**
+	 * Create an instance of Node Scenario with defined set of sub-scenarios
+	 * 
 	 * @param ss set of child scenarios with weight coefficient defined within ..
-	 * @param r  instance of Run object
+	 * @param x  instance of Run object
 	 */
 	public AbstractNodeScenario(Set<Scenario> ss, Execution x) {
 		super(x);
 		marker(NODE_SCENARIO_MARKER);
 		scenarios = new Scenarios(x);
 		scenarios.add(ss, x);
-		pervWeight = scenarios.pervasive();
+		pervWeight = scenarios.upstream();
 	}
 
 	/**
-	 * @param ss name of package to load child scenarios from with weight
-	 *           coefficient defined within ..
-	 * @param r  instance of Run object
+	 * Create a Node Scenario and add all scenarios from defined package as
+	 * sub-scenarios to this one
+	 * 
+	 * @param s name of package to load child scenarios from with weight coefficient
+	 *          defined within ..
+	 * @param x instance of Run object
 	 */
 	public AbstractNodeScenario(String s, Execution x) {
 		super(x);
 		marker(NODE_SCENARIO_MARKER);
 		scenarios = new Scenarios(x);
 		scenarios.add((Set<Scenario>) ScenarioLoader.read(s, x), x);
-		pervWeight = scenarios.pervasive();
+		pervWeight = scenarios.upstream();
 	}
-	
+
+	/**
+	 * Default constructor adds all scenarios from properly named package as
+	 * sub-scenarios of one being created
+	 * 
+	 * @param x instance of Run object
+	 */
+	public AbstractNodeScenario(Execution x) {
+		super(x);
+		marker(NODE_SCENARIO_MARKER);
+		scenarios = new Scenarios(x);
+		String name = this.getClass().getName();
+		{ // Strings are immutable, we need to create a new one
+			int i = name.lastIndexOf(".") + 1; // save the position of character in question
+			char[] nameChars = name.toCharArray(); // create character array
+			nameChars[i] = Character.toLowerCase(nameChars[i]); // Lowercase single char
+			name = String.valueOf(nameChars);
+		}
+		scenarios.add((Set<Scenario>) ScenarioLoader.read(name, x), x);
+		pervWeight = scenarios.upstream();
+	}
+
 	/**
 	 * @param onlyConfigured whether to include all available paths or only ones
 	 *                       currently configured for execution
-	 * 
 	 * @return calculated amount of possible execution paths of underlying scenarios
 	 */
 	public int combinations(boolean onlyConfigured) {
@@ -79,7 +104,17 @@ public class AbstractNodeScenario extends AbstractScenario {
 	}
 
 	/**
-	 * Returns the set with names of all underlying  
+	 * This is a stub implementation of empty finals() routine which is to be
+	 * redefined in scenarios as needed
+	 */
+	@Override
+	public void finals() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * Returns the set with names of all underlying
 	 * 
 	 * @param shortened or not by removing the common part of package names
 	 * @param decorated or not by scenario type marker
@@ -94,7 +129,7 @@ public class AbstractNodeScenario extends AbstractScenario {
 	/**
 	 * @return calculated pervasive weight of this scenario
 	 */
-	public double pervasive() {
+	public double upstream() {
 		return pervWeight;
 	}
 

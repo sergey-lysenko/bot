@@ -2,6 +2,7 @@ package works.lysenko.utils;
 
 import java.util.Comparator;
 
+@SuppressWarnings("javadoc")
 public class IgnoreCaseStringComparator implements Comparator<String> {
 
 	public IgnoreCaseStringComparator() {

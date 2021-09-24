@@ -1,5 +1,6 @@
 package works.lysenko;
 
+@SuppressWarnings("javadoc")
 public class Problem {
 	public long time;
 	public String text;

@@ -1,5 +1,6 @@
 package works.lysenko.logs;
 
+@SuppressWarnings("javadoc")
 public class Severe extends AbstractProblemLogData {
 
 	public Severe(int depth, String text) {

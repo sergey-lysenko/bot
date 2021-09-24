@@ -1,7 +1,10 @@
 package works.lysenko;
 
+@SuppressWarnings("javadoc")
 public class Constants {
 
+	public final static String LF = System.lineSeparator();
+	
 	public final static String DEFAULT_SHOTS_LOCATION = "target/screenshots/";
 	public final static String DEFAULT_RUNS_LOCATION = "target/runs/";
 	public final static String DEFAULT_PROPERTIES_LOCATION = "src/test/resources/";
@@ -10,13 +13,13 @@ public class Constants {
 	public static final String CONFIGURATION_CYCLES = "cycles";
 	public static final String CONFIGURATION_DEBUG = "debug";
 	public static final String CONFIGURATION_CONJOINT = "conjoint";
-	public static final String CONFIGURATION_PERVASIVE = "include_upstream";
-	public static final String CONFIGURATION_PERMEATIVE = "include_downstream";
+	public static final String CONFIGURATION_UPSTREAM = "include_upstream";
+	public static final String CONFIGURATION_DOWNSTREAM = "include_downstream";
 
 	public static final String DEFAULT_CYCLES = "1";
 	public static final String DEFAULT_SCENARIO_WEIGHT = "0.0";
-	public static final String DEFAULT_PERVASIVE = "false";
-	public static final String DEFAULT_PERMEATIVE = "false";
+	public static final String DEFAULT_UPSTREAM = "false";
+	public static final String DEFAULT_DOWNSTREAM = "false";
 	public static final String DEFAULT_DEBUG = "false";
 	public static final String DEFAULT_CONJOINT = "true";
 	public static final int DEFAULT_SUFFICIENCY_RETRIES = 11; // 13, 17

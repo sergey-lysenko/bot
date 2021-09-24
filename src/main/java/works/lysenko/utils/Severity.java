@@ -1,5 +1,6 @@
 package works.lysenko.utils;
 
+@SuppressWarnings("javadoc")
 public enum Severity {
 
 	S1("[SEVERE]", Ansi.RED), S2("[WARNING]", Ansi.YELLOW), S3("[NOTICE]", Ansi.CYAN), SK("[KNOWN-ISSUE]", Ansi.MAGENTA);

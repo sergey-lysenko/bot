@@ -1,5 +1,6 @@
 package works.lysenko.logs;
 
+@SuppressWarnings("javadoc")
 public class LineFeed extends AbstractLogData {
 
 	public LineFeed() {

@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
 
+@SuppressWarnings("javadoc")
 public class GoogleDomains {
 
     private static final List<Pair<String, Double>> d = new LinkedList<Pair<String, Double>>();

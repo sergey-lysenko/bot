@@ -46,6 +46,9 @@ public class Scenarios extends Common {
 
 	private int retries;
 
+	/**
+	 * @param x
+	 */
 	public Scenarios(Execution x) {
 		this(DEFAULT_SUFFICIENCY_RETRIES, x);
 	}
@@ -55,6 +58,7 @@ public class Scenarios extends Common {
 	 * 
 	 * @param sufficiencyRetries number of retries while trying to select a scenario
 	 *                           to be executed
+	 * @param x
 	 */
 	public Scenarios(int sufficiencyRetries, Execution x) {
 		super(x);
@@ -87,6 +91,7 @@ public class Scenarios extends Common {
 	 * Add single scenario and read it's weight from properties file
 	 * 
 	 * @param s Scenario to be adder
+	 * @param x
 	 * @param r
 	 */
 	public void add(Scenario s, Execution x) {
@@ -109,6 +114,7 @@ public class Scenarios extends Common {
 	 * Add set of scenarios and read their weights from properties
 	 * 
 	 * @param ss Set of Scenarios to be added
+	 * @param x
 	 * @param r
 	 */
 	public void add(Set<Scenario> ss, Execution x) {
@@ -118,6 +124,11 @@ public class Scenarios extends Common {
 			});
 	}
 
+	/**
+	 * @param onlyConfigured defines whether to include only scenarios configured to
+	 *                       start, or all available
+	 * @return nupber of possible execution paths
+	 */
 	public int combinations(boolean onlyConfigured) {
 		int c = 0;
 		for (Pair<Scenario, Double> s : scenarios) {
@@ -165,14 +176,14 @@ public class Scenarios extends Common {
 		double pervasiveWeight = 0.0;
 		double permeativeWeight = 0.0;
 		if (!scenarios.isEmpty()) {
-			section("Selecting scenario to execute among " + list(scenarios, (x._pervasive() || x._permeative())));
+			section("Selecting scenario to execute among " + list(scenarios, (x._upstream() || x._downstream())));
 			// Cloning scenarios into candidates
 			List<Pair<Scenario, Double>> candidates = new LinkedList<Pair<Scenario, Double>>();
 			for (Pair<Scenario, Double> pair : scenarios) {
 				Scenario k = pair.getKey();
 				Double v = pair.getValue();
-				if (x._pervasive()) {
-					pervasiveWeight = k.pervasive();
+				if (x._upstream()) {
+					pervasiveWeight = k.upstream();
 					v = v + pervasiveWeight;
 				}
 				if (k.executable()) {
@@ -189,12 +200,12 @@ public class Scenarios extends Common {
 				try {
 					s = (AbstractScenario) new EnumeratedDistribution<Scenario>(candidates).sample();
 				} catch (MathArithmeticException e) {
-					if (x._permeative()) {
+					if (x._downstream()) {
 						// Cloning candidates into permeates with same default weight
 						List<Pair<Scenario, Double>> permeates = new LinkedList<Pair<Scenario, Double>>();
 						for (Pair<Scenario, Double> pair : candidates) {
 							Scenario k = pair.getKey();
-							permeativeWeight = permeative(k);
+							permeativeWeight = downstream(k);
 							Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k, permeativeWeight);
 							permeates.add(newPair);
 							try {
@@ -209,7 +220,7 @@ public class Scenarios extends Common {
 					} else {
 						l.logProblem(S2,
 								"Unable to select a scenario among " + list(candidates, true)
-										+ (x._permeative() ? " and all nestested scenarios" : "")
+										+ (x._downstream() ? " and all nestested scenarios" : "")
 										+ ": combined weight is zero");
 						break;
 					}
@@ -247,10 +258,15 @@ public class Scenarios extends Common {
 		}
 	}
 
-	public List<Pair<Scenario, Double>> get() {
+	protected List<Pair<Scenario, Double>> get() {
 		return scenarios;
 	}
 
+	/**
+	 * @param shortened
+	 * @param decorated
+	 * @return list of underlying scenarios
+	 */
 	public Set<String> list(boolean shortened, boolean decorated) {
 		Set<String> c = new SortedStringSet();
 		for (Pair<Scenario, Double> s : scenarios)
@@ -274,15 +290,18 @@ public class Scenarios extends Common {
 		return packagePart + c.toString();
 	}
 
-	private Double permeative(Scenario k) {
-		return x.permeative(k);
+	private Double downstream(Scenario k) {
+		return x.downstream(k);
 	}
 
-	public Double pervasive() {
+	/**
+	 * @return calculated upstream weight
+	 */
+	public Double upstream() {
 		Double p = 0.0;
 		for (Pair<Scenario, Double> s : scenarios) {
 			p = p + s.getValue(); // weight of a scenario
-			p = p + s.getKey().pervasive(); // weight of underlying
+			p = p + s.getKey().upstream(); // weight of underlying
 		}
 		return p;
 	}

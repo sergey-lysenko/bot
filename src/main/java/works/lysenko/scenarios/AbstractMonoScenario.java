@@ -7,10 +7,16 @@ import java.util.Set;
 import works.lysenko.Execution;
 import works.lysenko.utils.SortedStringSet;
 
+/**
+ * @author Sergii Lysenko
+ */
 public class AbstractMonoScenario extends AbstractScenario {
 
 	private boolean executed = false;
 
+	/**
+	 * @param x instance of Execution object
+	 */
 	public AbstractMonoScenario(Execution x) {
 		super(x);
 		marker(MONO_SCENARIO_MARKER);
@@ -38,6 +44,16 @@ public class AbstractMonoScenario extends AbstractScenario {
 		finals();
 		done();
 		executed = true;
+	}
+
+	/**
+	 * This is a stub implementation of empty finals() routine which is to be
+	 * redefined in scenarios as needed
+	 */
+	@Override
+	public void finals() {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**

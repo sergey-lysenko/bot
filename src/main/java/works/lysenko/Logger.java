@@ -28,19 +28,36 @@ import works.lysenko.logs.Warning;
 import works.lysenko.utils.Ansi;
 import works.lysenko.utils.Severity;
 
+/**
+ * @author Sergii Lysenko
+ */
 public class Logger {
 
 	private static void logConsole(String s) {
 		System.out.println(s);
 	}
+
+	/**
+	 * Link to Execution object
+	 */
 	public Execution x;
+	/**
+	 * Set of browser logs to read
+	 */
 	public Set<String> logsToRead;
+	/**
+	 * Queue of log messages
+	 */
 	public PriorityQueue<LogRecord> log;
 	protected BufferedWriter logWriter;
 	private long prev = 0;
 
 	private int length = 5;
 
+	/**
+	 * @param x
+	 * @param logsToRead
+	 */
 	public Logger(Execution x, Set<String> logsToRead) {
 		super();
 		this.x = x;
@@ -149,6 +166,13 @@ public class Logger {
 		}
 	}
 
+	/**
+	 * Write a string to a named log file
+	 * 
+	 * @param s text to write
+	 * @param n name of log file
+	 * @param ex extension of log file
+	 */
 	public void logFile(String s, String n, String ex) {
 		String location = DEFAULT_RUNS_LOCATION + x.t.startedAt() + "/";
 		BufferedWriter writer = null;
@@ -173,16 +197,30 @@ public class Logger {
 
 	}
 
+	/**
+	 * Log a problem as Known Issue
+	 * 
+	 * @param s description of known issue
+	 */
 	public void logKnownIssue(String s) {
 		logProblem(Severity.SK, s);
 	}
 
+	/**
+	 * Log an empty line
+	 */
 	public void logln() {
 		LogRecord lr;
 		lr = new LogRecord(x.timer(), new LineFeed());
 		log.add(lr);
 	}
 
+	/**
+	 * Log a problem
+	 * 
+	 * @param se severity of the problem
+	 * @param st description of the problem
+	 */
 	public void logProblem(Severity se, String st) {
 		int depth = x.currentDepth();
 		log.add(problem(x.timer(), depth, se.tag() + " " + st));
@@ -216,7 +254,7 @@ public class Logger {
 			LogRecord r = log.poll();
 			Long time = r.time();
 			String line = r.render();
-			if (x.debug()) {
+			if (x._debug()) {
 				since = time - prev;
 				int thisLength = String.valueOf(since).length();
 				if (thisLength > length)

@@ -1,5 +1,6 @@
 package works.lysenko.utils;
 
+@SuppressWarnings("javadoc")
 public class Stopwatch {
     private long start;
 

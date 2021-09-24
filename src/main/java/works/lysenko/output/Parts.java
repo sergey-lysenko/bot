@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import works.lysenko.Result;
 
+@SuppressWarnings("javadoc")
 public class Parts {
 	public TreeMap<String, Result> head;
 	public TreeMap<String, Result> body;

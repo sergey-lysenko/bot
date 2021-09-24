@@ -15,9 +15,15 @@ import works.lysenko.utils.SortedResultMap;
  */
 public class Results {
 
+	/**
+	 * 
+	 */
 	public Execution x;
 	private Map<String, Result> results;
 
+	/**
+	 * @param x
+	 */
 	public Results(Execution x) {
 		super();
 		this.x = x;
@@ -29,6 +35,7 @@ public class Results {
 	 * execution data then just times of execution)
 	 * 
 	 * @param s          tag of test execution
+	 * @param t
 	 * @param confWeight configuration eight coefficient
 	 * @param pervWeight
 	 * @param permWeight
@@ -37,6 +44,7 @@ public class Results {
 	public Result countScenario(String s, ScenarioType t, double confWeight, double pervWeight, double permWeight) {
 		Result r = results.getOrDefault(s, new Result());
 		{
+			// TODO: change to upstream / downstream notation
 			r.confWeight = confWeight;
 			r.pervWeight = pervWeight;
 			r.permWeight = permWeight;
@@ -72,7 +80,8 @@ public class Results {
 	 * of items and improves readability, including or excluding not executed
 	 * scenarios
 	 * 
-	 * @param b whether to include non-executed scenarios or not
+	 * @param ignoreCase
+	 * @param shortened
 	 * @return execution counters sorted properly
 	 */
 	public TreeMap<String, Result> getSorted(boolean ignoreCase, boolean shortened) {

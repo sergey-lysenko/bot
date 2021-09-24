@@ -9,6 +9,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 
+@SuppressWarnings("javadoc")
 public class WebDrivers {
 
 	public static WebDriver get(Browser browser) {

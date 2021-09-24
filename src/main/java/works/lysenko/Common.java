@@ -31,6 +31,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import works.lysenko.utils.Ansi;
 
+/**
+ * @author Sergii Lysenko
+ */
 public class Common {
 
 	/**
@@ -106,28 +109,33 @@ public class Common {
 	}
 
 	/**
-	 * Get an element from a list of WebElement objects.
+	 * Get random object from a list of objects
 	 * 
-	 * @param l list of WebElement objects to select from
-	 * @return a WebElement object from a list
-	 */
-	public static WebElement select3One(List<WebElement> l) {
-		return l.get(new Random().nextInt(l.size()));
-	}
-
-	/**
-	 * @param <T>
-	 * @param l
-	 * @return
+	 * @param <T> type of objects in a list
+	 * @param l   list of objects
+	 * @return random object from a list of objects
 	 */
 	public static <T> T selectOne(List<T> l) {
 		return l.get(new Random().nextInt(l.size()));
 	}
 
-	public static Object selectOne(Object[] s) {
-		return s[new Random().nextInt(Array.getLength(s))];
+	/**
+	 * Get random object from an array of objects
+	 * 
+	 * @param a array of objects
+	 * @return random element from an array of objects
+	 */
+	public static Object selectOne(Object[] a) {
+		return a[new Random().nextInt(Array.getLength(a))];
 	}
 
+	/**
+	 * Get random object from a set of objects
+	 * 
+	 * @param <T> type of objects in a set
+	 * @param s set of objects 
+	 * @return random object from a set of objects
+	 */
 	public static <T> Object selectOne(Set<T> s) {
 		// TODO: optimize
 		return s.toArray()[new Random().nextInt(s.size())];
@@ -161,7 +169,7 @@ public class Common {
 	 * Supply visual representation for non-printable character
 	 * 
 	 * @param k key to be screened
-	 * @return
+	 * @return visual representation for non-printable character
 	 */
 	public static String visualize(Keys k) {
 		switch (k) {
@@ -197,22 +205,46 @@ public class Common {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	public Output o;
 
+	/**
+	 * 
+	 */
 	public Logger l;
 
+	/**
+	 * 
+	 */
 	public Results r;
 
+	/**
+	 * 
+	 */
 	public Execution x;
 
+	/**
+	 * 
+	 */
 	public WebDriver d;
 
+	/**
+	 * 
+	 */
 	public WebDriverWait w;
 
+	/**
+	 * 
+	 */
 	public Common() {
 		super();
 	}
 
+	/**
+	 * @param x instance of Execution object
+	 */
 	public Common(Execution x) {
 		super();
 		this.x = x;
@@ -223,6 +255,10 @@ public class Common {
 		this.w = x.w;
 	}
 
+	/**
+	 * 
+	 * @param lc
+	 */
 	public void clear(String... lc) {
 		l.log("Clearing " + describe(lc));
 		find(true, lc).clear();
@@ -237,12 +273,16 @@ public class Common {
 		find(true, lc).click(); // Silent find during click
 	}
 
+	/**
+	 * @param e WebElement to click on
+	 */
 	public void click(WebElement e) {
 		click(e, true);
 	}
 
 	/**
 	 * @param e element to be clicked on
+	 * @param geometry 
 	 */
 	public void click(WebElement e, boolean geometry) {
 		l.log("Clicking " + describe(e, true));
@@ -269,6 +309,13 @@ public class Common {
 		return tg + ((an.isEmpty()) ? "" : "'" + an + "'") + ((geometry) ? (" @ " + describe(e.getRect())) : "");
 	}
 
+	/**
+	 * Find an element defined by one or several nested String locators
+	 * 
+	 * @param silent if true, no output will be added to log
+	 * @param lc     one or several nested String locators
+	 * @return WebElement object
+	 */
 	public WebElement find(boolean silent, String... lc) {
 		WebElement e = null;
 		if (!silent && lc.length > 0)
@@ -286,10 +333,23 @@ public class Common {
 		return find(e);
 	}
 
+	/**
+	 * Find an element defined by one or several nested String locators
+	 * 
+	 * @param lc one or several nested String locators
+	 * @return WebElement object
+	 */
 	public WebElement find(String... lc) {
 		return find(false, lc);
 	}
 
+	/**
+	 * "Find" an element which could be located outside of current view by
+	 * performing moveToElement() call
+	 * 
+	 * @param e WebElement to scroll to
+	 * @return same web element
+	 */
 	public WebElement find(WebElement e) {
 		Actions actions = new Actions(d);
 		actions.moveToElement(e);
@@ -310,6 +370,8 @@ public class Common {
 
 	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.log(ll, s)}
+	 * @param ll 
+	 * @param s 
 	 */
 	public void log(int ll, String s) {
 		l.log(ll, s);
@@ -317,6 +379,7 @@ public class Common {
 
 	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.log(s)}
+	 * @param s 
 	 */
 	public void log(String s) {
 		l.log(s);
@@ -411,14 +474,21 @@ public class Common {
 		return d.findElement(by(lc)).getText();
 	}
 
+	/**
+	 * Read contents of the WebElement
+	 * 
+	 * @param e WebElement to read text from
+	 * @return text
+	 */
 	public String read(WebElement e) {
 		return read(e, true);
 	}
 
 	/**
-	 * Read contents of the element defined by string locator
+	 * Read contents of given WebElement with optional logging of geometry information
 	 * 
-	 * @param lc string locator of an element
+	 * @param e 
+	 * @param geometry 
 	 * @return result of .getText() for this element
 	 */
 	public String read(WebElement e, boolean geometry) {
@@ -427,7 +497,7 @@ public class Common {
 	}
 
 	/**
-	 * Read contents of the element defined by string locator
+	 * Read contents of the element defined by String locator
 	 * 
 	 * @param lc string locator of an element
 	 * @return result of .getText() for this element
@@ -466,18 +536,31 @@ public class Common {
 		find(lc).sendKeys(s);
 	}
 
+	/**
+	 * Sleep during defined amount of milliseconds
+	 * 
+	 * @param ms
+	 */
 	public void sleep(long ms) {
 		sleep(ms, null);
 	}
 
+	/**
+	 * Sleep during defined amount of milliseconds with optional bypassing of
+	 * logging
+	 * 
+	 * @param ms
+	 * @param silent
+	 */
 	public void sleep(long ms, boolean silent) {
 		sleep(ms, null, silent);
 	}
 
 	/**
-	 * Sleep during defined amount of milliseconds with record in the test log
+	 * Sleep during defined amount of milliseconds with optional custom message
 	 * 
 	 * @param ms amount of milliseconds to pause for
+	 * @param s
 	 */
 	public void sleep(long ms, String s) {
 		if (ms < SILENT_SLEEPING_TRESHHOLD)
@@ -487,10 +570,12 @@ public class Common {
 	}
 
 	/**
-	 * Sleep during defined amount of milliseconds with optional bypassing of
-	 * logging
+	 * Sleep during defined amount of milliseconds with optional custom message and
+	 * optional bypassing of logging
 	 * 
 	 * @param ms     amount of milliseconds to pause for
+	 * @param s      text to displey in log, can be set to null for default
+	 *               "Sleeping X ms" message
 	 * @param silent whether to bypass output to test log. Useful for short delays
 	 */
 	public void sleep(long ms, String s, boolean silent) {

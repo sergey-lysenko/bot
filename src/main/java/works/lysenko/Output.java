@@ -25,10 +25,19 @@ import works.lysenko.output.Groups;
 import works.lysenko.output.Parts;
 import works.lysenko.utils.Ansi;
 
+/**
+ * @author Sergii Lysenko
+ */
 public class Output {
 
+	/**
+	 * 
+	 */
 	public Execution x;
 
+	/**
+	 * @param x
+	 */
 	public Output(Execution x) {
 		super();
 		this.x = x;

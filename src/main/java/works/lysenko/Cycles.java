@@ -2,12 +2,12 @@ package works.lysenko;
 
 import static works.lysenko.Constants.CONFIGURATION_CONJOINT;
 import static works.lysenko.Constants.CONFIGURATION_CYCLES;
-import static works.lysenko.Constants.CONFIGURATION_PERMEATIVE;
-import static works.lysenko.Constants.CONFIGURATION_PERVASIVE;
+import static works.lysenko.Constants.CONFIGURATION_DOWNSTREAM;
+import static works.lysenko.Constants.CONFIGURATION_UPSTREAM;
 import static works.lysenko.Constants.DEFAULT_CONJOINT;
 import static works.lysenko.Constants.DEFAULT_CYCLES;
-import static works.lysenko.Constants.DEFAULT_PERMEATIVE;
-import static works.lysenko.Constants.DEFAULT_PERVASIVE;
+import static works.lysenko.Constants.DEFAULT_DOWNSTREAM;
+import static works.lysenko.Constants.DEFAULT_UPSTREAM;
 import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
 import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
 import static works.lysenko.utils.Severity.S2;
@@ -21,12 +21,25 @@ import works.lysenko.scenarios.Scenarios;
 import works.lysenko.utils.Ansi;
 import works.lysenko.utils.SortedStringSet;
 
+/**
+ * @author Sergii Lysenko
+ */
 public class Cycles {
 
+	/**
+	 * Associated Execution object
+	 */
 	public Execution x;
+	/**
+	 * Amount of test cycles left to be executed in current run
+	 */
 	public int cyclesToDo;
 	protected Scenarios scenarios;
 
+	/**
+	 * @param ss
+	 * @param x
+	 */
 	public Cycles(Set<Scenario> ss, Execution x) {
 		super();
 		this.x = x;
@@ -36,6 +49,10 @@ public class Cycles {
 		x.cycles = this;
 	}
 
+	/**
+	 * @param s
+	 * @param x
+	 */
 	public Cycles(String s, Execution x) {
 		super();
 		this.x = x;
@@ -49,6 +66,9 @@ public class Cycles {
 		return Ansi.colorize(String.valueOf(s), Ansi.YELLOW_BOLD);
 	}
 
+	/**
+	 * Execute configured cycles
+	 */
 	public void execute() {
 		if (cyclesToDo == 0)
 			x.l.logProblem(S2, "No test cycles were perfomed");
@@ -65,12 +85,15 @@ public class Cycles {
 					+ GENERATED_CONFIG_FILE + "' was updated");
 	}
 
+	/**
+	 * @return default configuration properties
+	 */
 	public Set<String> defConf() {
 		Set<String> c = new SortedStringSet();
 		c.add("_" + CONFIGURATION_CYCLES + " = " + DEFAULT_CYCLES);
 		c.add("_" + CONFIGURATION_CONJOINT + " = " + DEFAULT_CONJOINT);
-		c.add("_" + CONFIGURATION_PERVASIVE + " = " + DEFAULT_PERVASIVE);
-		c.add("_" + CONFIGURATION_PERMEATIVE + " = " + DEFAULT_PERMEATIVE);
+		c.add("_" + CONFIGURATION_UPSTREAM + " = " + DEFAULT_UPSTREAM);
+		c.add("_" + CONFIGURATION_DOWNSTREAM + " = " + DEFAULT_DOWNSTREAM);
 		scenarios.list(false, false).forEach((s) -> {
 			c.add(s + " = " + DEFAULT_SCENARIO_WEIGHT);
 		});

@@ -3,13 +3,13 @@ package works.lysenko;
 import static works.lysenko.Constants.CONFIGURATION_CONJOINT;
 import static works.lysenko.Constants.CONFIGURATION_CYCLES;
 import static works.lysenko.Constants.CONFIGURATION_DEBUG;
-import static works.lysenko.Constants.CONFIGURATION_PERMEATIVE;
-import static works.lysenko.Constants.CONFIGURATION_PERVASIVE;
+import static works.lysenko.Constants.CONFIGURATION_DOWNSTREAM;
+import static works.lysenko.Constants.CONFIGURATION_UPSTREAM;
 import static works.lysenko.Constants.DEFAULT_CONJOINT;
 import static works.lysenko.Constants.DEFAULT_CYCLES;
 import static works.lysenko.Constants.DEFAULT_DEBUG;
-import static works.lysenko.Constants.DEFAULT_PERMEATIVE;
-import static works.lysenko.Constants.DEFAULT_PERVASIVE;
+import static works.lysenko.Constants.DEFAULT_DOWNSTREAM;
+import static works.lysenko.Constants.DEFAULT_UPSTREAM;
 import static works.lysenko.Constants.DEFAULT_PROPERTIES_LOCATION;
 
 import java.io.FileInputStream;
@@ -69,24 +69,59 @@ public class Execution extends Common {
 		return null;
 	}
 
+	/**
+	 * Stack of currently executed scenarios
+	 */
 	public Stack<AbstractScenario> current = new Stack<AbstractScenario>();
+	/**
+	 * Linked Cycles object
+	 */
 	public Cycles cycles = null;
 
-	public Integer minDepth = null;
+	/**
+	 * This information is shared between Scenarios
+	 */
+	public Integer minDepth = null; // TODO: rework this implementation to avoid usage of public access to this
+									// field from single external code location
 	protected Stopwatch t;
 
+	/**
+	 * Cached GsonBuilder object to share between calls
+	 */
 	public GsonBuilder gsonBuilder = new GsonBuilder();
 	private Properties prop;
 	private Properties know;
+	/**
+	 * Shared data storage (for prerequisites management)
+	 */
 	public Properties data;
 
+	/**
+	 * Name of the test execution for logging purposes
+	 */
 	public String name;
+	/**
+	 * Target domain name of current execution
+	 */
 	public String domain;
 
+	/**
+	 * @param implicitWait
+	 * @param explicitWait
+	 * @param logsToRead
+	 * @param name
+	 */
 	public Execution(int implicitWait, int explicitWait, Set<String> logsToRead, String name) {
 		this(implicitWait, explicitWait, logsToRead, name, null);
 	}
 
+	/**
+	 * @param implicitWait
+	 * @param explicitWait
+	 * @param logsToRead
+	 * @param name
+	 * @param domain
+	 */
 	public Execution(int implicitWait, int explicitWait, Set<String> logsToRead, String name, String domain) {
 		super();
 		this.x = this;
@@ -112,20 +147,39 @@ public class Execution extends Common {
 		this.domain = domain;
 	}
 
+	/**
+	 * @return whether current test execution have "conjoint" mode active
+	 */
 	public boolean _conjoint() {
 		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_CONJOINT, DEFAULT_CONJOINT));
 	}
 
+	/**
+	 * @return configured number of cycles to be executed
+	 */
 	public int _cycles() {
 		return Integer.valueOf(prop.getProperty("_" + CONFIGURATION_CYCLES, DEFAULT_CYCLES));
 	}
 
-	public boolean _permeative() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_PERMEATIVE, DEFAULT_PERMEATIVE));
+	/**
+	 * @return true if debug mode is configured in current test run
+	 */
+	public boolean _debug() {
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DEBUG, DEFAULT_DEBUG));
 	}
 
-	public boolean _pervasive() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_PERVASIVE, DEFAULT_PERVASIVE));
+	/**
+	 * @return true if downstream weight distribution is activated in configuration
+	 */
+	public boolean _downstream() {
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DOWNSTREAM, DEFAULT_DOWNSTREAM));
+	}
+
+	/**
+	 * @return true if upstream weight distribution is activated in configuration
+	 */
+	public boolean _upstream() {
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_UPSTREAM, DEFAULT_UPSTREAM));
 	}
 
 	/**
@@ -155,23 +209,34 @@ public class Execution extends Common {
 			d.quit();
 	}
 
+	/**
+	 * @return number of current cycle
+	 */
 	public int currentCycle() {
 		return _cycles() - cycles.cyclesToDo;
 	}
 
+	/**
+	 * @return logical depth of current scenario
+	 */
 	public int currentDepth() {
 		return (null == x.currentScenario()) ? 0 : x.currentScenario().depth();
 	}
 
+	/**
+	 * @return link to currently executed Scenario
+	 */
 	public AbstractScenario currentScenario() {
 		return current.empty() ? null : current.peek();
 	}
 
-	public boolean debug() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DEBUG, DEFAULT_DEBUG));
-	}
-
+	/**
+	 * @param p string to search Known Issues
+	 * @return Set of KnownIssues for given query
+	 */
 	public Set<String> getKnownIssue(String p) {
+		// TODO: either add ability to have several known issues for one query, or
+		// change this routine to return single known issue
 		HashSet<String> knownIssues = new HashSet<String>();
 		if (null != know)
 			know.forEach((k, v) -> {
@@ -182,30 +247,27 @@ public class Execution extends Common {
 		return knownIssues;
 	}
 
-	public Set<Scenario> getScenarios() {
-		for (Entry<Object, Object> p : prop.entrySet()) {
-			String key = (String) p.getKey();
-			if (!(key.charAt(0) == '_')) {
-				/*
-				 * if (s.getClass().getName().toLowerCase().contains(key.toLowerCase())) {
-				 * Double v = Double.valueOf((String) p.getValue()); s.permeative(v); return v;
-				 */
-			}
-		}
-		return null;
-	}
-
+	/**
+	 * @return Gson object built by cached GsonBuilder
+	 */
 	public Gson gson() {
 		return gsonBuilder.create();
 	}
 
-	public Double permeative(Scenario s) {
+	/**
+	 * Calculate downstream weights of given scenario from current execution parameters
+	 * 
+	 * @param s Scenario to calculate downstream weights
+	 * @return cumulative downstream weight 
+	 */
+	public Double downstream(Scenario s) {
+		// TODO: move this to Scenario class(es) ?
 		for (Entry<Object, Object> p : prop.entrySet()) {
 			String key = (String) p.getKey();
 			if (!(key.charAt(0) == '_')) {
 				if (s.getClass().getName().toLowerCase().contains(key.toLowerCase())) {
 					Double v = Double.valueOf((String) p.getValue());
-					s.permeative(v);
+					s.downstream(v);
 					return v;
 				}
 			}

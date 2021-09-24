@@ -1,7 +1,14 @@
 package works.lysenko.logs;
 
+/**
+ * @author Sergii Checkbox
+ */
 public interface LogData {
 
+	// TODO: why not .toString();?
+	/**
+	 * @return text representation of Log Data
+	 */
 	public String render();
 
 	/**
