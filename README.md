@@ -1,5 +1,7 @@
 # WebDriver Bot PoC repository #
 
+Universal Bot for Exploratory testing based on Selenium WebDriver
+
 ## Software prerequisites ##
 
 * Java JDK 11 or later
