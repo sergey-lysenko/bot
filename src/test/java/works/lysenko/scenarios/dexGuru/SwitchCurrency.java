@@ -13,6 +13,7 @@ import org.openqa.selenium.WebElement;
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;
 
+@SuppressWarnings("javadoc")
 public class SwitchCurrency extends AbstractLeafScenario {
 
 	public SwitchCurrency(Execution x) {

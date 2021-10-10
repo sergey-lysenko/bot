@@ -173,49 +173,48 @@ public class Scenarios extends Common {
 	 */
 	public void execute() {
 		int retries = this.retries;
-		double pervasiveWeight = 0.0;
-		double permeativeWeight = 0.0;
+		double downstreamWeight = 0.0;
 		if (!scenarios.isEmpty()) {
 			section("Selecting scenario to execute among " + list(scenarios, (x._upstream() || x._downstream())));
-			// Cloning scenarios into candidates
 			List<Pair<Scenario, Double>> candidates = new LinkedList<Pair<Scenario, Double>>();
-			for (Pair<Scenario, Double> pair : scenarios) {
-				Scenario k = pair.getKey();
-				Double v = pair.getValue();
-				if (x._upstream()) {
-					pervasiveWeight = k.upstream();
-					v = v + pervasiveWeight;
+			{ // Cloning scenarios into candidates and populating upstream weights
+				for (Pair<Scenario, Double> pair : scenarios) {
+					Scenario k = pair.getKey();
+					Double v = pair.getValue();
+					if (x._upstream()) {
+						v = v + k.upstream();
+					}
+					if (k.executable()) {
+						Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k,
+								(v == Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : v);
+						candidates.add(newPair);
+					} else
+						l.logProblem(S3, k.name() + " is not executable");
 				}
-				if (k.executable()) {
-					Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k,
-							(v == Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : v);
-					candidates.add(newPair);
-				} else
-					l.logProblem(S3, k.name() + " is not executable");
 			}
 			AbstractScenario s = null;
 			boolean sufficed = false;
-			do {
+			do { // Main selection cycle
 				boolean doubleBreak = false;
-				try {
+				try { // Select a scenario among candidates
 					s = (AbstractScenario) new EnumeratedDistribution<Scenario>(candidates).sample();
-				} catch (MathArithmeticException e) {
+				} catch (MathArithmeticException e) { // Most probably - all weights are zero
 					if (x._downstream()) {
 						// Cloning candidates into permeates with same default weight
 						List<Pair<Scenario, Double>> permeates = new LinkedList<Pair<Scenario, Double>>();
 						for (Pair<Scenario, Double> pair : candidates) {
 							Scenario k = pair.getKey();
-							permeativeWeight = downstream(k);
-							Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k, permeativeWeight);
+							downstreamWeight = downstream(k);
+							Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k, downstreamWeight);
 							permeates.add(newPair);
-							try {
-								s = (AbstractScenario) new EnumeratedDistribution<Scenario>(permeates).sample();
-							} catch (MathArithmeticException e1) {
-								l.logProblem(S2, "Unable to select a scenario among " + list(candidates, true)
-										+ ": out of upstream");
-								doubleBreak = true;
-								break;
-							}
+						}
+						try { // Select a scenario among permeates
+							s = (AbstractScenario) new EnumeratedDistribution<Scenario>(permeates).sample();
+						} catch (MathArithmeticException e1) {
+							l.logProblem(S2, "Unable to select a scenario among " + list(candidates, true)
+									+ ": no downstream weights");
+							doubleBreak = true;
+							break;
 						}
 					} else {
 						l.logProblem(S2,
@@ -253,7 +252,9 @@ public class Scenarios extends Common {
 			if (!(retries >= 0)) {
 				l.logProblem(S2, "Scenario selection exausted after " + this.retries + " retries");
 			}
-		} else {
+		} else
+
+		{
 			l.logProblem(S3, "Current Node scenario have no nested scenarios. Is it just a Leaf scenario?");
 		}
 	}

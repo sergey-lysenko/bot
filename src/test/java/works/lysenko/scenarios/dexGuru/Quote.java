@@ -7,6 +7,7 @@ import static works.lysenko.C._BUY_;
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;
 
+@SuppressWarnings("javadoc")
 public class Quote extends AbstractLeafScenario {
 
 	public Quote(Execution x) {

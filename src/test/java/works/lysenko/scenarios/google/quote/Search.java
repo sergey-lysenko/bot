@@ -6,6 +6,7 @@ import static works.lysenko.C.quoteShortEnough;
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;
 
+@SuppressWarnings("javadoc")
 public class Search extends AbstractLeafScenario {
 	public Search(Execution x) {
 		super(x);

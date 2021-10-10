@@ -4,6 +4,10 @@ import static works.lysenko.Constants.DEFAULT_RUNS_LOCATION;
 import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
 import static works.lysenko.Constants.RUN_JSON_FILENAME;
 import static works.lysenko.Constants.RUN_SVG_FILENAME;
+import static works.lysenko.utils.Ansi.RED_BACKGROUND;
+import static works.lysenko.utils.Ansi.GREEN_BACKGROUND;
+import static works.lysenko.utils.Ansi.BLACK;
+import static works.lysenko.utils.Ansi.colorize;
 
 import java.awt.Color;
 import java.io.BufferedWriter;
@@ -23,7 +27,6 @@ import org.jfree.svg.SVGUtils;
 
 import works.lysenko.output.Groups;
 import works.lysenko.output.Parts;
-import works.lysenko.utils.Ansi;
 
 /**
  * @author Sergii Lysenko
@@ -162,21 +165,35 @@ public class Output {
 		return DEFAULT_RUNS_LOCATION + Common.fill(t, String.valueOf(x.t.startedAt()));
 	}
 
-	/**
-	 * Write test execution statistics only to console
-	 */
-	public void stats() {
+	protected void stats() {
 		int total = x.cycles.scenarios.combinations(false);
 		int active = x.cycles.scenarios.combinations(true);
 		String persentage = new DecimalFormat("####0.0").format((Double.valueOf(active) / Double.valueOf(total)) * 100)
 				+ "%";
-		x.l.log(0, "= Execution statistics =");
+
+		if (!x.current.empty()) {
+			// If scenarios stack is not empty at that point, it means that nomal execution
+			// was halted due to an error
+			x.current.removeAllElements(); // It works, but this is kinda wrong. Non-empty execution stack is used as an
+											// indicator for Statistics that there were an error. It is nonelegant
+											// cross-reference. TODO: rework this to proper implementation with catching
+											// exceptions and processing that properly
+			x.l.logln();
+			x.l.log(0, colorize(colorize("                                      ", RED_BACKGROUND), BLACK));
+			x.l.log(0, colorize(colorize(" = Execution was halted by an error = ", RED_BACKGROUND), BLACK));
+			x.l.log(0, colorize(colorize("                                      ", RED_BACKGROUND), BLACK));
+			x.makeSnapshot("_[EXIT]_");
+		} else {
+			x.l.log(0, colorize(colorize("                          ", GREEN_BACKGROUND), BLACK));
+			x.l.log(0, colorize(colorize(" = Execution statistics = ", GREEN_BACKGROUND), BLACK));
+			x.l.log(0, colorize(colorize("                          ", GREEN_BACKGROUND), BLACK));
+		}
 		TreeMap<String, Result> sorted = x.r.getSorted();
 		x.l.log(0, total + " paths were possible with current set of Scenarios");
 		x.l.log(0, active + " (" + persentage + ") among these were allowed by current configuration");
 		// TODO: add statistics of actually executed Node Scenarios
 		if (sorted.entrySet().isEmpty())
-			x.l.log(0, Ansi.colorize("[WARNING] No Test Execution Data available"));
+			x.l.log(0, colorize("[WARNING] No Test Execution Data available"));
 		else
 			for (Map.Entry<String, Result> e : sorted.entrySet()) {
 				x.l.log(0, e.getKey() + " : " + e.getValue().toString());

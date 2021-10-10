@@ -20,6 +20,7 @@ import works.lysenko.utils.SortedStringSet;
  */
 public abstract class AbstractScenario extends Common implements Scenario {
 
+	private long startAt = 0;
 	protected double pervWeight = 0.0;
 	private double downWeight = 0.0;
 	private String marker = "?";
@@ -100,11 +101,12 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	}
 
 	protected void done() {
+		long r = x.timer() - startAt;
 		if (standalone()) {
-			l.log(0, "Standalone " + this.name() + " done");
+			l.log(0, "Standalone " + this.name() + " done in " + timeH(r));
 			l.logln();
 		} else {
-			l.log(0, this.name() + " done");
+			l.log(0, this.name() + " done in " + timeH(r));
 		}
 		x.current.pop();
 	}
@@ -134,6 +136,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	 * Default common code for a scenario execution
 	 */
 	public void execute() {
+		startAt = x.timer();
 		x.current.push(this);
 		l.logln();
 		l.log(0, Ansi.colorize(name(true), Ansi.BLUE_BOLD_BRIGHT) + " : "

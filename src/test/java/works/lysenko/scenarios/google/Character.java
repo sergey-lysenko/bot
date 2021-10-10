@@ -11,6 +11,7 @@ import works.lysenko.scenarios.google.character.Lucky;
 import works.lysenko.scenarios.google.character.Search;
 import works.lysenko.utils.Fakers;
 
+@SuppressWarnings("javadoc")
 public class Character extends AbstractNodeScenario {
 	public Character(Execution x) {
 		super(Set.of(new Search(x), new Lucky(x), new Enter(x)), x);

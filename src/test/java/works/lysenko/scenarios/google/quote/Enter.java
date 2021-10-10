@@ -7,6 +7,7 @@ import org.openqa.selenium.Keys;
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;
 
+@SuppressWarnings("javadoc")
 public class Enter extends AbstractLeafScenario {
 	public Enter(Execution x) {
 		super(x);

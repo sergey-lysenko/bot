@@ -1,13 +1,13 @@
 package works.lysenko;
 
+@SuppressWarnings("javadoc")
 public class C { // C for Constants & Common
 
 	// Parameters
 	public static final String DEFAULT_TEST = "bot";
 	public static final String DEFAULT_DEX_DOMAIN = "dex.guru";
 	public static final String TEST = (null == System.getenv("TEST")) ? DEFAULT_TEST : System.getenv("TEST");
-	public static final String DEX_DOMAIN = (null == System.getenv("DEX_DOMAIN")) ? DEFAULT_DEX_DOMAIN
-			: System.getenv("DEX_DOMAIN");
+
 	// try to increase this limit and see the failures
 	public static final Integer MAX_QUOTE_LENGHT_FOR_BUTTONS = 30;
 
@@ -17,6 +17,8 @@ public class C { // C for Constants & Common
 	public static final String GOOGLE_LUCKY_BUTTON = "//input[@name='btnI']";
 
 	// Dex.guru
+	public static final String DEX_DOMAIN = (null == System.getenv("DEX_DOMAIN")) ? DEFAULT_DEX_DOMAIN
+			: System.getenv("DEX_DOMAIN");
 	public final static String LOADER_RAINBOW = "//div[@class='loader-guru__rainbow']";
 	public final static String LOADER_AVATAR = "//div[@class='loader-guru__avatar']";
 	public final static String GRAPH = "//div[@class='graph']";
@@ -36,7 +38,7 @@ public class C { // C for Constants & Common
 
 	public final static String SEARCH = "//input[@class='omnibox-search__query']";
 	public final static String ROW = "//tr[@class='dropdown-search__trow token']";
-	
+
 	public final static String _BUY_ = "//div[@class='tradeform-tab tradeform-tab--buy']";
 	public final static String _SELL_ = "//div[@class='tradeform-tab tradeform-tab--sell']";
 
@@ -49,4 +51,8 @@ public class C { // C for Constants & Common
 		return (null == x.data.get("quote")) ? true : (Integer) x.data.get("quote") < C.MAX_QUOTE_LENGHT_FOR_BUTTONS;
 	}
 
+	// Decentraland
+	public static final String DECENTRALAND_DOMAIN = "decentraland.org";
+	public final static String GET_STARTED = "//a[@class='ui primary button']";
+	public final static String PLAY_AS_GUEST = "//button[@class='eth-login-guest-button']";
 }

@@ -8,6 +8,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;
 
+@SuppressWarnings("javadoc")
 public class Search extends AbstractLeafScenario {
 
 	public Search(Execution x) {

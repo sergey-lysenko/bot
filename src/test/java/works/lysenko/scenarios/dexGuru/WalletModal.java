@@ -11,6 +11,7 @@ import works.lysenko.scenarios.dexGuru.walletModal.Buy;
 import works.lysenko.scenarios.dexGuru.walletModal.Sell;
 import works.lysenko.scenarios.dexGuru.walletModal.Wallet;
 
+@SuppressWarnings("javadoc")
 public class WalletModal extends AbstractNodeScenario {
 
 	public WalletModal(Execution x) {

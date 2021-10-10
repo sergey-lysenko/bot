@@ -7,6 +7,7 @@ import works.lysenko.scenarios.google.Character;
 import works.lysenko.scenarios.google.Quote;
 import works.lysenko.utils.GoogleDomains;
 
+@SuppressWarnings("javadoc")
 public class Google extends AbstractNodeScenario {
 
 	public Google(Execution x) {

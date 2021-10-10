@@ -17,10 +17,9 @@ import org.junit.jupiter.api.Test;
 
 import works.lysenko.Cycles;
 import works.lysenko.Execution;
-import works.lysenko.scenarios.Google;
 
-@Disabled
-public class GoogleTest {
+@SuppressWarnings("javadoc")
+public class Bot {
 
 	private static Execution x;
 	private static Cycles cycles;
@@ -29,7 +28,7 @@ public class GoogleTest {
 	@BeforeAll
 	public static void setupTest() {
 		x = new Execution(1, 30, logs, TEST);
-		cycles = new Cycles(Set.of(new Google(x)), x);
+		cycles = new Cycles("works.lysenko.scenarios", x);
 	}
 
 	@AfterAll

@@ -11,6 +11,7 @@ import works.lysenko.scenarios.google.quote.Lucky;
 import works.lysenko.scenarios.google.quote.Search;
 import works.lysenko.utils.Fakers;
 
+@SuppressWarnings("javadoc")
 public class Quote extends AbstractNodeScenario {
 	public Quote(Execution x) {
 		super(Set.of(new Search(x), new Lucky(x), new Enter(x)), x);

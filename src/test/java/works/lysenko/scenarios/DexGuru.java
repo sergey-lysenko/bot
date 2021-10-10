@@ -13,6 +13,7 @@ import works.lysenko.scenarios.dexGuru.Search;
 import works.lysenko.scenarios.dexGuru.SwitchCurrency;
 import works.lysenko.scenarios.dexGuru.WalletModal;
 
+@SuppressWarnings("javadoc")
 public class DexGuru extends AbstractNodeScenario {
 
 	public DexGuru(Execution x) {

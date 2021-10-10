@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
 
+import org.openqa.selenium.Point;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.gson.Gson;
@@ -134,6 +135,7 @@ public class Execution extends Common {
 
 		// Web driver components
 		d = WebDrivers.get(Browser.CHROME, false);
+		d.manage().window().setPosition(new Point(0, 0));
 		d.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitWait));
 		w = new WebDriverWait(d, Duration.ofSeconds(explicitWait));
 
@@ -255,24 +257,27 @@ public class Execution extends Common {
 	}
 
 	/**
-	 * Calculate downstream weights of given scenario from current execution parameters
+	 * Calculate downstream weights of given scenario from current execution
+	 * parameters
 	 * 
 	 * @param s Scenario to calculate downstream weights
-	 * @return cumulative downstream weight 
+	 * @return cumulative downstream weight
 	 */
 	public Double downstream(Scenario s) {
 		// TODO: move this to Scenario class(es) ?
+		double v = 0.0;
 		for (Entry<Object, Object> p : prop.entrySet()) {
-			String key = (String) p.getKey();
-			if (!(key.charAt(0) == '_')) {
-				if (s.getClass().getName().toLowerCase().contains(key.toLowerCase())) {
-					Double v = Double.valueOf((String) p.getValue());
-					s.downstream(v);
-					return v;
+			String k = (String) p.getKey();
+			if (!(k.charAt(0) == '_')) {
+				String a = s.getClass().getName().toLowerCase();
+				String b = k.toLowerCase();
+				if (a.contains(b)) {
+					v = v + Double.valueOf((String) p.getValue());
 				}
 			}
 		}
-		return 0.0;
+		s.downstream(v);
+		return v;
 	}
 
 	/**

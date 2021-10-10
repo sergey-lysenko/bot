@@ -132,11 +132,4 @@ public class AbstractNodeScenario extends AbstractScenario {
 	public double upstream() {
 		return pervWeight;
 	}
-
-	/**
-	 * @return whether this scenario meets it's prerequisites
-	 */
-	public boolean sufficed() {
-		return false;
-	}
 }

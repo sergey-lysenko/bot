@@ -17,6 +17,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -133,7 +134,7 @@ public class Common {
 	 * Get random object from a set of objects
 	 * 
 	 * @param <T> type of objects in a set
-	 * @param s set of objects 
+	 * @param s   set of objects
 	 * @return random object from a set of objects
 	 */
 	public static <T> Object selectOne(Set<T> s) {
@@ -154,6 +155,19 @@ public class Common {
 		List<String> copy = new ArrayList<>(l);
 		copy.remove(e);
 		return selectOne(copy);
+	}
+
+	/**
+	 * @param t milliseconds
+	 * @return String human readable representation of given milliseconds time
+	 *         interval
+	 */
+	public static String timeH(long t) {
+		String s = String.valueOf(t);
+		if (s.length() > 3)
+			return String.valueOf(ArrayUtils.insert(s.length() - 3, String.valueOf(t).toCharArray(), '.')) + " s";
+		else
+			return s + " ms";
 	}
 
 	/**
@@ -281,8 +295,8 @@ public class Common {
 	}
 
 	/**
-	 * @param e element to be clicked on
-	 * @param geometry 
+	 * @param e        element to be clicked on
+	 * @param geometry
 	 */
 	public void click(WebElement e, boolean geometry) {
 		l.log("Clicking " + describe(e, true));
@@ -370,8 +384,9 @@ public class Common {
 
 	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.log(ll, s)}
-	 * @param ll 
-	 * @param s 
+	 * 
+	 * @param ll
+	 * @param s
 	 */
 	public void log(int ll, String s) {
 		l.log(ll, s);
@@ -379,7 +394,8 @@ public class Common {
 
 	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.log(s)}
-	 * @param s 
+	 * 
+	 * @param s
 	 */
 	public void log(String s) {
 		l.log(s);
@@ -400,7 +416,7 @@ public class Common {
 	 * @param n of the screenshot
 	 */
 	public void makeScreenshot(String n) {
-		makeScreenshot(null, DEFAULT_SHOTS_LOCATION, n);
+		makeScreenshot(null, shotLocation(), n);
 	}
 
 	/**
@@ -412,7 +428,7 @@ public class Common {
 	 * @param x
 	 */
 	public void makeScreenshot(WebElement element, String name) {
-		makeScreenshot(element, DEFAULT_SHOTS_LOCATION, name);
+		makeScreenshot(element, shotLocation(), name);
 	}
 
 	private void makeScreenshot(WebElement element, String path, String name) {
@@ -436,8 +452,8 @@ public class Common {
 	 * @param x
 	 */
 	public void makeSnapshot(String f) {
-		makeScreenshot(null, DEFAULT_SHOTS_LOCATION, f);
-		makeCodeshot(DEFAULT_SHOTS_LOCATION, f);
+		makeScreenshot(null, shotLocation(), f);
+		makeCodeshot(shotLocation(), f);
 	}
 
 	/**
@@ -485,10 +501,11 @@ public class Common {
 	}
 
 	/**
-	 * Read contents of given WebElement with optional logging of geometry information
+	 * Read contents of given WebElement with optional logging of geometry
+	 * information
 	 * 
-	 * @param e 
-	 * @param geometry 
+	 * @param e
+	 * @param geometry
 	 * @return result of .getText() for this element
 	 */
 	public String read(WebElement e, boolean geometry) {
@@ -534,6 +551,10 @@ public class Common {
 	 */
 	public void sendKeys(String lc, CharSequence s) {
 		find(lc).sendKeys(s);
+	}
+
+	private String shotLocation() {
+		return DEFAULT_SHOTS_LOCATION + x.t.startedAt() + "/";
 	}
 
 	/**
@@ -838,7 +859,9 @@ public class Common {
 	public String waitValueNotEmpty(String lc) {
 		l.log("Waiting while " + lc + " is still empty");
 		w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), "")));
-		return read(lc);
+		String t = read(lc);
+		l.log("The text of " + lc + " is now '" + t + "'");
+		return t;
 	}
 
 	/**

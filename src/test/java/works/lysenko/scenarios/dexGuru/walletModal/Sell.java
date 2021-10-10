@@ -5,6 +5,7 @@ import static works.lysenko.C.SELL;
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;
 
+@SuppressWarnings("javadoc")
 public class Sell extends AbstractLeafScenario {
 	public Sell(Execution x) {
 		super(x);
