@@ -22,7 +22,7 @@ public class GoogleDomains {
     static {
         // data source: https://www.google.com/supported_domains
         d.add(pair("google.com", 1.5));
-        d.add(pair("google.aс", 0.75)); // absent in source, but available (!)
+        d.add(pair("google.aс", 0.0)); // absent in source, but available (!)
         d.add(pair("google.ad", 0.15));
         d.add(pair("google.ae", 0.85));
         d.add(pair("google.com.af", 0.15));

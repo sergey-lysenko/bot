@@ -11,7 +11,7 @@ import works.lysenko.utils.GoogleDomains;
 public class Google extends AbstractNodeScenario {
 
 	public Google(Execution x) {
-		super(Set.of(new Quote(x), new Character(x)), x);
+		super(x);
 	}
 
 	@Override
