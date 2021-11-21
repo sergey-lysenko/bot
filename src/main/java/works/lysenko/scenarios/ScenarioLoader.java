@@ -44,9 +44,15 @@ public class ScenarioLoader {
 	}
 
 	private static Set<Class<?>> findAll(String s) {
-		return new BufferedReader(
-				new InputStreamReader(ClassLoader.getSystemClassLoader().getResourceAsStream(s.replaceAll("[.]", "/"))))
-						.lines().filter(l -> l.endsWith(".class")).map(l -> getClass(l, s)).collect(Collectors.toSet());
+		Set<Class<?>> a = null;
+		try {
+			a = new BufferedReader(new InputStreamReader(
+					ClassLoader.getSystemClassLoader().getResourceAsStream(s.replaceAll("[.]", "/")))).lines()
+							.filter(l -> l.endsWith(".class")).map(l -> getClass(l, s)).collect(Collectors.toSet());
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Unable to find nested scenarios in package '" + s + "'");
+		}
+		return a;
 	}
 
 	private static Class<?> getClass(String className, String packageName) {

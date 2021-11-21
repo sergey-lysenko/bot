@@ -1,8 +1,6 @@
 package works.lysenko.scenarios.google;
 
-import static works.lysenko.C.GOOGLE_INPUT;
-
-import java.util.Set;
+import static works.lysenko.bot.Constants.GOOGLE_INPUT;
 
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractNodeScenario;
@@ -14,7 +12,7 @@ import works.lysenko.utils.Fakers;
 @SuppressWarnings("javadoc")
 public class Character extends AbstractNodeScenario {
 	public Character(Execution x) {
-		super(Set.of(new Search(x), new Lucky(x), new Enter(x)), x);
+		super(x, new Search(x), new Lucky(x), new Enter(x));
 	}
 
 	@Override

@@ -8,13 +8,13 @@ public class Result {
 	public ScenarioType type = null;
 	public int executions;
 	public List<Problem> problems = new ArrayList<Problem>();
-	public double confWeight;
-	public double pervWeight;
-	public double permWeight;
+	public double cWeight;
+	public double uWeight;
+	public double dWeight;
 
 	public String toString() {
-		String weight = ((permWeight > 0.0) ? ("(" + permWeight + ")" + "\u2192") : "") + "(" + confWeight + ")"
-				+ ((pervWeight > 0.0) ? "\u2190" + "(" + pervWeight + ")" : "");
+		String weight = ((dWeight > 0.0) ? ("(" + dWeight + ")" + "\u2192") : "") + "(" + cWeight + ")"
+				+ ((uWeight > 0.0) ? "\u2190" + "(" + uWeight + ")" : "");
 		String problems = ((this.problems != null && this.problems.size() > 0)
 				? " (" + this.problems.size() + ((this.problems.size() == 1) ? " problem)" : " problems)")
 				: "");

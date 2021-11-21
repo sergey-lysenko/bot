@@ -1,7 +1,7 @@
 package works.lysenko.scenarios.dexGuru;
 
-import static works.lysenko.C.ROW;
-import static works.lysenko.C.SEARCH;
+import static works.lysenko.bot.Constants.ROW;
+import static works.lysenko.bot.Constants.SEARCH;
 
 import org.apache.commons.lang3.RandomStringUtils;
 

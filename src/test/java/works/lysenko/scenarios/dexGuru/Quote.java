@@ -1,8 +1,8 @@
 package works.lysenko.scenarios.dexGuru;
 
-import static works.lysenko.C.FROM;
-import static works.lysenko.C.INPUT;
-import static works.lysenko.C._BUY_;
+import static works.lysenko.bot.Constants.FROM;
+import static works.lysenko.bot.Constants.INPUT;
+import static works.lysenko.bot.Constants._BUY_;
 
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;

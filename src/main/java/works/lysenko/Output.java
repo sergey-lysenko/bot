@@ -1,12 +1,17 @@
 package works.lysenko;
 
-import static works.lysenko.Constants.DEFAULT_RUNS_LOCATION;
+import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
 import static works.lysenko.Constants.RUN_JSON_FILENAME;
 import static works.lysenko.Constants.RUN_SVG_FILENAME;
 import static works.lysenko.utils.Ansi.RED_BACKGROUND;
 import static works.lysenko.utils.Ansi.GREEN_BACKGROUND;
 import static works.lysenko.utils.Ansi.BLACK;
+import static works.lysenko.utils.Ansi.WHITE_BOLD_BRIGHT;
+import static works.lysenko.utils.Ansi.GREEN;
+import static works.lysenko.utils.Ansi.RED;
+import static works.lysenko.utils.Ansi.MAGENTA;
+import static works.lysenko.utils.Ansi.YELLOW;
 import static works.lysenko.utils.Ansi.colorize;
 
 import java.awt.Color;
@@ -27,6 +32,7 @@ import org.jfree.svg.SVGUtils;
 
 import works.lysenko.output.Groups;
 import works.lysenko.output.Parts;
+import works.lysenko.utils.Ansi;
 
 /**
  * @author Sergii Lysenko
@@ -47,7 +53,6 @@ public class Output {
 	}
 
 	private void drawGroup(SVGGraphics2D g, int col, int[] dy, TreeMap<String, Result> sorted) {
-		// TODO: get rid of this wtf method
 		Groups t = new Groups("cycles", sorted);
 		for (Entry<String, TreeMap<String, Result>> group : t.entrySet()) {
 			drawGroup(g, null, col, dy, group);
@@ -111,13 +116,36 @@ public class Output {
 		TreeMap<String, Result> sorted = x.r.getSorted();
 		BufferedWriter w;
 		try {
+			int i;
 			w = new BufferedWriter(new FileWriter(name(RUN_JSON_FILENAME)));
-			w.write("{\"startAt\":" + x.t.startedAt() + ",\"run\":[");
-			int i = sorted.size();
+			w.write("{\"startAt\":" + x.t.startedAt() + ",\"issues\":{");
+			w.write("\"newIssues\":[");
+			i = x.newIssues.size();
+			for (String str : x.newIssues) {
+				w.write('"' + str.replaceAll("\n", " ").replace("\"", "\\\"") + '"');
+				if (i-- > 1)
+					w.write(",");
+			}
+			i = x.knownIssues.size();
+			w.write("],\"knownIssues\":[");
+			for (String str : x.knownIssues) {
+				w.write("\"" + str.replaceAll("\n", " ").replace("\"", "\\\"") + "\"");
+				if (i-- > 1)
+					w.write(",");
+			}
+			i = x.notReproduced.size();
+			w.write("],\"notReproduced\":[");
+			for (String str : x.notReproduced) {
+				w.write("\"" + str.replaceAll("\n", " ").replace("\"", "\\\"") + "\"");
+				if (i-- > 1)
+					w.write(",");
+			}
+			w.write("]},\"run\":[");
+			i = sorted.size();
 			for (Entry<String, Result> s : sorted.entrySet()) {
-				w.write("{\"scenario\":\"" + s.getKey() + "\"" + ",\"cWeight\": " + jsonify(s.getValue().confWeight)
-						+ ",\"dWeight\": " + jsonify(s.getValue().permWeight) + ",\"uWeight\": "
-						+ jsonify(s.getValue().pervWeight) + ",\"executions\":" + s.getValue().executions);
+				w.write("{\"scenario\":\"" + s.getKey() + "\"" + ",\"cWeight\": " + jsonify(s.getValue().cWeight)
+						+ ",\"dWeight\": " + jsonify(s.getValue().dWeight) + ",\"uWeight\": "
+						+ jsonify(s.getValue().uWeight) + ",\"executions\":" + s.getValue().executions);
 				if ((s.getValue().problems != null) && (s.getValue().problems.size() > 0)) {
 					w.write(",\"problems\":[");
 					int j = s.getValue().problems.size();
@@ -162,36 +190,63 @@ public class Output {
 	}
 
 	private String name(String t) {
-		return DEFAULT_RUNS_LOCATION + Common.fill(t, String.valueOf(x.t.startedAt()));
+		return RUNS + Common.fill(t, String.valueOf(x.t.startedAt()));
 	}
 
 	protected void stats() {
+		// If scenarios stack is not empty at that point, it means that normal execution
+		// was halted due to an error
+		boolean status = x.current.empty();
+		String failed = null;
+
 		int total = x.cycles.scenarios.combinations(false);
 		int active = x.cycles.scenarios.combinations(true);
 		String persentage = new DecimalFormat("####0.0").format((Double.valueOf(active) / Double.valueOf(total)) * 100)
 				+ "%";
 
-		if (!x.current.empty()) {
-			// If scenarios stack is not empty at that point, it means that nomal execution
-			// was halted due to an error
-			x.current.removeAllElements(); // It works, but this is kinda wrong. Non-empty execution stack is used as an
-											// indicator for Statistics that there were an error. It is nonelegant
-											// cross-reference. TODO: rework this to proper implementation with catching
-											// exceptions and processing that properly
-			x.l.logln();
-			x.l.log(0, colorize(colorize("                                      ", RED_BACKGROUND), BLACK));
-			x.l.log(0, colorize(colorize(" = Execution was halted by an error = ", RED_BACKGROUND), BLACK));
-			x.l.log(0, colorize(colorize("                                      ", RED_BACKGROUND), BLACK));
-			x.makeSnapshot("_[EXIT]_");
-		} else {
-			x.l.log(0, colorize(colorize("                          ", GREEN_BACKGROUND), BLACK));
-			x.l.log(0, colorize(colorize(" = Execution statistics = ", GREEN_BACKGROUND), BLACK));
-			x.l.log(0, colorize(colorize("                          ", GREEN_BACKGROUND), BLACK));
+		// It works, but this is kinda wrong. It is very non-elegant cross-reference.
+		// TODO: rework this to proper implementation
+		if (!status) {
+			failed = x.current.peek().shortName(false);
+			x.current.removeAllElements();
 		}
+		x.l.logln();
+		x.l.log(0, "Test execution stopped");
+
+		// New issues output
+		x.l.logln();
+		if (x.newIssues.isEmpty())
+			x.l.log(0, colorize("No new Issues", GREEN));
+		else {
+			x.l.log(0, colorize("New Issues:", RED));
+			for (String s : x.newIssues)
+				x.l.log(0, colorize(s));
+		}
+
+		// Known issues
+		x.l.logln();
+		if (x.knownIssues.isEmpty())
+			x.l.log(0, colorize("No Known Issues were reproduced", RED));
+		else {
+			x.l.log(0, colorize("Confirmed Known Issues:", MAGENTA));
+			x.l.log(0, colorize(String.join(", ", x.knownIssues), MAGENTA));
+		}
+
+		// Not reproduced issues
+		x.l.logln();
+		if (x.notReproduced.isEmpty())
+			x.l.log(0, colorize("All Known Issues were reproduced", GREEN));
+		else {
+			x.l.log(0, colorize("Not reproduced Known Issues:", YELLOW));
+			x.l.log(0, colorize(String.join(", ", x.notReproduced), YELLOW));
+		}
+
+		// Scenarios statistics
+		x.l.logln();
+		x.l.log(0, "Scenarios statistics:");
 		TreeMap<String, Result> sorted = x.r.getSorted();
 		x.l.log(0, total + " paths were possible with current set of Scenarios");
 		x.l.log(0, active + " (" + persentage + ") among these were allowed by current configuration");
-		// TODO: add statistics of actually executed Node Scenarios
 		if (sorted.entrySet().isEmpty())
 			x.l.log(0, colorize("[WARNING] No Test Execution Data available"));
 		else
@@ -199,11 +254,25 @@ public class Output {
 				x.l.log(0, e.getKey() + " : " + e.getValue().toString());
 			}
 		x.l.logln();
+
+		// Result marker
+		if (status) {
+			plaque(" = Execution passed successfuly = ", BLACK, GREEN_BACKGROUND);
+		} else {
+			plaque(" = Execution of '" + failed + "' failed = ", WHITE_BOLD_BRIGHT, RED_BACKGROUND);
+			x.makeSnapshot("_[EXIT]_");
+		}
+	}
+
+	private void plaque(String message, Ansi foreground, Ansi background) {
+		x.l.log(0, colorize(colorize(" ".repeat(message.length()), background), foreground));
+		x.l.log(0, colorize(colorize(message, background), foreground));
+		x.l.log(0, colorize(colorize(" ".repeat(message.length()), background), foreground));
 	}
 
 	protected void svgStats() {
 		TreeMap<String, Result> sorted = x.r.getSorted(false, true);
-		SVGGraphics2D g = new SVGGraphics2D(1920, 1080);
+		SVGGraphics2D g = new SVGGraphics2D(2560, 1440); // TODO: add dynamic resolution calculation
 
 		int[] dy = new int[100];
 		Arrays.fill(dy, 1);

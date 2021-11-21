@@ -2,6 +2,8 @@ package works.lysenko.scenarios;
 
 import static works.lysenko.Constants.NODE_SCENARIO_MARKER;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.math3.util.Pair;
@@ -23,15 +25,16 @@ public class AbstractNodeScenario extends AbstractScenario {
 	/**
 	 * Create an instance of Node Scenario with defined set of sub-scenarios
 	 * 
-	 * @param ss set of child scenarios with weight coefficient defined within ..
+	 * @param ss array of child scenarios with weight coefficient defined within ..
 	 * @param x  instance of Run object
 	 */
-	public AbstractNodeScenario(Set<Scenario> ss, Execution x) {
+	public AbstractNodeScenario(Execution x, Scenario... ss) {
 		super(x);
 		marker(NODE_SCENARIO_MARKER);
 		scenarios = new Scenarios(x);
-		scenarios.add(ss, x);
-		pervWeight = scenarios.upstream();
+		if (null != ss)
+			scenarios.add(new HashSet<Scenario>(Arrays.asList(ss)), x);
+		uWeight = scenarios.upstream();
 	}
 
 	/**
@@ -42,12 +45,12 @@ public class AbstractNodeScenario extends AbstractScenario {
 	 *          defined within ..
 	 * @param x instance of Run object
 	 */
-	public AbstractNodeScenario(String s, Execution x) {
+	public AbstractNodeScenario(Execution x, String s) {
 		super(x);
 		marker(NODE_SCENARIO_MARKER);
 		scenarios = new Scenarios(x);
 		scenarios.add((Set<Scenario>) ScenarioLoader.read(s, x), x);
-		pervWeight = scenarios.upstream();
+		uWeight = scenarios.upstream();
 	}
 
 	/**
@@ -68,7 +71,7 @@ public class AbstractNodeScenario extends AbstractScenario {
 			name = String.valueOf(nameChars);
 		}
 		scenarios.add((Set<Scenario>) ScenarioLoader.read(name, x), x);
-		pervWeight = scenarios.upstream();
+		uWeight = scenarios.upstream();
 	}
 
 	/**
@@ -130,6 +133,13 @@ public class AbstractNodeScenario extends AbstractScenario {
 	 * @return calculated pervasive weight of this scenario
 	 */
 	public double upstream() {
-		return pervWeight;
+		return uWeight;
+	}
+
+	/**
+	 * @return whether this scenario meets it's prerequisites
+	 */
+	public boolean sufficed() {
+		return false;
 	}
 }

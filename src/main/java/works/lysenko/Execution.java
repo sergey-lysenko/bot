@@ -4,13 +4,15 @@ import static works.lysenko.Constants.CONFIGURATION_CONJOINT;
 import static works.lysenko.Constants.CONFIGURATION_CYCLES;
 import static works.lysenko.Constants.CONFIGURATION_DEBUG;
 import static works.lysenko.Constants.CONFIGURATION_DOWNSTREAM;
+import static works.lysenko.Constants.CONFIGURATION_ROOT;
 import static works.lysenko.Constants.CONFIGURATION_UPSTREAM;
 import static works.lysenko.Constants.DEFAULT_CONJOINT;
 import static works.lysenko.Constants.DEFAULT_CYCLES;
 import static works.lysenko.Constants.DEFAULT_DEBUG;
 import static works.lysenko.Constants.DEFAULT_DOWNSTREAM;
+import static works.lysenko.Constants.RESOURCES;
+import static works.lysenko.Constants.DEFAULT_ROOT;
 import static works.lysenko.Constants.DEFAULT_UPSTREAM;
-import static works.lysenko.Constants.DEFAULT_PROPERTIES_LOCATION;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -92,6 +94,9 @@ public class Execution extends Common {
 	public GsonBuilder gsonBuilder = new GsonBuilder();
 	private Properties prop;
 	private Properties know;
+	protected Set<String> newIssues = new HashSet<String>();
+	protected Set<String> knownIssues = new HashSet<String>();
+	protected Set<String> notReproduced;
 	/**
 	 * Shared data storage (for prerequisites management)
 	 */
@@ -105,6 +110,10 @@ public class Execution extends Common {
 	 * Target domain name of current execution
 	 */
 	public String domain;
+	/**
+	 * Exception happened during execution
+	 */
+	public Exception exception;
 
 	/**
 	 * @param implicitWait
@@ -123,6 +132,7 @@ public class Execution extends Common {
 	 * @param name
 	 * @param domain
 	 */
+	@SuppressWarnings("unchecked")
 	public Execution(int implicitWait, int explicitWait, Set<String> logsToRead, String name, String domain) {
 		super();
 		this.x = this;
@@ -143,6 +153,8 @@ public class Execution extends Common {
 		data = new Properties();
 		prop = readProperties(name);
 		know = readProperties("_knownIssues");
+		// That's one dirty trick :)
+		notReproduced = new HashSet<String>((Set<String>) (Set<?>) know.keySet());
 
 		// Information
 		this.name = name;
@@ -175,6 +187,13 @@ public class Execution extends Common {
 	 */
 	public boolean _downstream() {
 		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DOWNSTREAM, DEFAULT_DOWNSTREAM));
+	}
+
+	/**
+	 * @return configured root of scenarios
+	 */
+	public String _root() {
+		return prop.getProperty("_" + CONFIGURATION_ROOT, DEFAULT_ROOT);
 	}
 
 	/**
@@ -233,30 +252,6 @@ public class Execution extends Common {
 	}
 
 	/**
-	 * @param p string to search Known Issues
-	 * @return Set of KnownIssues for given query
-	 */
-	public Set<String> getKnownIssue(String p) {
-		// TODO: either add ability to have several known issues for one query, or
-		// change this routine to return single known issue
-		HashSet<String> knownIssues = new HashSet<String>();
-		if (null != know)
-			know.forEach((k, v) -> {
-				if (p.contains((String) v)) {
-					knownIssues.add((String) k);
-				}
-			});
-		return knownIssues;
-	}
-
-	/**
-	 * @return Gson object built by cached GsonBuilder
-	 */
-	public Gson gson() {
-		return gsonBuilder.create();
-	}
-
-	/**
 	 * Calculate downstream weights of given scenario from current execution
 	 * parameters
 	 * 
@@ -281,6 +276,32 @@ public class Execution extends Common {
 	}
 
 	/**
+	 * @param p string to search Known Issues
+	 * @return Set of KnownIssues for given query
+	 */
+	public Set<String> getKnownIssue(String p) {
+		HashSet<String> ki = new HashSet<String>();
+		if (null != know)
+			know.forEach((k, v) -> {
+				if (p.contains((String) v)) {
+					ki.add((String) k);
+					if (notReproduced.contains(k)) {
+						notReproduced.remove(k);
+						knownIssues.add((String) k);
+					}
+				}
+			});
+		return ki;
+	}
+
+	/**
+	 * @return Gson object built by cached GsonBuilder
+	 */
+	public Gson gson() {
+		return gsonBuilder.create();
+	}
+
+	/**
 	 * @param n name of run property
 	 * @param d default value of run property
 	 * @return value of requested property
@@ -298,20 +319,22 @@ public class Execution extends Common {
 
 	private Properties readProperties(String name) {
 		Properties prop = new Properties();
-		String propertiesFile = DEFAULT_PROPERTIES_LOCATION + name + ".properties";
-		FileInputStream fis = null;
-		try {
-			fis = new FileInputStream(propertiesFile);
-		} catch (FileNotFoundException e) {
-			l.logProblem(Severity.S1, "Requested properties file '" + propertiesFile + "' not found");
-		}
-		try {
-			if (null != fis)
-				prop.load(fis);
-			else
-				l.logProblem(Severity.S2, "Unable to read properties from '" + propertiesFile + "'");
-		} catch (IOException e) {
-			throw new IllegalArgumentException("Unable to load requested properties file");
+		if (null != name) {
+			String propertiesFile = RESOURCES + name + ".properties";
+			FileInputStream fis = null;
+			try {
+				fis = new FileInputStream(propertiesFile);
+			} catch (FileNotFoundException e) {
+				l.logProblem(Severity.S1, "Requested properties file '" + propertiesFile + "' not found");
+			}
+			try {
+				if (null != fis)
+					prop.load(fis);
+				else
+					l.logProblem(Severity.S2, "Unable to read properties from '" + propertiesFile + "'");
+			} catch (IOException e) {
+				throw new IllegalArgumentException("Unable to load requested properties file");
+			}
 		}
 		return prop;
 	}

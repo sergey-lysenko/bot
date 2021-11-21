@@ -1,6 +1,6 @@
 package works.lysenko;
 
-import static works.lysenko.Constants.DEFAULT_RUNS_LOCATION;
+import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.FILENAME;
 import static works.lysenko.Constants.RUN_LOG_FILENAME;
 
@@ -62,9 +62,9 @@ public class Logger {
 		super();
 		this.x = x;
 		try {
-			new File(DEFAULT_RUNS_LOCATION).mkdirs();
+			new File(RUNS).mkdirs();
 			logWriter = new BufferedWriter(new FileWriter(
-					DEFAULT_RUNS_LOCATION + Common.fill(RUN_LOG_FILENAME, String.valueOf(x.t.startedAt()))));
+					RUNS + Common.fill(RUN_LOG_FILENAME, String.valueOf(x.t.startedAt()))));
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to open log file for writting");
 		}
@@ -174,7 +174,7 @@ public class Logger {
 	 * @param ex extension of log file
 	 */
 	public void logFile(String s, String n, String ex) {
-		String location = DEFAULT_RUNS_LOCATION + x.t.startedAt() + "/";
+		String location = RUNS + x.t.startedAt() + "/";
 		BufferedWriter writer = null;
 		try {
 			new File(location).mkdirs();
@@ -233,8 +233,10 @@ public class Logger {
 			lr = new LogRecord(t, new KnownIssue(d, "[KNOWN-ISSUE]:" + ki.toString() + ":" + p));
 		} else if (p.contains("[SEVERE]")) {
 			lr = new LogRecord(t, new Severe(d, p));
+			x.newIssues.add(p);
 		} else if (p.contains("[WARNING]")) {
 			lr = new LogRecord(t, new Warning(d, p));
+			x.newIssues.add(p);
 		} else if (p.contains("[NOTICE]")) {
 			lr = new LogRecord(t, new Notice(d, p));
 		} else if (p.contains("[KNOWN-ISSUE]")) {

@@ -1,9 +1,7 @@
 package works.lysenko.scenarios.dexGuru;
 
-import static works.lysenko.C.PROVIDER_ITEM;
-import static works.lysenko.C.PROVIDER_MENU;
-
-import java.util.Set;
+import static works.lysenko.bot.Constants.PROVIDER_ITEM;
+import static works.lysenko.bot.Constants.PROVIDER_MENU;
 
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractNodeScenario;
@@ -15,7 +13,7 @@ import works.lysenko.scenarios.dexGuru.walletModal.Wallet;
 public class WalletModal extends AbstractNodeScenario {
 
 	public WalletModal(Execution x) {
-		super(Set.of(new Buy(x), new Sell(x), new Wallet(x)), x);
+		super(x, new Buy(x), new Sell(x), new Wallet(x));
 	}
 
 	@Override
@@ -29,7 +27,6 @@ public class WalletModal extends AbstractNodeScenario {
 		wait(PROVIDER_MENU);
 		wait(fill(PROVIDER_ITEM, "MetaMask"));
 		wait(fill(PROVIDER_ITEM, "WalletConnect"));
-		wait(fill(PROVIDER_ITEM, "Binance Wallet"));
 	}
 
 	@Override

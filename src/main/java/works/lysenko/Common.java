@@ -1,8 +1,12 @@
 package works.lysenko;
 
-import static works.lysenko.Constants.DEFAULT_SHOTS_LOCATION;
+import static works.lysenko.Constants.RESOURCES;
+import static works.lysenko.Constants.SCREENSHOTS;
 import static works.lysenko.Constants.SILENT_SLEEPING_TRESHHOLD;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -22,6 +26,7 @@ import org.apache.commons.math3.random.RandomDataGenerator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -31,6 +36,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import works.lysenko.utils.Ansi;
+import works.lysenko.utils.Severity;
 
 /**
  * @author Sergii Lysenko
@@ -86,12 +92,30 @@ public class Common {
 	}
 
 	/**
+	 * Generate random integer in the defined range with list of values to exclude
+	 * 
+	 * @param l minimum value
+	 * @param u maximum value
+	 * @param x list of values to exclude
+	 * @return random integer
+	 */
+	public static Integer integer(int l, int u, Integer... x) {
+		Integer n; // Non-primitive for asList() compatibility
+		do
+			n = new RandomDataGenerator().nextInt(l, u);
+		while (Arrays.asList(x).contains(n));
+		return n;
+	}
+
+	/**
 	 * Return 'true' with defined probability, or 'false' otherwise
 	 * 
 	 * @param d probability of 'true' selection
 	 * @return random boolean value
 	 */
 	public static boolean isTrue(double d) {
+		if ((d > 1.0) || (d < 0.0))
+			throw new IllegalArgumentException("Given probability " + d + " is outside the valid range of [0.0 - 1.0]");
 		return new Random().nextFloat() < d;
 	}
 
@@ -262,6 +286,13 @@ public class Common {
 	public Common(Execution x) {
 		super();
 		this.x = x;
+		populateShortcuts();
+	}
+
+	/**
+	 * Populate links to sub-objects from Execution
+	 */
+	public void populateShortcuts() {
 		this.d = x.d;
 		this.l = x.l;
 		this.o = x.o;
@@ -275,7 +306,7 @@ public class Common {
 	 */
 	public void clear(String... lc) {
 		l.log("Clearing " + describe(lc));
-		find(true, lc).clear();
+		find(true, true, lc).clear();
 		; // Silent find during clear
 	}
 
@@ -284,7 +315,37 @@ public class Common {
 	 */
 	public void click(String... lc) {
 		l.log("Clicking " + describe(lc));
-		find(true, lc).click(); // Silent find during click
+		find(true, true, lc).click(); // Silent find during click
+	}
+
+	/**
+	 * Perform a non-centered click on an element. Exact location of click defined
+	 * by two double typed relative x and y coordinates, where value 0.0 corresponds
+	 * to leftmost or upmost part of the element, as 1.0 is for rightmost of lowest
+	 * part of an object.
+	 * 
+	 * Consequently, coordinates (0.5, 0.5) defining a center of the object
+	 * 
+	 * @param x  requested x coordinate offset
+	 * @param y
+	 * @param lc string locator(s) of element to be clicked on
+	 */
+	public void click(double x, double y, String... lc) {
+		l.log("Clicking " + describe(lc) + " at (x" + x + ",y" + y + ")");
+		l.log(2, "Locating the element " + describe(lc) + " ...");
+		WebElement e = find(true, true, lc);
+		Rectangle re = e.getRect();
+		l.log(2, "Element's rectangle is " + describe(re) + " ...");
+		Point c = getCenter(re);
+		Point p = getPoint(x, y, re);
+		int offsetX = p.x - c.x;
+		int offsetY = p.y - c.y;
+		l.log(2, "Calculated offset in pixels from center is  (x" + offsetX + ",y" + offsetY + ") ...");
+		Actions actions = new Actions(d);
+		actions.moveToElement(e);
+		actions.moveByOffset(offsetX, offsetY);
+		actions.click();
+		actions.perform();
 	}
 
 	/**
@@ -317,20 +378,26 @@ public class Common {
 		return null;
 	}
 
+	private String describe(WebElement e) {
+		return describe(e, true);
+	}
+
 	private String describe(WebElement e, boolean geometry) {
 		String an = e.getAccessibleName();
 		String tg = e.getTagName();
-		return tg + ((an.isEmpty()) ? "" : "'" + an + "'") + ((geometry) ? (" @ " + describe(e.getRect())) : "");
+		return tg + ((an.isEmpty()) ? "" : " '" + an + "'") + ((geometry) ? (" @ " + describe(e.getRect())) : "");
 	}
 
 	/**
 	 * Find an element defined by one or several nested String locators
 	 * 
-	 * @param silent if true, no output will be added to log
-	 * @param lc     one or several nested String locators
+	 * @param silent   if true, no output will be added to log
+	 * @param scrollTo if true, window will be scrolled to make this element visible
+	 *                 on screen
+	 * @param lc       one or several nested String locators
 	 * @return WebElement object
 	 */
-	public WebElement find(boolean silent, String... lc) {
+	public WebElement find(boolean silent, boolean scrollTo, String... lc) {
 		WebElement e = null;
 		if (!silent && lc.length > 0)
 			l.log("Finding " + lc[0]);
@@ -344,7 +411,7 @@ public class Common {
 					l.log(" ... and child " + lc[i]);
 				e = e.findElement(by(lc[i]));
 			}
-		return find(e);
+		return (scrollTo) ? find(e) : e;
 	}
 
 	/**
@@ -354,7 +421,7 @@ public class Common {
 	 * @return WebElement object
 	 */
 	public WebElement find(String... lc) {
-		return find(false, lc);
+		return find(false, true, lc);
 	}
 
 	/**
@@ -383,6 +450,44 @@ public class Common {
 	}
 
 	/**
+	 * Calculate a point placed in a center of a rectangle
+	 * 
+	 * @param r Rectangle
+	 * @return Point located in a center of the given Rectangle
+	 */
+	public Point getCenter(Rectangle r) {
+		return new Point(r.x + r.width / 2, r.y + r.height / 2);
+	}
+
+	/**
+	 * Calculate a point based on a rectangle and relative coefficients of x and y
+	 * coordinates. Coordinate 0.0 corresponds to leftmost or upper part of the
+	 * rectangle, and 1.0 is for rightmost of lowest part of an object.
+	 * 
+	 * @param x horizontal location of the requested point relative to the given
+	 *          rectangle
+	 * @param y vertical location of the requested point relative to the given
+	 *          rectangle
+	 * @param r base rectangle
+	 * @return Point object based on given parameters
+	 */
+	public Point getPoint(double x, double y, Rectangle r) {
+		int offsetX = (int) Math.round(Double.valueOf(r.width) * x);
+		int offsetY = (int) Math.round(Double.valueOf(r.height) * y);
+		return new Point(r.x + offsetX, r.y + offsetY);
+	}
+
+	/**
+	 * @param lc
+	 * @return true is this Web Element is present in DOM
+	 */
+	public boolean isPresent(String lc) {
+		l.log("Checking visibility of " + lc);
+		return !d.findElements(by(lc)).isEmpty();
+	}
+
+	
+	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.log(ll, s)}
 	 * 
 	 * @param ll
@@ -399,6 +504,16 @@ public class Common {
 	 */
 	public void log(String s) {
 		l.log(s);
+	}
+
+	/**
+	 * Shortcut for {@link works.lysenko.Logger#l.logProblem(s)}
+	 * 
+	 * @param se
+	 * @param st
+	 */
+	public void logProblem(Severity se, String st) {
+		l.logProblem(se, st);
 	}
 
 	private void makeCodeshot(String p, String f) {
@@ -514,6 +629,19 @@ public class Common {
 	}
 
 	/**
+	 * @return contents of Clipboard as String
+	 */
+	public String readClipboard() {
+		String result = null;
+		try {
+			result = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+		} catch (UnsupportedFlavorException | IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	/**
 	 * Read contents of the element defined by String locator
 	 * 
 	 * @param lc string locator of an element
@@ -540,6 +668,7 @@ public class Common {
 	 * @param s string to be added as section title
 	 */
 	public void section(String s) {
+		l.logln();
 		l.log(0, Ansi.colorize("= " + s + " =", Ansi.BLUE_BOLD_BRIGHT));
 	}
 
@@ -554,7 +683,7 @@ public class Common {
 	}
 
 	private String shotLocation() {
-		return DEFAULT_SHOTS_LOCATION + x.t.startedAt() + "/";
+		return SCREENSHOTS + x.t.startedAt() + "/";
 	}
 
 	/**
@@ -743,19 +872,38 @@ public class Common {
 	 */
 	public boolean typeInto(WebElement e, Object c, double pp, boolean secret) {
 		CharSequence symbols = String.valueOf(c);
-		l.log("Typing '" + ((secret) ? "•".repeat(symbols.length()) : c) + "' into " + describe(e, true));
-		if (isTrue(pp)) {
-			// simulation of pasting from clipboard by instant addition of all content
-			e.sendKeys(symbols);
-			return true;
-		} else {
-			char[] chars = symbols.toString().toCharArray();
-			for (char ch : chars) {
-				sleep(integer(0, 50), true); // silent sleep
-				e.sendKeys(String.valueOf(ch));
+		l.log("Typing '" + ((secret) ? "•".repeat(symbols.length()) : c) + "' into " + describe(e));
+		try {
+			if (isTrue(pp)) {
+				// simulation of pasting from clipboard by instant addition of all content
+				e.sendKeys(symbols);
+				return true;
+			} else {
+				char[] chars = symbols.toString().toCharArray();
+				for (char ch : chars) {
+					sleep(integer(0, 50), true); // silent sleep
+					e.sendKeys(String.valueOf(ch));
+				}
+				return false;
 			}
-			return false;
+		} catch (Exception ex) {
+			logProblem(Severity.S2,
+					"Exception " + ex.getClass().getName() + " caught while trying to type '"
+							+ ((secret) ? "•".repeat(symbols.length()) : c) + "' into " + describe(e)
+							+ ", attempting workaround ...");
+			Actions action = new Actions(x.d);
+			action.moveToElement(e).click().sendKeys(String.valueOf(c)).build().perform();
+			return true;
 		}
+	}
+
+	/**
+	 * @param uploader locator of upload input
+	 * @param name     filename of file to upload
+	 */
+	public void upload(String uploader, String name) {
+		l.log("Uploading '" + name + "' through " + uploader);
+		find(false, false, uploader).sendKeys(System.getProperty("user.dir") + "/" + RESOURCES + name);
 	}
 
 	/**

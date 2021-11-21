@@ -1,11 +1,11 @@
 package works.lysenko.scenarios.dexGuru;
 
-import static works.lysenko.C.ETH;
-import static works.lysenko.C.ETH_SIGN;
-import static works.lysenko.C.LIQUIDITY;
-import static works.lysenko.C.USD;
-import static works.lysenko.C.USD_SIGN;
-import static works.lysenko.C.VOLUME;
+import static works.lysenko.bot.Constants.ETH;
+import static works.lysenko.bot.Constants.ETH_SIGN;
+import static works.lysenko.bot.Constants.LIQUIDITY;
+import static works.lysenko.bot.Constants.USD;
+import static works.lysenko.bot.Constants.USD_SIGN;
+import static works.lysenko.bot.Constants.VOLUME;
 
 import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.WebElement;

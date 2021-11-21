@@ -6,20 +6,19 @@ import static org.openqa.selenium.logging.LogType.DRIVER;
 import static org.openqa.selenium.logging.LogType.PERFORMANCE;
 import static org.openqa.selenium.logging.LogType.PROFILER;
 import static org.openqa.selenium.logging.LogType.SERVER;
-import static works.lysenko.C.TEST;
+import static works.lysenko.bot.Constants.TEST;
 
 import java.util.Set;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import works.lysenko.Cycles;
 import works.lysenko.Execution;
 
 @SuppressWarnings("javadoc")
-public class Bot {
+public class BotTest {
 
 	private static Execution x;
 	private static Cycles cycles;

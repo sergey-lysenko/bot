@@ -1,6 +1,6 @@
 package works.lysenko.scenarios.dexGuru.walletModal;
 
-import static works.lysenko.C.BUY;
+import static works.lysenko.bot.Constants.BUY;
 
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;

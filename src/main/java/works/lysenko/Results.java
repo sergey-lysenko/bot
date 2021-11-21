@@ -34,20 +34,19 @@ public class Results {
 	 * Count in test execution (in later versions there will be collection of more
 	 * execution data then just times of execution)
 	 * 
-	 * @param s          tag of test execution
-	 * @param t
-	 * @param confWeight configuration eight coefficient
-	 * @param pervWeight
-	 * @param permWeight
+	 * @param s       tag of test execution
+	 * @param t       type of Scenario
+	 * @param cWeight weight coefficient from configuration
+	 * @param uWeight upstream weight
+	 * @param dWeight downstream weight
 	 * @return copy of added test execution data
 	 */
-	public Result countScenario(String s, ScenarioType t, double confWeight, double pervWeight, double permWeight) {
+	public Result count(String s, ScenarioType t, double cWeight, double uWeight, double dWeight) {
 		Result r = results.getOrDefault(s, new Result());
 		{
-			// TODO: change to upstream / downstream notation
-			r.confWeight = confWeight;
-			r.pervWeight = pervWeight;
-			r.permWeight = permWeight;
+			r.cWeight = cWeight;
+			r.uWeight = uWeight;
+			r.dWeight = dWeight;
 			++r.executions;
 			r.type = t;
 		}

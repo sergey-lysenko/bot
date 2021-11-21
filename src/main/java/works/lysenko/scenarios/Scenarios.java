@@ -2,7 +2,6 @@ package works.lysenko.scenarios;
 
 import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
 import static works.lysenko.Constants.DEFAULT_SUFFICIENCY_RETRIES;
-import static works.lysenko.utils.Severity.S2;
 import static works.lysenko.utils.Severity.S3;
 
 import java.util.LinkedList;
@@ -205,19 +204,21 @@ public class Scenarios extends Common {
 						for (Pair<Scenario, Double> pair : candidates) {
 							Scenario k = pair.getKey();
 							downstreamWeight = downstream(k);
-							Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k, downstreamWeight);
+							Pair<Scenario, Double> newPair = new Pair<Scenario, Double>(k,
+									(downstreamWeight == Double.POSITIVE_INFINITY) ? Double.MAX_VALUE
+											: downstreamWeight);
 							permeates.add(newPair);
 						}
 						try { // Select a scenario among permeates
 							s = (AbstractScenario) new EnumeratedDistribution<Scenario>(permeates).sample();
 						} catch (MathArithmeticException e1) {
-							l.logProblem(S2, "Unable to select a scenario among " + list(candidates, true)
+							l.logProblem(S3, "Unable to select a scenario among " + list(candidates, true)
 									+ ": no downstream weights");
 							doubleBreak = true;
 							break;
 						}
 					} else {
-						l.logProblem(S2,
+						l.logProblem(S3,
 								"Unable to select a scenario among " + list(candidates, true)
 										+ (x._downstream() ? " and all nestested scenarios" : "")
 										+ ": combined weight is zero");
@@ -247,10 +248,10 @@ public class Scenarios extends Common {
 				s.execute();
 			}
 			if (candidates.isEmpty())
-				l.logProblem(S2, "Unable to suffice a scenario among " + list(scenarios, false)
+				l.logProblem(S3, "Unable to suffice a scenario among " + list(scenarios, false)
 						+ ": all scenarios have unmet requirements or are not executable");
 			if (!(retries >= 0)) {
-				l.logProblem(S2, "Scenario selection exausted after " + this.retries + " retries");
+				l.logProblem(S3, "Scenario selection exausted after " + this.retries + " retries");
 			}
 		} else
 

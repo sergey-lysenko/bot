@@ -1,6 +1,6 @@
 package works.lysenko.scenarios.google.quote;
 
-import static works.lysenko.C.GOOGLE_INPUT;
+import static works.lysenko.bot.Constants.GOOGLE_INPUT;
 
 import org.openqa.selenium.Keys;
 

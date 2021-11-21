@@ -2,14 +2,16 @@ package works.lysenko.scenarios;
 
 import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
 import static works.lysenko.Constants.LF;
+import static works.lysenko.ScenarioType.LEAF;
+import static works.lysenko.ScenarioType.NODE;
+import static works.lysenko.utils.Ansi.BLUE_BOLD_BRIGHT;
+import static works.lysenko.utils.Ansi.colorize;
 
 import java.util.Arrays;
 import java.util.Set;
 
 import works.lysenko.Common;
 import works.lysenko.Execution;
-import works.lysenko.ScenarioType;
-import works.lysenko.utils.Ansi;
 import works.lysenko.utils.SortedStringSet;
 
 /**
@@ -21,8 +23,8 @@ import works.lysenko.utils.SortedStringSet;
 public abstract class AbstractScenario extends Common implements Scenario {
 
 	private long startAt = 0;
-	protected double pervWeight = 0.0;
-	private double downWeight = 0.0;
+	protected double uWeight = 0.0;
+	private double dWeight = 0.0;
 	private String marker = "?";
 
 	/**
@@ -48,7 +50,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	 */
 	public int combinations(boolean onlyConfigured) {
 		if (onlyConfigured)
-			return ((this.downWeight > 0.0) || (this.pervWeight > 0.0) || (this.weight() > 0.0)) ? 1 : 0;
+			return ((this.dWeight > 0.0) || (this.uWeight > 0.0) || (this.weight() > 0.0)) ? 1 : 0;
 		return 1;
 	}
 
@@ -115,14 +117,14 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	 * @return current downstream weight
 	 */
 	public double downstream() {
-		return downWeight;
+		return dWeight;
 	}
 
 	/**
 	 * @param d downstream weight to set
 	 */
 	public void downstream(double d) {
-		this.downWeight = d;
+		this.dWeight = d;
 	}
 
 	/**
@@ -139,10 +141,8 @@ public abstract class AbstractScenario extends Common implements Scenario {
 		startAt = x.timer();
 		x.current.push(this);
 		l.logln();
-		l.log(0, Ansi.colorize(name(true), Ansi.BLUE_BOLD_BRIGHT) + " : "
-				+ x.r.countScenario(shortName(true),
-						((this instanceof AbstractNodeScenario) ? ScenarioType.NODE : ScenarioType.LEAF), weight(),
-						pervWeight, downWeight));
+		l.log(0, colorize(name(true), BLUE_BOLD_BRIGHT) + " : " + x.r.count(shortName(true),
+				((this instanceof AbstractNodeScenario) ? NODE : LEAF), weight(), uWeight, dWeight));
 	}
 
 	private int gauge() {
@@ -293,7 +293,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	 * @return current upstream weight
 	 */
 	public double upstream() {
-		return pervWeight;
+		return uWeight;
 	}
 
 	/**

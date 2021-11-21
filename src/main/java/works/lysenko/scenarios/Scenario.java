@@ -2,7 +2,7 @@ package works.lysenko.scenarios;
 
 import java.util.Set;
 
-@SuppressWarnings("javadoc") // TODO: Add javadoc 
+@SuppressWarnings("javadoc") 
 public interface Scenario {
 
 	public abstract void action();

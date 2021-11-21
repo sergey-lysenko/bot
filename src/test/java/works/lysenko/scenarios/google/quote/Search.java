@@ -1,7 +1,7 @@
 package works.lysenko.scenarios.google.quote;
 
-import static works.lysenko.C.GOOGLE_SEARCH_BUTTON;
-import static works.lysenko.C.quoteShortEnough;
+import static works.lysenko.bot.Constants.GOOGLE_SEARCH_BUTTON;
+import static works.lysenko.bot.Constants.quoteShortEnough;
 
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;
