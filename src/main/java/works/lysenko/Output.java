@@ -272,7 +272,7 @@ public class Output {
 
 	protected void svgStats() {
 		TreeMap<String, Result> sorted = x.r.getSorted(false, true);
-		SVGGraphics2D g = new SVGGraphics2D(2560, 1440); // TODO: add dynamic resolution calculation
+		SVGGraphics2D g = new SVGGraphics2D(2560, 1440);
 
 		int[] dy = new int[100];
 		Arrays.fill(dy, 1);

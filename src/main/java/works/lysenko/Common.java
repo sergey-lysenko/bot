@@ -1,5 +1,6 @@
 package works.lysenko;
 
+import static works.lysenko.Constants.EXCEPTION_RETRIES;
 import static works.lysenko.Constants.RESOURCES;
 import static works.lysenko.Constants.SCREENSHOTS;
 import static works.lysenko.Constants.SILENT_SLEEPING_TRESHHOLD;
@@ -25,10 +26,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -396,22 +400,43 @@ public class Common {
 	 *                 on screen
 	 * @param lc       one or several nested String locators
 	 * @return WebElement object
+	 * @throws Exception
 	 */
 	public WebElement find(boolean silent, boolean scrollTo, String... lc) {
+
 		WebElement e = null;
-		if (!silent && lc.length > 0)
-			l.log("Finding " + lc[0]);
-		if (lc.length == 0)
-			e = d.findElement(by("//body"));
-		if (lc.length > 0)
-			e = d.findElement(by(lc[0]));
-		if (lc.length > 1)
-			for (int i = 1; i < lc.length; i++) {
-				if (!silent)
-					l.log(" ... and child " + lc[i]);
-				e = e.findElement(by(lc[i]));
+		long start = x.timer();
+		boolean done = false;
+		int attempt = 0;
+		do {
+			try {
+				attempt++;
+
+				if (!silent && lc.length > 0)
+					l.log("Finding " + lc[0]);
+				if (lc.length == 0)
+					e = d.findElement(by("//body"));
+				if (lc.length > 0)
+					e = d.findElement(by(lc[0]));
+				if (lc.length > 1)
+					for (int i = 1; i < lc.length; i++) {
+						if (!silent)
+							l.log(" ... and child " + lc[i]);
+						e = e.findElement(by(lc[i]));
+					}
+				done = true;
+			} catch (TimeoutException | NoSuchElementException | StaleElementReferenceException ex) {
+				l.logProblem(Severity.S2,
+						"Caught " + ex.getClass().getName() + ", while trying to find(), attempt " + attempt + " ...");
 			}
-		return (scrollTo) ? find(e) : e;
+		} while (!done || attempt > EXCEPTION_RETRIES);
+		if (attempt > EXCEPTION_RETRIES) {
+			logProblem(Severity.S1, "Maximum retries amount reached");
+			return null;
+		} else {
+			l.log("Element located in " + timeH(x.timer() - start));
+			return (scrollTo) ? find(e) : e;
+		}
 	}
 
 	/**
@@ -436,6 +461,15 @@ public class Common {
 		actions.moveToElement(e);
 		actions.perform();
 		return e;
+	}
+
+	/**
+	 * @param e
+	 * @param c
+	 * @return child element of e defined by c
+	 */
+	public WebElement find(WebElement e, String c) {
+		return e.findElement(by(c));
 	}
 
 	/**
@@ -486,7 +520,6 @@ public class Common {
 		return !d.findElements(by(lc)).isEmpty();
 	}
 
-	
 	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.log(ll, s)}
 	 * 
@@ -972,6 +1005,28 @@ public class Common {
 	public void waitThenClick(String[] lc) {
 		wait(lc);
 		click(lc);
+	}
+
+	/**
+	 * Wait for appearance of the defined element and return reference to it
+	 * 
+	 * @param lc string locator of an element to be waited for
+	 * @return element
+	 */
+	public WebElement waitThenFind(String lc) {
+		wait(lc);
+		return find(lc);
+	}
+
+	/**
+	 * Wait for appearance of the defined element and return reference to it
+	 * 
+	 * @param lc string locator of an element to be waited for
+	 * @return element
+	 */
+	public WebElement waitThenFind(String[] lc) {
+		wait(lc);
+		return find(lc);
 	}
 
 	/**

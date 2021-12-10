@@ -1,7 +1,6 @@
 package works.lysenko.scenarios;
 
 import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
-import static works.lysenko.Constants.LF;
 import static works.lysenko.ScenarioType.LEAF;
 import static works.lysenko.ScenarioType.NODE;
 import static works.lysenko.utils.Ansi.BLUE_BOLD_BRIGHT;
@@ -61,10 +60,24 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	 * @param field of test data to be verified
 	 * @return true if data is present
 	 */
+	public boolean contains(Object field) {
+		boolean b = x.data.containsKey(field);
+		if (x._debug())
+			log(3, "contains(" + field + ")" + "\u2192" + b);
+		return b;
+	}
+
+	/**
+	 * Shortcut for checking the presence of a data in the common test data
+	 * container
+	 * 
+	 * @param field of test data to be verified
+	 * @return true if data is present
+	 */
 	public boolean containsKey(Object field) {
 		boolean b = x.data.containsKey(field);
 		if (x._debug())
-			log(3, "containsKey(" + field + ")" + "\u2192" + b + " " + x.data.toString());
+			log(3, "containsKey(" + field + ")" + "\u2192" + b);
 		return b;
 	}
 
@@ -81,7 +94,8 @@ public abstract class AbstractScenario extends Common implements Scenario {
 			if (!x.data.containsKey(f))
 				b = false;
 		if (x._debug())
-			log(3, "containsKeys(" + Arrays.toString(fields) + ")" + "\u0336" + b + " " + LF + x.gson().toJson(x.data));
+			log(3, "containsKeys(" + Arrays.toString(fields) + ")" + "\u0336" + b);
+			//  + " " + LF + x.gson().toJson(x.data));
 		return b;
 	}
 
@@ -181,7 +195,8 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	}
 
 	private void getLog(Object field, Object o) {
-		log(3, "get(" + field + ")" + "\u21D2" + o + " " + LF + x.gson().toJson(x.data));
+		log(3, "get(" + field + ")" + "\u21D2" + o + " ");
+		// + LF + x.gson().toJson(x.data));
 	}
 
 	/**
@@ -236,7 +251,8 @@ public abstract class AbstractScenario extends Common implements Scenario {
 		Object o = x.data.put(field, value);
 		if (x._debug()) {
 			String j = x.gson().toJson(x.data);
-			log(3, "put(" + field + ")" + "\u21D0" + "[" + value + "\u2192" + o + "]" + LF + j);
+			log(3, "put(" + field + ")" + "\u21D0" + "[" + value + "\u2192" + o + "]");
+			// + LF + j);
 			l.logFile(j, "data", "json");
 		}
 	}

@@ -3,6 +3,8 @@ package works.lysenko;
 @SuppressWarnings("javadoc")
 public class Constants {
 
+	public static final int EXCEPTION_RETRIES = 5;
+
 	public final static String LF = System.lineSeparator();
 	
 	public final static String RESOURCES = "src/test/resources/";
@@ -43,9 +45,9 @@ public class Constants {
 	public final static String _FIRST_SPAN = "(.//span)[1]";
 	public static final String _SECOND_DIV = "(.//div)[2]";
 	public static final String _FIRST_DIV = "(.//div)[1]";
+	public static final String _SPAN_TEXT = "//span[text()='%1$s']";
 	public static final String _DIV_TEXT = "//div[text()='%1$s']";
-
-
+	
 	public static final String NODE_SCENARIO_MARKER = "▷";
 	public static final String LEAF_SCENARIO_MARKER = "◆";
 	public static final String MONO_SCENARIO_MARKER = "◼";

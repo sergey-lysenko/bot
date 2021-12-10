@@ -8,6 +8,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -63,8 +66,8 @@ public class Logger {
 		this.x = x;
 		try {
 			new File(RUNS).mkdirs();
-			logWriter = new BufferedWriter(new FileWriter(
-					RUNS + Common.fill(RUN_LOG_FILENAME, String.valueOf(x.t.startedAt()))));
+			logWriter = new BufferedWriter(
+					new FileWriter(RUNS + Common.fill(RUN_LOG_FILENAME, String.valueOf(x.t.startedAt()))));
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to open log file for writting");
 		}
@@ -169,17 +172,19 @@ public class Logger {
 	/**
 	 * Write a string to a named log file
 	 * 
-	 * @param s text to write
-	 * @param n name of log file
+	 * @param s  text to write
+	 * @param n  name of log file
 	 * @param ex extension of log file
 	 */
 	public void logFile(String s, String n, String ex) {
 		String location = RUNS + x.t.startedAt() + "/";
+		String timestamp = String.format("%013d", x.t.millis());
+		String name = Common.fill(FILENAME, timestamp, n, ex);
+		String filename = location + name;
 		BufferedWriter writer = null;
 		try {
 			new File(location).mkdirs();
-			writer = new BufferedWriter(
-					new FileWriter(location + Common.fill(FILENAME, String.format("%013d", x.t.millis()), n, ex)));
+			writer = new BufferedWriter(new FileWriter(filename));
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to open a file for writting");
 		}
@@ -191,10 +196,21 @@ public class Logger {
 		try {
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		Path target = Paths.get(".", name);
+		Path link = Paths.get(location, Common.fill(FILENAME, "latest", n, ex));
+		try {
+			// if (Files.exists(link))
+			Files.delete(link);
+		} catch (IOException e1) {
+			// NOP
+		}
+		try {
+			Files.createSymbolicLink(link, target);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

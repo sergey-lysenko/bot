@@ -35,7 +35,8 @@ public class BotTest {
 		x.complete();
 	}
 
-	public static void init(Execution xun) {
+	public static void init(Execution x) {
+	
 	}
 
 	@Test

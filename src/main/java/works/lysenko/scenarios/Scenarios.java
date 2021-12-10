@@ -7,6 +7,7 @@ import static works.lysenko.utils.Severity.S3;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -221,7 +222,7 @@ public class Scenarios extends Common {
 						l.logProblem(S3,
 								"Unable to select a scenario among " + list(candidates, true)
 										+ (x._downstream() ? " and all nestested scenarios" : "")
-										+ ": combined weight is zero");
+										+ ": cumulative probability is zero");
 						break;
 					}
 				} catch (NotPositiveException e) {
@@ -277,19 +278,21 @@ public class Scenarios extends Common {
 	}
 
 	private String list(Iterable<Pair<Scenario, Double>> list, boolean includeZeroWeight) {
-		// There is an algorithmic assumption that all scenarios in a list are from same
-		// package
-		String qualifiedName = list.iterator().next().getKey().getClass().getName();
-		String[] nameParts = qualifiedName.split("\\."); // this is just twice escaped dot symbol
-		String scenarioClassName = nameParts[nameParts.length - 1]; // last one
-		String packagePart = qualifiedName.replace(scenarioClassName, "");
-		// Creating the set of Strings representing nested scenarios
-		Set<String> c = new TreeSet<String>();
-		list.forEach((s) -> {
-			if (s.getValue() > 0 || includeZeroWeight)
-				c.add(s.getKey().getClass().getName().toString().replace(packagePart, ""));
-		});
-		return packagePart + c.toString();
+		try {
+			String qualifiedName = list.iterator().next().getKey().getClass().getName();
+			String[] nameParts = qualifiedName.split("\\."); // this is just twice escaped dot symbol
+			String scenarioClassName = nameParts[nameParts.length - 1]; // last one
+			String packagePart = qualifiedName.replace(scenarioClassName, "");
+			// Creating the set of Strings representing nested scenarios
+			Set<String> c = new TreeSet<String>();
+			list.forEach((s) -> {
+				if (s.getValue() > 0 || includeZeroWeight)
+					c.add(s.getKey().getClass().getName().toString().replace(packagePart, ""));
+			});
+			return packagePart + c.toString();
+		} catch (NoSuchElementException e) {
+			return "Ø";
+		}
 	}
 
 	private Double downstream(Scenario k) {

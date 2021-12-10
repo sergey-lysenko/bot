@@ -89,8 +89,7 @@ public class Cycles {
 		try {
 			if (cyclesToDo == 0)
 				x.l.logProblem(S2, "No test cycles were perfomed");
-			x.l.log(0, "Executing " + y(cyclesToDo) + " cycles of " + y(x.name)
-					+ ((null == x.domain) ? "" : " on " + y(x.domain)));
+			x.l.log(0, "Executing " + y(cyclesToDo) + " cycles of " + y(x.name) + " on " + y(x.domain));
 			while (cyclesToDo-- > 0) {
 				scenarios.execute();
 				x.l.logln();

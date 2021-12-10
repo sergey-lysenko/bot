@@ -38,7 +38,6 @@ public class WebDrivers {
 	}
 
 	private static ChromeOptions getChromeOptions(String profile) {
-		// TODO: (later) externalize that
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("window-size=1920,1080");
 		options.addArguments("lang=en-GB");
@@ -55,7 +54,6 @@ public class WebDrivers {
 	}
 
 	private static FirefoxOptions getFireFoxOptions() {
-		// TODO: (later) externalize that
 		FirefoxOptions options = new FirefoxOptions();
 		FirefoxProfile profile = new FirefoxProfile();
 		profile.setPreference("intl.accept_languages", "en-GB");
