@@ -4,6 +4,8 @@ import static works.lysenko.Constants.EXCEPTION_RETRIES;
 import static works.lysenko.Constants.RESOURCES;
 import static works.lysenko.Constants.SCREENSHOTS;
 import static works.lysenko.Constants.SILENT_SLEEPING_TRESHHOLD;
+import static works.lysenko.utils.Browser.FIREFOX;
+import static works.lysenko.utils.Browser.CHROME;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -38,8 +40,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.JavascriptExecutor;
 
 import works.lysenko.utils.Ansi;
+import works.lysenko.utils.Browser;
 import works.lysenko.utils.Severity;
 
 /**
@@ -225,7 +229,7 @@ public class Common {
 	}
 
 	/**
-	 * Write lines of the provided a set to a file
+	 * Write lines of the provided set to a file
 	 * 
 	 * @param fl optional first line of the text to be added to a file (title)
 	 * @param ss set of lines to be stored in a file
@@ -318,8 +322,18 @@ public class Common {
 	 * @param lc string locator of element to be clicked on
 	 */
 	public void click(String... lc) {
-		l.log("Clicking " + describe(lc));
-		find(true, true, lc).click(); // Silent find during click
+		boolean done = false;
+		int attempt = 0;
+		do {
+			try {
+				l.log("Clicking " + describe(lc));
+				find(true, true, lc).click(); // Silent find during click
+				done = true;
+			} catch (StaleElementReferenceException ex) {
+				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName() + ", while trying to click(), attempt "
+						+ ++attempt + " ...");
+			}
+		} while (!done && attempt > EXCEPTION_RETRIES);
 	}
 
 	/**
@@ -387,7 +401,7 @@ public class Common {
 	}
 
 	private String describe(WebElement e, boolean geometry) {
-		String an = e.getAccessibleName();
+		String an = (x.in(CHROME)) ? e.getAccessibleName() : "";
 		String tg = e.getTagName();
 		return tg + ((an.isEmpty()) ? "" : " '" + an + "'") + ((geometry) ? (" @ " + describe(e.getRect())) : "");
 	}
@@ -405,13 +419,10 @@ public class Common {
 	public WebElement find(boolean silent, boolean scrollTo, String... lc) {
 
 		WebElement e = null;
-		long start = x.timer();
 		boolean done = false;
 		int attempt = 0;
 		do {
 			try {
-				attempt++;
-
 				if (!silent && lc.length > 0)
 					l.log("Finding " + lc[0]);
 				if (lc.length == 0)
@@ -426,15 +437,14 @@ public class Common {
 					}
 				done = true;
 			} catch (TimeoutException | NoSuchElementException | StaleElementReferenceException ex) {
-				l.logProblem(Severity.S2,
-						"Caught " + ex.getClass().getName() + ", while trying to find(), attempt " + attempt + " ...");
+				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName() + ", while trying to find(), attempt "
+						+ ++attempt + " ...");
 			}
-		} while (!done || attempt > EXCEPTION_RETRIES);
+		} while (!done && attempt > EXCEPTION_RETRIES);
 		if (attempt > EXCEPTION_RETRIES) {
 			logProblem(Severity.S1, "Maximum retries amount reached");
 			return null;
 		} else {
-			l.log("Element located in " + timeH(x.timer() - start));
 			return (scrollTo) ? find(e) : e;
 		}
 	}
@@ -457,9 +467,14 @@ public class Common {
 	 * @return same web element
 	 */
 	public WebElement find(WebElement e) {
-		Actions actions = new Actions(d);
-		actions.moveToElement(e);
-		actions.perform();
+
+		if (in(FIREFOX))
+			((JavascriptExecutor) x.d).executeScript("arguments[0].scrollIntoView(true);", e);
+		else {
+			Actions actions = new Actions(d);
+			actions.moveToElement(e);
+			actions.perform();
+		}
 		return e;
 	}
 
@@ -509,6 +524,21 @@ public class Common {
 		int offsetX = (int) Math.round(Double.valueOf(r.width) * x);
 		int offsetY = (int) Math.round(Double.valueOf(r.height) * y);
 		return new Point(r.x + offsetX, r.y + offsetY);
+	}
+
+	/**
+	 * @return browser in which current execution takes place
+	 */
+	public Browser in() {
+		return x.in();
+	}
+
+	/**
+	 * @param b
+	 * @return true if current is in defined browser
+	 */
+	public boolean in(Browser b) {
+		return x.in(b);
 	}
 
 	/**
@@ -998,6 +1028,31 @@ public class Common {
 	}
 
 	/**
+	 * Find visible instance of the defined element and the click on it
+	 * 
+	 * @param lc string locator of an element to be waited for
+	 */
+	public void findThenClick(String lc) {
+		List<WebElement> list = findAll(lc);
+		WebElement target = null;
+		boolean done = false;
+		int attempt = 0;
+		do {
+			try {
+				for (WebElement e : list) {
+					if (e.isDisplayed())
+						target = e;
+				}
+				done = true;
+			} catch (TimeoutException ex) {
+				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
+						+ ", while trying to findThenClick(), attempt " + ++attempt + " ...");
+			}
+		} while (!done && attempt > EXCEPTION_RETRIES);
+		target.click();
+	}
+
+	/**
 	 * Wait for appearance of the defined element and the click on it
 	 * 
 	 * @param lc string locator of an element to be waited for
@@ -1083,7 +1138,7 @@ public class Common {
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void waitVisibility(String[] lc) {
-		l.log("Waiting for visibility of one of " + Arrays.toString(lc));
+		l.log("Waiting for visibility of " + Arrays.toString(lc));
 		w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
 	}
 

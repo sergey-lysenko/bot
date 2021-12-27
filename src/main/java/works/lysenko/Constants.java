@@ -4,13 +4,24 @@ package works.lysenko;
 public class Constants {
 
 	public static final int EXCEPTION_RETRIES = 5;
+	public static final int DEFAULT_IWAIT = 1;
+	public static final int DEFAULT_EWAIT = 30;
+	public static final String DEFAULT_TEST = "bot";
+	public static final String DEFAULT_DOMAIN = "";
 
 	public final static String LF = System.lineSeparator();
-	
+
+	public static final String TEST = ".test";
+
+	public static final String GENERATED_CONFIG_FILE = "target/generated-sources/generated" + TEST;
+	public static final String STORED_PARAMETERS_FILE = "target/parameters";
+	public static final String STORED_BROWSERS_FILE = "target/browsers";
+
 	public final static String RESOURCES = "src/test/resources/";
+	public static final String KNOWN_ISSUES = RESOURCES + "_knownIssues.properties";
+	public final static String TESTS = RESOURCES + "tests/";
 	public final static String SCREENSHOTS = "target/screenshots/";
 	public final static String RUNS = "target/runs/";
-	public static final String GENERATED_CONFIG_FILE = "target/generated-sources/generated.properties";
 
 	public static final String CONFIGURATION_DOWNSTREAM = "include_downstream";
 	public static final String CONFIGURATION_CONJOINT = "conjoint";
@@ -25,8 +36,8 @@ public class Constants {
 	public static final String DEFAULT_UPSTREAM = "false";
 	public static final String DEFAULT_CYCLES = "1";
 	public static final String DEFAULT_DEBUG = "false";
-	public static final String DEFAULT_ROOT = "__undefined__";
-	
+	public static final String DEFAULT_ROOT = "";
+
 	public static final int DEFAULT_SUFFICIENCY_RETRIES = 11; // 13, 17
 
 	public static final int SILENT_SLEEPING_TRESHHOLD = 10;
@@ -47,7 +58,7 @@ public class Constants {
 	public static final String _FIRST_DIV = "(.//div)[1]";
 	public static final String _SPAN_TEXT = "//span[text()='%1$s']";
 	public static final String _DIV_TEXT = "//div[text()='%1$s']";
-	
+
 	public static final String NODE_SCENARIO_MARKER = "▷";
 	public static final String LEAF_SCENARIO_MARKER = "◆";
 	public static final String MONO_SCENARIO_MARKER = "◼";

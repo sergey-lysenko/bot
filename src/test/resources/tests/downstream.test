@@ -2,4 +2,4 @@ _cycles = 3
 _include_downstream = true
 _include_upstream = false
 _root = works.lysenko.scenarios
-works.lysenko.scenarios.Google = 1.0
+Google = 1.0

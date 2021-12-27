@@ -16,6 +16,8 @@ import static works.lysenko.utils.Severity.S3;
 
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import works.lysenko.scenarios.Scenario;
 import works.lysenko.scenarios.ScenarioLoader;
 import works.lysenko.scenarios.Scenarios;
@@ -89,7 +91,7 @@ public class Cycles {
 		try {
 			if (cyclesToDo == 0)
 				x.l.logProblem(S2, "No test cycles were perfomed");
-			x.l.log(0, "Executing " + y(cyclesToDo) + " cycles of " + y(x.name) + " on " + y(x.domain));
+			x.l.log(0, "Executing " + y(cyclesToDo) + " cycles of " + y(x.parameters.get("TEST")) + " on " + y(x.parameters.get("DOMAIN")));
 			while (cyclesToDo-- > 0) {
 				scenarios.execute();
 				x.l.logln();
@@ -120,7 +122,7 @@ public class Cycles {
 		c.add("_" + CONFIGURATION_UPSTREAM + " = " + DEFAULT_UPSTREAM);
 		c.add("_" + CONFIGURATION_DOWNSTREAM + " = " + DEFAULT_DOWNSTREAM);
 		scenarios.list(false, false).forEach((s) -> {
-			c.add(s + " = " + DEFAULT_SCENARIO_WEIGHT);
+			c.add(StringUtils.removeStart(s, x._root().concat(".")) + " = " + DEFAULT_SCENARIO_WEIGHT);
 		});
 		return c;
 	}

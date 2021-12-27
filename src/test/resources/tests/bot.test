@@ -4,5 +4,5 @@ _debug = true
 _include_downstream = true
 _include_upstream = true
 _root = works.lysenko.scenarios
-works.lysenko.scenarios.DexGuru = 1.0
-works.lysenko.scenarios.Google = 1.0
+DexGuru = 1.0
+Google = 1.0

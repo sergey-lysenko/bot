@@ -2,6 +2,7 @@ package works.lysenko.scenarios;
 
 import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
 import static works.lysenko.Constants.DEFAULT_SUFFICIENCY_RETRIES;
+import static works.lysenko.utils.Severity.S2;
 import static works.lysenko.utils.Severity.S3;
 
 import java.util.LinkedList;
@@ -11,6 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.exception.NotPositiveException;
@@ -38,7 +40,8 @@ public class Scenarios extends Common {
 	 * @return weight coefficient for defined scenario
 	 */
 	private static double weight(Scenario s, Execution x) {
-		Double d = Double.valueOf(x.prop(s.getClass().getName(), DEFAULT_SCENARIO_WEIGHT));
+		String propName = StringUtils.removeStart(s.getClass().getName(), x._root().concat("."));
+		Double d = Double.valueOf(x.prop(propName, DEFAULT_SCENARIO_WEIGHT));
 		return d.equals(Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : d;
 	}
 
@@ -249,15 +252,15 @@ public class Scenarios extends Common {
 				s.execute();
 			}
 			if (candidates.isEmpty())
-				l.logProblem(S3, "Unable to suffice a scenario among " + list(scenarios, false)
+				l.logProblem(S2, "Unable to suffice a scenario among " + list(scenarios, false)
 						+ ": all scenarios have unmet requirements or are not executable");
 			if (!(retries >= 0)) {
-				l.logProblem(S3, "Scenario selection exausted after " + this.retries + " retries");
+				l.logProblem(S2, "Scenario selection exausted after " + this.retries + " retries");
 			}
 		} else
 
 		{
-			l.logProblem(S3, "Current Node scenario have no nested scenarios. Is it just a Leaf scenario?");
+			l.logProblem(S2, "Current Node scenario have no nested scenarios. Is it just a Leaf scenario?");
 		}
 	}
 

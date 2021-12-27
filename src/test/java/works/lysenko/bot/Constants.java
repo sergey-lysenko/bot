@@ -28,7 +28,7 @@ public class Constants { // C for Constants & Common
 
 	public final static String TOOLTIP = "//div[@class='introjs-tooltiptext']";
 	public final static String SKIP = "//a[@class='introjs-skipbutton']";
-	
+
 	public final static String BUY = "//button[@class='button button--xl tradeform-button tradeform-button--buy']";
 	public final static String SELL = "//button[@class='button button--xl tradeform-button tradeform-button--sell']";
 	public final static String PROVIDER_MENU = "//div[@class='provider-menu']";
@@ -37,12 +37,8 @@ public class Constants { // C for Constants & Common
 	public final static String USD = "//button[@data-currency='USD']";
 	public final static String ETH = "//button[@data-currency='ETH']";
 
-	public final static String LIQUIDITY = "//aside[@class='dashboard__sidebar dashboard__sidebar--left']/div[@class='sidebar \n"
-			+ "        sidebar--left  \n"
-			+ "        open']/div[@class='sidebar__wrapper']/div[@class='sidebar__header']/div[@class='chart-sidebar']/div[@class='sum']/span[@class='sign-sum']";
-	public final static String VOLUME = "//aside[@class='dashboard__sidebar dashboard__sidebar--right']/div[@class='sidebar \n"
-			+ "        sidebar--right  \n"
-			+ "        open']/div[@class='sidebar__wrapper']/div[@class='sidebar__header']/div[@class='chart-sidebar']/div[@class='sum']/span[@class='sign-sum']";
+	public final static String LIQUIDITY = "//aside[@class='dashboard__sidebar dashboard__sidebar--left']/div[@class='sidebar sidebar--left open']/div[@class='sidebar__wrapper']/div[@class='sidebar__header']/div[@class='chart-sidebar']/div[@class='sum']/span[@class='sign-sum']";
+	public final static String VOLUME = "//aside[@class='dashboard__sidebar dashboard__sidebar--right']/div[@class='sidebar sidebar--right open']/div[@class='sidebar__wrapper']/div[@class='sidebar__header']/div[@class='chart-sidebar']/div[@class='sum']/span[@class='sign-sum']";
 	public final static String USD_SIGN = "./span[1]";
 	public final static String ETH_SIGN = "./span[2]";
 
@@ -58,7 +54,8 @@ public class Constants { // C for Constants & Common
 	public final static String INPUT = ".//input[@class='tradeform-field__input']";
 
 	public static final boolean quoteShortEnough(Execution x) {
-		return (null == x.data.get("quote")) ? true : (Integer) x.data.get("quote") < Constants.MAX_QUOTE_LENGHT_FOR_BUTTONS;
+		return (null == x.data.get("quote")) ? true
+				: (Integer) x.data.get("quote") < Constants.MAX_QUOTE_LENGHT_FOR_BUTTONS;
 	}
 
 	// Decentraland

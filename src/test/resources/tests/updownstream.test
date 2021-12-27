@@ -1,5 +1,5 @@
-_cycles = 10
+_cycles = 3
 _include_downstream = true
 _include_upstream = true
 _root = works.lysenko.scenarios
-works.lysenko.scenarios.google.Quote = 1.0
+google.Quote = 1.0

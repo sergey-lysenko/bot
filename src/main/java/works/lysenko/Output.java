@@ -117,7 +117,7 @@ public class Output {
 		BufferedWriter w;
 		try {
 			int i;
-			w = new BufferedWriter(new FileWriter(name(RUN_JSON_FILENAME)));
+			w = new BufferedWriter(new FileWriter(name(x, RUN_JSON_FILENAME)));
 			w.write("{\"startAt\":" + x.t.startedAt() + ",\"issues\":{");
 			w.write("\"newIssues\":[");
 			i = x.newIssues.size();
@@ -189,8 +189,11 @@ public class Output {
 		}
 	}
 
-	private String name(String t) {
-		return RUNS + Common.fill(t, String.valueOf(x.t.startedAt()));
+	static String name(Execution x, String t) {
+		String path = RUNS + x.parameters.get("TEST") + "/";
+		String name = path + Common.fill(t, String.valueOf(x.t.startedAt()));
+		new File(path).mkdirs();
+		return name;
 	}
 
 	protected void stats() {
@@ -233,12 +236,14 @@ public class Output {
 		}
 
 		// Not reproduced issues
-		x.l.logln();
-		if (x.notReproduced.isEmpty())
-			x.l.log(0, colorize("All Known Issues were reproduced", GREEN));
-		else {
-			x.l.log(0, colorize("Not reproduced Known Issues:", YELLOW));
-			x.l.log(0, colorize(String.join(", ", x.notReproduced), YELLOW));
+		if (!(x.knownIssues.isEmpty())) {
+			x.l.logln();
+			if (x.notReproduced.isEmpty())
+				x.l.log(0, colorize("All Known Issues were reproduced", GREEN));
+			else {
+				x.l.log(0, colorize("Not reproduced Known Issues:", YELLOW));
+				x.l.log(0, colorize(String.join(", ", x.notReproduced), YELLOW));
+			}
 		}
 
 		// Scenarios statistics
@@ -279,7 +284,7 @@ public class Output {
 
 		drawGroup(g, 0, dy, sorted);
 		try {
-			SVGUtils.writeToSVG(new File(Common.fill(name(RUN_SVG_FILENAME))), g.getSVGElement());
+			SVGUtils.writeToSVG(new File(Common.fill(name(x, RUN_SVG_FILENAME))), g.getSVGElement());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

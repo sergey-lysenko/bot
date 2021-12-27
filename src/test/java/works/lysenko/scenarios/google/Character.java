@@ -2,6 +2,8 @@ package works.lysenko.scenarios.google;
 
 import static works.lysenko.bot.Constants.GOOGLE_INPUT;
 
+import org.openqa.selenium.Keys;
+
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractNodeScenario;
 import works.lysenko.scenarios.google.character.Enter;
@@ -19,6 +21,7 @@ public class Character extends AbstractNodeScenario {
 	public void action() {
 		section("Typing random Character into search query input");
 		typeInto(GOOGLE_INPUT, Fakers.character());
+		typeInto(GOOGLE_INPUT, Keys.TAB);
 		/*
 		 * Absence of "quote" in a data storage is sign that Quote scenario was not
 		 * recently executed and it is ok to press Search or Lucky without additional

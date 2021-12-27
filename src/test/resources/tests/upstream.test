@@ -2,5 +2,5 @@ _cycles = 3
 _include_downstream = false
 _include_upstream = true
 _root = works.lysenko.scenarios
-works.lysenko.scenarios.google.character.Search = 0.1
+google.character.Search = 0.1
 

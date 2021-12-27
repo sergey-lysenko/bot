@@ -2,6 +2,8 @@ package works.lysenko.scenarios.google;
 
 import static works.lysenko.bot.Constants.GOOGLE_INPUT;
 
+import org.openqa.selenium.Keys;
+
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractNodeScenario;
 import works.lysenko.scenarios.google.quote.Enter;
@@ -22,6 +24,7 @@ public class Quote extends AbstractNodeScenario {
 		put("quote", q.length());
 		log(2, "Length of selected quote:" + q.length());
 		typeInto(GOOGLE_INPUT, q);
+		typeInto(GOOGLE_INPUT, Keys.TAB);
 	}
 
 	@Override

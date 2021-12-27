@@ -6,7 +6,7 @@
 
 	<groupId>works.lysenko</groupId>
 	<artifactId>bot</artifactId>
-	<version>0.21.49</version>
+	<version>0.21.51</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,8 +16,8 @@
 
 		<!-- Dependencies versions -->
 		<junit.jupiter.version>5.8.1</junit.jupiter.version>
-		<selenuim.version>4.0.0</selenuim.version>
-		<webdrivermanager.version>4.4.3</webdrivermanager.version>
+		<selenuim.version>4.1.0</selenuim.version>
+		<webdrivermanager.version>5.0.3</webdrivermanager.version>
 		<aspectj.version>1.9.8.RC2</aspectj.version>
 		<commons-math3.version>3.6.1</commons-math3.version>
 		<commons-lang3.version>3.12.0</commons-lang3.version>

@@ -9,6 +9,8 @@ import static works.lysenko.utils.Ansi.colorize;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import works.lysenko.Common;
 import works.lysenko.Execution;
 import works.lysenko.utils.SortedStringSet;
@@ -95,7 +97,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 				b = false;
 		if (x._debug())
 			log(3, "containsKeys(" + Arrays.toString(fields) + ")" + "\u0336" + b);
-			//  + " " + LF + x.gson().toJson(x.data));
+		// + " " + LF + x.gson().toJson(x.data));
 		return b;
 	}
 
@@ -196,7 +198,6 @@ public abstract class AbstractScenario extends Common implements Scenario {
 
 	private void getLog(Object field, Object o) {
 		log(3, "get(" + field + ")" + "\u21D2" + o + " ");
-		// + LF + x.gson().toJson(x.data));
 	}
 
 	/**
@@ -252,7 +253,6 @@ public abstract class AbstractScenario extends Common implements Scenario {
 		if (x._debug()) {
 			String j = x.gson().toJson(x.data);
 			log(3, "put(" + field + ")" + "\u21D0" + "[" + value + "\u2192" + o + "]");
-			// + LF + j);
 			l.logFile(j, "data", "json");
 		}
 	}
@@ -317,6 +317,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	 *         properties
 	 */
 	private Double weight() {
-		return Double.valueOf(x.prop(this.getClass().getName(), DEFAULT_SCENARIO_WEIGHT));
+		return Double.valueOf(x.prop(StringUtils.removeStart(this.getClass().getName(), x._root().concat(".")),
+				DEFAULT_SCENARIO_WEIGHT));
 	}
 }

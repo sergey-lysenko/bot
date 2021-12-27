@@ -15,7 +15,7 @@ public class Lucky extends AbstractLeafScenario {
 	@Override
 	public void action() {
 		section("Pressing 'Search' button");
-		waitThenClick(GOOGLE_LUCKY_BUTTON);
+		findThenClick(GOOGLE_LUCKY_BUTTON);
 		makeScreenshot("cycle" + x.currentCycle() + "-" + name());
 	}
 

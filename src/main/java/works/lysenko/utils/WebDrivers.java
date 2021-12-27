@@ -1,43 +1,65 @@
 package works.lysenko.utils;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.ie.InternetExplorerOptions;
+import org.openqa.selenium.opera.OperaDriver;
+import org.openqa.selenium.opera.OperaOptions;
+import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.safari.SafariOptions;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
 
 @SuppressWarnings("javadoc")
 public class WebDrivers {
 
 	public static WebDriver get(Browser browser) {
-		return get(browser, null, false);
+		return get(browser, false);
 	}
 
 	public static WebDriver get(Browser browser, boolean maximize) {
-		return get(browser, null, maximize);
-	}
-
-	public static WebDriver get(Browser browser, String profile, boolean maximize) {
-		WebDriver d;
+		WebDriver d = null;
 		switch (browser) {
 		case FIREFOX:
 			WebDriverManager.firefoxdriver().setup();
 			d = new FirefoxDriver(getFireFoxOptions());
 			break;
+		case OPERA:
+			WebDriverManager.operadriver().setup();
+			d = new OperaDriver(getOperaOptions());
+			break;
+		case EDGE:
+			WebDriverManager.edgedriver().setup();
+			d = new EdgeDriver(getEdgeOptions());
+			break;
+		case IEXPLORER:
+			WebDriverManager.iedriver().setup();
+			d = new InternetExplorerDriver(getIEOptions());
+			break;
+		case SAFARI:
+			WebDriverManager.safaridriver().setup();
+			d = new SafariDriver(getSafariOptions());
+			break;
 		case CHROME:
-		default:
 			WebDriverManager.chromedriver().setup();
-			d = new ChromeDriver(getChromeOptions(profile));
+			d = new ChromeDriver(getChromeOptions());
+			break;
+		default:
+			System.out.println("Browser not defined, testing is not possible");
+			System.exit(3);
 		}
 		if (maximize)
 			d.manage().window().maximize();
 		return d;
 	}
 
-	private static ChromeOptions getChromeOptions(String profile) {
+	private static ChromeOptions getChromeOptions() {
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("window-size=1920,1080");
 		options.addArguments("lang=en-GB");
@@ -48,16 +70,33 @@ public class WebDrivers {
 		options.addArguments("disable-infobars");
 		options.addArguments("enable-logging");
 		options.addArguments("v=1");
-		if (null != profile)
-			options.addArguments("user-data-dir=" + profile);
 		return options;
 	}
 
 	private static FirefoxOptions getFireFoxOptions() {
 		FirefoxOptions options = new FirefoxOptions();
-		FirefoxProfile profile = new FirefoxProfile();
-		profile.setPreference("intl.accept_languages", "en-GB");
-		options.setProfile(profile);
+		options.setCapability("devtools.console.stdout.content", true);
 		return options;
 	}
+
+	private static EdgeOptions getEdgeOptions() {
+		EdgeOptions options = new EdgeOptions();
+		return options;
+	}
+
+	private static InternetExplorerOptions getIEOptions() {
+		InternetExplorerOptions options = new InternetExplorerOptions();
+		return options;
+	}
+
+	private static OperaOptions getOperaOptions() {
+		OperaOptions options = new OperaOptions();
+		return options;
+	}
+
+	private static SafariOptions getSafariOptions() {
+		SafariOptions options = new SafariOptions();
+		return options;
+	}
+
 }

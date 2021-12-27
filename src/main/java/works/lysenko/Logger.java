@@ -3,6 +3,7 @@ package works.lysenko;
 import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.FILENAME;
 import static works.lysenko.Constants.RUN_LOG_FILENAME;
+import static works.lysenko.utils.Browser.CHROME;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -65,9 +66,7 @@ public class Logger {
 		super();
 		this.x = x;
 		try {
-			new File(RUNS).mkdirs();
-			logWriter = new BufferedWriter(
-					new FileWriter(RUNS + Common.fill(RUN_LOG_FILENAME, String.valueOf(x.t.startedAt()))));
+			logWriter = new BufferedWriter(new FileWriter(Output.name(x, RUN_LOG_FILENAME)));
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to open log file for writting");
 		}
@@ -113,29 +112,29 @@ public class Logger {
 		LogRecord lr;
 		int depth = x.currentDepth();
 
-		if (logsToRead.contains(LogType.BROWSER)) {
-			ls = x.d.manage().logs().get(LogType.BROWSER);
-			long time = ((null == t) ? x.timer() : t);
-			for (LogEntry e : ls) {
-				long timestamp = e.getTimestamp() - x.t.startedAt(); // since test start
-				long difference = time - timestamp; // since capturing
-				log.add(problem(timestamp, depth, "[" + difference + "]" + " [BROWSER] " + e.toString()));
+		if (x.in(CHROME)) {
+			if (logsToRead.contains(LogType.BROWSER)) {
+				ls = x.d.manage().logs().get(LogType.BROWSER);
+				long time = ((null == t) ? x.timer() : t);
+				for (LogEntry e : ls) {
+					long timestamp = e.getTimestamp() - x.t.startedAt(); // since test start
+					long difference = time - timestamp; // since capturing
+					log.add(problem(timestamp, depth, "[" + difference + "]" + " [BROWSER] " + e.toString()));
+				}
 			}
-		}
-
-		if (logsToRead.contains(LogType.CLIENT)) {
-			ls = x.d.manage().logs().get(LogType.CLIENT);
-			long time = ((null == t) ? x.timer() : t);
-			for (LogEntry e : ls) {
-				log.add(problem(time, depth, "[CLIENT] " + e.toString()));
+			if (logsToRead.contains(LogType.CLIENT)) {
+				ls = x.d.manage().logs().get(LogType.CLIENT);
+				long time = ((null == t) ? x.timer() : t);
+				for (LogEntry e : ls) {
+					log.add(problem(time, depth, "[CLIENT] " + e.toString()));
+				}
 			}
-		}
-
-		if (logsToRead.contains(LogType.DRIVER)) {
-			ls = x.d.manage().logs().get(LogType.DRIVER);
-			long time = ((null == t) ? x.timer() : t);
-			for (LogEntry e : ls) {
-				log.add(problem(time, depth, "[DRIVER] " + e.toString()));
+			if (logsToRead.contains(LogType.DRIVER)) {
+				ls = x.d.manage().logs().get(LogType.DRIVER);
+				long time = ((null == t) ? x.timer() : t);
+				for (LogEntry e : ls) {
+					log.add(problem(time, depth, "[DRIVER] " + e.toString()));
+				}
 			}
 		}
 
@@ -177,10 +176,11 @@ public class Logger {
 	 * @param ex extension of log file
 	 */
 	public void logFile(String s, String n, String ex) {
-		String location = RUNS + x.t.startedAt() + "/";
+		String location = RUNS + x.parameters.get("TEST") + "/" + x.t.startedAt() + "/";
 		String timestamp = String.format("%013d", x.t.millis());
 		String name = Common.fill(FILENAME, timestamp, n, ex);
 		String filename = location + name;
+
 		BufferedWriter writer = null;
 		try {
 			new File(location).mkdirs();

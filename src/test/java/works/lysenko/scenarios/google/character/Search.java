@@ -15,7 +15,7 @@ public class Search extends AbstractLeafScenario {
 	@Override
 	public void action() {
 		section("Pressing 'Search' button");
-		waitThenClick(GOOGLE_SEARCH_BUTTON);
+		findThenClick(GOOGLE_SEARCH_BUTTON);
 		makeScreenshot("cycle" + x.currentCycle() + "-" + name());
 	}
 

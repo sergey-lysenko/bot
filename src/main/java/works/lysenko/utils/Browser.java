@@ -5,5 +5,34 @@ package works.lysenko.utils;
  */
 @SuppressWarnings("javadoc")
 public enum Browser {
-	CHROME, FIREFOX
+	CHROME("Chrome"), FIREFOX("Firefox"), OPERA("Opera"), EDGE("Edge"), IEXPLORER("Internet Explorer"),
+	SAFARI("Safari");
+
+	private String name;
+
+	Browser(String name) {
+		this.name = name;
+	}
+
+	public static Browser get(String string) {
+		switch (string) {
+		case "Firefox":
+			return FIREFOX;
+		case "Opera":
+			return OPERA;
+		case "Edge":
+			return EDGE;
+		case "Internet Explorer":
+			return IEXPLORER;
+		case "Safari":
+			return SAFARI;
+		case "Chrome":
+		default:
+			return CHROME;
+		}
+	}
+
+	public String getName() {
+		return name;
+	}
 }

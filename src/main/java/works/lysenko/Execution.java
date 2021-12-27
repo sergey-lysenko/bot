@@ -1,5 +1,11 @@
 package works.lysenko;
 
+import static org.openqa.selenium.logging.LogType.BROWSER;
+import static org.openqa.selenium.logging.LogType.CLIENT;
+import static org.openqa.selenium.logging.LogType.DRIVER;
+import static org.openqa.selenium.logging.LogType.PERFORMANCE;
+import static org.openqa.selenium.logging.LogType.PROFILER;
+import static org.openqa.selenium.logging.LogType.SERVER;
 import static works.lysenko.Constants.CONFIGURATION_CONJOINT;
 import static works.lysenko.Constants.CONFIGURATION_CYCLES;
 import static works.lysenko.Constants.CONFIGURATION_DEBUG;
@@ -10,9 +16,11 @@ import static works.lysenko.Constants.DEFAULT_CONJOINT;
 import static works.lysenko.Constants.DEFAULT_CYCLES;
 import static works.lysenko.Constants.DEFAULT_DEBUG;
 import static works.lysenko.Constants.DEFAULT_DOWNSTREAM;
-import static works.lysenko.Constants.RESOURCES;
 import static works.lysenko.Constants.DEFAULT_ROOT;
 import static works.lysenko.Constants.DEFAULT_UPSTREAM;
+import static works.lysenko.Constants.KNOWN_ISSUES;
+import static works.lysenko.Constants.TEST;
+import static works.lysenko.Constants.TESTS;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -92,8 +100,10 @@ public class Execution extends Common {
 	 * Cached GsonBuilder object to share between calls
 	 */
 	public GsonBuilder gsonBuilder = new GsonBuilder();
-	private Properties prop;
+	@SuppressWarnings("javadoc")
+	public Parameters parameters;
 	private Properties know;
+	private Properties prop;
 	protected Set<String> newIssues = new HashSet<String>();
 	protected Set<String> knownIssues = new HashSet<String>();
 	protected Set<String> notReproduced;
@@ -103,62 +113,52 @@ public class Execution extends Common {
 	public Properties data;
 
 	/**
-	 * Name of the test execution for logging purposes
-	 */
-	public String name;
-	/**
-	 * Target domain name of current execution
-	 */
-	public String domain;
-	/**
 	 * Exception happened during execution
 	 */
 	public Exception exception;
 
 	/**
-	 * @param implicitWait
-	 * @param explicitWait
-	 * @param logsToRead
-	 * @param name
+	 * 
 	 */
-	public Execution(int implicitWait, int explicitWait, Set<String> logsToRead, String name) {
-		this(implicitWait, explicitWait, logsToRead, name, null);
+	public Execution() {
+		this(null);
 	}
 
 	/**
-	 * @param implicitWait
-	 * @param explicitWait
-	 * @param logsToRead
-	 * @param name
-	 * @param domain
+	 * @param parametersList
 	 */
 	@SuppressWarnings("unchecked")
-	public Execution(int implicitWait, int explicitWait, Set<String> logsToRead, String name, String domain) {
+	public Execution(String parametersList) {
 		super();
 		this.x = this;
+		Set<String> logsToRead = Set.of(BROWSER, CLIENT, DRIVER, PERFORMANCE, PROFILER, SERVER);
+
+		// Parameters
+		parameters = new Parameters(parametersList);
 
 		// Bot components
 		t = new Stopwatch();
-		o = new Output(this);
 		r = new Results(this);
 		l = new Logger(this, logsToRead);
+		o = new Output(this);
 
 		// Web driver components
-		d = WebDrivers.get(Browser.CHROME, false);
+		d = WebDrivers.get(Browser.get(parameters.string("BROWSER")), false);
 		d.manage().window().setPosition(new Point(0, 0));
-		d.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitWait));
-		w = new WebDriverWait(d, Duration.ofSeconds(explicitWait));
 
-		// Properties
+		// Web driver parameters
+		Long iwait = Long.valueOf(parameters.string("IWAIT"));
+		Long ewait = Long.valueOf(parameters.string("EWAIT"));
+		d.manage().timeouts().implicitlyWait(Duration.ofSeconds(iwait));
+		w = new WebDriverWait(d, Duration.ofSeconds(ewait));
+
+		// Test properties
 		data = new Properties();
-		prop = readProperties(name);
-		know = readProperties("_knownIssues");
+		know = readProperties(KNOWN_ISSUES);
+		prop = readProperties(TESTS + (String) parameters.get("TEST") + TEST);
+
 		// That's one dirty trick :)
 		notReproduced = new HashSet<String>((Set<String>) (Set<?>) know.keySet());
-
-		// Information
-		this.name = name;
-		this.domain = domain;
 	}
 
 	/**
@@ -302,6 +302,21 @@ public class Execution extends Common {
 	}
 
 	/**
+	 * @return browser in which current execution takes place
+	 */
+	public Browser in() {
+		return Browser.get(x.parameters.string("BROWSER"));
+	}
+
+	/**
+	 * @param b
+	 * @return true if current is in defined browser
+	 */
+	public boolean in(Browser b) {
+		return (x.parameters.string("BROWSER").equals(b.getName()));
+	}
+	
+	/**
 	 * @param n name of run property
 	 * @param d default value of run property
 	 * @return value of requested property
@@ -320,18 +335,17 @@ public class Execution extends Common {
 	private Properties readProperties(String name) {
 		Properties prop = new Properties();
 		if (null != name) {
-			String propertiesFile = RESOURCES + name + ".properties";
 			FileInputStream fis = null;
 			try {
-				fis = new FileInputStream(propertiesFile);
+				fis = new FileInputStream(name);
 			} catch (FileNotFoundException e) {
-				l.logProblem(Severity.S1, "Requested properties file '" + propertiesFile + "' not found");
+				l.logProblem(Severity.S1, "Requested properties file '" + name + "' not found");
 			}
 			try {
 				if (null != fis)
 					prop.load(fis);
 				else
-					l.logProblem(Severity.S2, "Unable to read properties from '" + propertiesFile + "'");
+					l.logProblem(Severity.S2, "Unable to read properties from '" + name + "'");
 			} catch (IOException e) {
 				throw new IllegalArgumentException("Unable to load requested properties file");
 			}
