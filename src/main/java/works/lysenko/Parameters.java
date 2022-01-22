@@ -39,8 +39,6 @@ public class Parameters extends Properties {
 
 	private static final int WIDTH = 18;
 
-	JTextField iWait = null;
-	JTextField eWait = null;
 	JTextField domain = null;
 	JComboBox<Object> browser = null;
 	JButton reset = null;
@@ -56,8 +54,6 @@ public class Parameters extends Properties {
 
 		super();
 		load();
-		read("IWAIT", "1");
-		read("EWAIT", "30");
 		read("DOMAIN", "");
 		read("BROWSER", Browser.CHROME.getName());
 		read("TEST", "");
@@ -134,8 +130,6 @@ public class Parameters extends Properties {
 		JPanel p = new JPanel();
 
 		p.setLayout(new GridLayout(size() + 1, 2, 5, 5));
-		add("IWAIT", iWait, p);
-		add("EWAIT", eWait, p);
 		add("DOMAIN", domain, p);
 		add("BROWSER", browser, p);
 		add("TEST", test, p);
@@ -177,8 +171,6 @@ public class Parameters extends Properties {
 	private void propagate() {
 
 		// Propagation of the user input
-		put("IWAIT", iWait.getText());
-		put("EWAIT", eWait.getText());
 		put("DOMAIN", domain.getText());
 		put("BROWSER", (browser.getSelectedItem() == null) ? "" : browser.getSelectedItem().toString());
 		put("TEST", (test.getSelectedItem() == null) ? "" : test.getSelectedItem().toString());
@@ -222,8 +214,6 @@ public class Parameters extends Properties {
 	private void standardParameters() {
 
 		// Standard parameters
-		iWait = new JTextField((String) get("IWAIT"), WIDTH);
-		eWait = new JTextField((String) get("EWAIT"), WIDTH);
 		domain = new JTextField((String) get("DOMAIN"), WIDTH);
 
 		browsers();

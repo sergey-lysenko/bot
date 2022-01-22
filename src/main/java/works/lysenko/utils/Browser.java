@@ -5,7 +5,7 @@ package works.lysenko.utils;
  */
 @SuppressWarnings("javadoc")
 public enum Browser {
-	CHROME("Chrome"), FIREFOX("Firefox"), OPERA("Opera"), EDGE("Edge"), IEXPLORER("Internet Explorer"),
+	CHROME("Chrome"), FIREFOX("Firefox"), OPERA("Opera"), EDGE("Edge"),
 	SAFARI("Safari");
 
 	private String name;
@@ -22,8 +22,6 @@ public enum Browser {
 			return OPERA;
 		case "Edge":
 			return EDGE;
-		case "Internet Explorer":
-			return IEXPLORER;
 		case "Safari":
 			return SAFARI;
 		case "Chrome":

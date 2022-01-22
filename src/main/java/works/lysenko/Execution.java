@@ -10,12 +10,16 @@ import static works.lysenko.Constants.CONFIGURATION_CONJOINT;
 import static works.lysenko.Constants.CONFIGURATION_CYCLES;
 import static works.lysenko.Constants.CONFIGURATION_DEBUG;
 import static works.lysenko.Constants.CONFIGURATION_DOWNSTREAM;
+import static works.lysenko.Constants.CONFIGURATION_EWAIT;
+import static works.lysenko.Constants.CONFIGURATION_IWAIT;
 import static works.lysenko.Constants.CONFIGURATION_ROOT;
 import static works.lysenko.Constants.CONFIGURATION_UPSTREAM;
 import static works.lysenko.Constants.DEFAULT_CONJOINT;
 import static works.lysenko.Constants.DEFAULT_CYCLES;
 import static works.lysenko.Constants.DEFAULT_DEBUG;
 import static works.lysenko.Constants.DEFAULT_DOWNSTREAM;
+import static works.lysenko.Constants.DEFAULT_EWAIT;
+import static works.lysenko.Constants.DEFAULT_IWAIT;
 import static works.lysenko.Constants.DEFAULT_ROOT;
 import static works.lysenko.Constants.DEFAULT_UPSTREAM;
 import static works.lysenko.Constants.KNOWN_ISSUES;
@@ -29,11 +33,13 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.openqa.selenium.Point;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -104,7 +110,7 @@ public class Execution extends Common {
 	public Parameters parameters;
 	private Properties know;
 	private Properties prop;
-	protected Set<String> newIssues = new HashSet<String>();
+	protected Set<String> newIssues = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	protected Set<String> knownIssues = new HashSet<String>();
 	protected Set<String> notReproduced;
 	/**
@@ -125,6 +131,37 @@ public class Execution extends Common {
 	}
 
 	/**
+	 * Start legacy-compatible execution with defined Implicit and Explicit waits
+	 * 
+	 * @param browser
+	 * 
+	 * @param parametersList
+	 */
+
+	public Execution(int iwait, int ewait, String browser) {
+		super();
+		this.x = this;
+		Set<String> logsToRead = Set.of(BROWSER, CLIENT, DRIVER, PERFORMANCE, PROFILER, SERVER);
+
+		// Bot components
+		t = new Stopwatch();
+		r = new Results(this);
+		l = new Logger(this, logsToRead);
+		o = new Output(this);
+
+		// Web driver components
+		d = WebDrivers.get(Browser.get(browser), false);
+		d.manage().window().setPosition(new Point(0, 0));
+
+		// Web driver parameters
+		d.manage().timeouts().implicitlyWait(Duration.ofSeconds(iwait));
+		w = new WebDriverWait(d, Duration.ofSeconds(ewait));
+	}
+
+	/**
+	 * 
+	 * Start bot-compatible execution
+	 * 
 	 * @param parametersList
 	 */
 	@SuppressWarnings("unchecked")
@@ -146,16 +183,14 @@ public class Execution extends Common {
 		d = WebDrivers.get(Browser.get(parameters.string("BROWSER")), false);
 		d.manage().window().setPosition(new Point(0, 0));
 
-		// Web driver parameters
-		Long iwait = Long.valueOf(parameters.string("IWAIT"));
-		Long ewait = Long.valueOf(parameters.string("EWAIT"));
-		d.manage().timeouts().implicitlyWait(Duration.ofSeconds(iwait));
-		w = new WebDriverWait(d, Duration.ofSeconds(ewait));
-
 		// Test properties
 		data = new Properties();
 		know = readProperties(KNOWN_ISSUES);
 		prop = readProperties(TESTS + (String) parameters.get("TEST") + TEST);
+
+		// Web driver parameters
+		d.manage().timeouts().implicitlyWait(Duration.ofSeconds(_iwait()));
+		w = new WebDriverWait(d, Duration.ofSeconds(_ewait()));
 
 		// That's one dirty trick :)
 		notReproduced = new HashSet<String>((Set<String>) (Set<?>) know.keySet());
@@ -187,6 +222,20 @@ public class Execution extends Common {
 	 */
 	public boolean _downstream() {
 		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DOWNSTREAM, DEFAULT_DOWNSTREAM));
+	}
+
+	/**
+	 * @return configured number of cycles to be executed
+	 */
+	private int _ewait() {
+		return Integer.valueOf(prop.getProperty("_" + CONFIGURATION_EWAIT, DEFAULT_EWAIT));
+	}
+
+	/**
+	 * @return configured number of cycles to be executed
+	 */
+	private int _iwait() {
+		return Integer.valueOf(prop.getProperty("_" + CONFIGURATION_IWAIT, DEFAULT_IWAIT));
 	}
 
 	/**
@@ -315,7 +364,7 @@ public class Execution extends Common {
 	public boolean in(Browser b) {
 		return (x.parameters.string("BROWSER").equals(b.getName()));
 	}
-	
+
 	/**
 	 * @param n name of run property
 	 * @param d default value of run property

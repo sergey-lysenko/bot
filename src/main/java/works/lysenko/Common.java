@@ -319,6 +319,15 @@ public class Common {
 	}
 
 	/**
+	 * 
+	 * @param lc
+	 */
+	public void clear(WebElement e) {
+		l.log("Clearing " + describe(e));
+		e.clear();
+	}
+
+	/**
 	 * @param lc string locator of element to be clicked on
 	 */
 	public void click(String... lc) {
@@ -326,14 +335,15 @@ public class Common {
 		int attempt = 0;
 		do {
 			try {
+				WebElement e = find(false, true, lc);
 				l.log("Clicking " + describe(lc));
-				find(true, true, lc).click(); // Silent find during click
+				e.click();
 				done = true;
 			} catch (StaleElementReferenceException ex) {
-				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName() + ", while trying to click(), attempt "
-						+ ++attempt + " ...");
+				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
+						+ ", while trying to click(), during attempt " + ++attempt + " ...");
 			}
-		} while (!done && attempt > EXCEPTION_RETRIES);
+		} while ((!done) && (attempt <= EXCEPTION_RETRIES));
 	}
 
 	/**
@@ -406,6 +416,12 @@ public class Common {
 		return tg + ((an.isEmpty()) ? "" : " '" + an + "'") + ((geometry) ? (" @ " + describe(e.getRect())) : "");
 	}
 
+	public boolean exist(String lc) {
+		int oc = findAll(lc).size();
+		log("... found " + oc + " occurence(s)");
+		return oc > 0;
+	}
+
 	/**
 	 * Find an element defined by one or several nested String locators
 	 * 
@@ -437,12 +453,12 @@ public class Common {
 					}
 				done = true;
 			} catch (TimeoutException | NoSuchElementException | StaleElementReferenceException ex) {
-				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName() + ", while trying to find(), attempt "
-						+ ++attempt + " ...");
+				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
+						+ ", while trying to find(), during attempt " + ++attempt + " ...");
 			}
-		} while (!done && attempt > EXCEPTION_RETRIES);
-		if (attempt > EXCEPTION_RETRIES) {
-			logProblem(Severity.S1, "Maximum retries amount reached");
+		} while ((!done) && (attempt < EXCEPTION_RETRIES));
+		if (attempt >= EXCEPTION_RETRIES) {
+			logProblem(Severity.S1, "Maximum retries amount reached, find() returns null, test failure imminent");
 			return null;
 		} else {
 			return (scrollTo) ? find(e) : e;
@@ -541,6 +557,24 @@ public class Common {
 		return x.in(b);
 	}
 
+	/**
+	 * @param lc
+	 * @return true is this Web Element is disabled
+	 */
+	public boolean isDisabled(String lc) {
+		l.log("Checking whether " + lc + " is disabled");
+		return !d.findElement(by(lc)).isEnabled();
+	}
+
+	/**
+	 * @param lc
+	 * @return true is this Web Element is disabled
+	 */
+	public boolean isEnabled(String lc) {
+		l.log("Checking whether " + lc + " is enabled");
+		return d.findElement(by(lc)).isEnabled();
+	}
+	
 	/**
 	 * @param lc
 	 * @return true is this Web Element is present in DOM
@@ -705,14 +739,25 @@ public class Common {
 	}
 
 	/**
-	 * Read contents of the element defined by String locator
+	 * Read value attribute of the element defined by String locator
 	 * 
 	 * @param lc string locator of an element
-	 * @return result of .getText() for this element
+	 * @return contents of value attribute of the element
 	 */
 	public String readInput(String lc) {
 		l.log("Reading from " + lc);
 		return d.findElement(by(lc)).getAttribute("value");
+	}
+
+	/**
+	 * Read value attribute of the element
+	 * 
+	 * @param e an element
+	 * @return contents of value attribute of the element
+	 */
+	public String readInput(WebElement e) {
+		l.log("Reading from " + describe(e));
+		return e.getAttribute("value");
 	}
 
 	/**
@@ -1028,6 +1073,19 @@ public class Common {
 	}
 
 	/**
+	 * Wait for appearance of the defined element and the click on it
+	 * 
+	 * @param lc string locator of an element to be waited for
+	 * @param x
+	 * @param y
+	 */
+	public void waitThenClick(double x, double y, String lc) {
+		wait(lc);
+		click(x, y, lc);
+	}
+
+	
+	/**
 	 * Find visible instance of the defined element and the click on it
 	 * 
 	 * @param lc string locator of an element to be waited for
@@ -1046,9 +1104,9 @@ public class Common {
 				done = true;
 			} catch (TimeoutException ex) {
 				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
-						+ ", while trying to findThenClick(), attempt " + ++attempt + " ...");
+						+ ", while trying to findThenClick(), during attempt " + ++attempt + " ...");
 			}
-		} while (!done && attempt > EXCEPTION_RETRIES);
+		} while ((!done) || (attempt > EXCEPTION_RETRIES));
 		target.click();
 	}
 

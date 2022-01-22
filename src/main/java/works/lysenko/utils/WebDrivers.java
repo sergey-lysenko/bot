@@ -7,8 +7,6 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.opera.OperaOptions;
 import org.openqa.selenium.safari.SafariDriver;
@@ -37,10 +35,6 @@ public class WebDrivers {
 		case EDGE:
 			WebDriverManager.edgedriver().setup();
 			d = new EdgeDriver(getEdgeOptions());
-			break;
-		case IEXPLORER:
-			WebDriverManager.iedriver().setup();
-			d = new InternetExplorerDriver(getIEOptions());
 			break;
 		case SAFARI:
 			WebDriverManager.safaridriver().setup();
@@ -81,11 +75,6 @@ public class WebDrivers {
 
 	private static EdgeOptions getEdgeOptions() {
 		EdgeOptions options = new EdgeOptions();
-		return options;
-	}
-
-	private static InternetExplorerOptions getIEOptions() {
-		InternetExplorerOptions options = new InternetExplorerOptions();
 		return options;
 	}
 
