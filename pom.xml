@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>works.lysenko</groupId>
@@ -16,7 +14,7 @@
 
 		<!-- Dependencies versions -->
 		<junit.jupiter.version>5.8.1</junit.jupiter.version>
-		<selenuim.version>4.1.0</selenuim.version>
+		<selenuim.version>4.1.1</selenuim.version>
 		<webdrivermanager.version>5.0.3</webdrivermanager.version>
 		<aspectj.version>1.9.8.RC2</aspectj.version>
 		<commons-math3.version>3.6.1</commons-math3.version>
@@ -99,6 +97,11 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>${gson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.appium</groupId>
+			<artifactId>java-client</artifactId>
+			<version>8.0.0-beta2</version>
 		</dependency>
 	</dependencies>
 

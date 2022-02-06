@@ -1,7 +1,5 @@
 package works.lysenko.scenarios.docCoach.useCases;
 
-import org.junit.jupiter.api.Assertions;
-
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;
 

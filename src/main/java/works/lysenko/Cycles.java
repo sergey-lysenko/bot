@@ -91,7 +91,8 @@ public class Cycles {
 		try {
 			if (cyclesToDo == 0)
 				x.l.logProblem(S2, "No test cycles were perfomed");
-			x.l.log(0, "Executing " + y(cyclesToDo) + " cycles of " + y(x.parameters.get("TEST")) + " on " + y(x.parameters.get("DOMAIN")));
+			x.l.log(0, "Executing " + y(cyclesToDo) + " cycles of " + y(x.parameters.get("TEST")) + " on "
+					+ y(x.parameters.get("DOMAIN")));
 			while (cyclesToDo-- > 0) {
 				scenarios.execute();
 				x.l.logln();
@@ -103,6 +104,10 @@ public class Cycles {
 				x.l.logProblem(S3,
 						"Test properties are absent. Wrong configuration? Template of Test Run Properties file '"
 								+ GENERATED_CONFIG_FILE + "' was updated");
+			if (x.service != null)
+				x.l.log("Closing test service ...");
+				x.service.close();
+				x.l.log(" ... done.");
 		} catch (Exception e) {
 			x.exception = e;
 			x.l.logProblem(S1, "Uncaught exception during cycles execution: " + e.getMessage());

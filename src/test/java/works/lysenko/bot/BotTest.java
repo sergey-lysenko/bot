@@ -16,7 +16,7 @@ public class BotTest {
 	@BeforeAll
 	public static void setupTest() {
 		x = new Execution();
-		cycles = new Cycles("works.lysenko.scenarios", x);
+		cycles = new Cycles(x);
 	}
 
 	@AfterAll

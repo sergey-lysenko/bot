@@ -17,11 +17,11 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 @SuppressWarnings("javadoc")
 public class WebDrivers {
 
-	public static WebDriver get(Browser browser) {
+	public static WebDriver get(Platform browser) {
 		return get(browser, false);
 	}
 
-	public static WebDriver get(Browser browser, boolean maximize) {
+	public static WebDriver get(Platform browser, boolean maximize) {
 		WebDriver d = null;
 		switch (browser) {
 		case FIREFOX:
@@ -43,6 +43,7 @@ public class WebDrivers {
 		case CHROME:
 			WebDriverManager.chromedriver().setup();
 			d = new ChromeDriver(getChromeOptions());
+			// d = WebDriverManager.chromedriver().browserInDockerAndroid().create();
 			break;
 		default:
 			System.out.println("Browser not defined, testing is not possible");

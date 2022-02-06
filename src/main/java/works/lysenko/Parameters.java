@@ -29,7 +29,7 @@ import javax.swing.JTextField;
 
 import org.apache.commons.lang3.StringUtils;
 
-import works.lysenko.utils.Browser;
+import works.lysenko.utils.Platform;
 
 /**
  * @author Sergii Lysenko
@@ -40,7 +40,7 @@ public class Parameters extends Properties {
 	private static final int WIDTH = 18;
 
 	JTextField domain = null;
-	JComboBox<Object> browser = null;
+	JComboBox<Object> platform = null;
 	JButton reset = null;
 	JComboBox<Object> test = null;
 	List<JTextField> aparams = null;
@@ -55,7 +55,7 @@ public class Parameters extends Properties {
 		super();
 		load();
 		read("DOMAIN", "");
-		read("BROWSER", Browser.CHROME.getName());
+		read("PLATFORM", Platform.CHROME.getName());
 		read("TEST", "");
 
 		if (null != list) {
@@ -99,29 +99,29 @@ public class Parameters extends Properties {
 		}
 	}
 
-	private void browsers() {
+	private void platforms() {
 
-		List<String> browserNames = browserNames();
+		List<String> platformNames = platformNames();
 
 		// Creating Browsers ComboBox
-		browser = new JComboBox<Object>(browserNames.toArray());
-		browser.setSelectedItem((String) get("BROWSER"));
+		platform = new JComboBox<Object>(platformNames.toArray());
+		platform.setSelectedItem((String) get("PLATFORM"));
 
 		reset = new JButton("reset");
 		reset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Browsers.reset();
+				Platforms.reset();
 				System.exit(2);
 			}
 		});
 	}
 
-	private List<String> browserNames() {
-		List<String> browserNames = new LinkedList<String>();
-		for (Browser b : Browsers.available())
-			browserNames.add(b.getName());
-		browserNames.sort(null);
-		return browserNames;
+	private List<String> platformNames() {
+		List<String> platformNames = new LinkedList<String>();
+		for (Platform b : Platforms.available())
+			platformNames.add(b.getName());
+		platformNames.sort(null);
+		return platformNames;
 	}
 
 	private JPanel dialogueBox() {
@@ -131,7 +131,7 @@ public class Parameters extends Properties {
 
 		p.setLayout(new GridLayout(size() + 1, 2, 5, 5));
 		add("DOMAIN", domain, p);
-		add("BROWSER", browser, p);
+		add("PLATFORM", platform, p);
 		add("TEST", test, p);
 
 		// Additional parameters
@@ -172,7 +172,7 @@ public class Parameters extends Properties {
 
 		// Propagation of the user input
 		put("DOMAIN", domain.getText());
-		put("BROWSER", (browser.getSelectedItem() == null) ? "" : browser.getSelectedItem().toString());
+		put("PLATFORM", (platform.getSelectedItem() == null) ? "" : platform.getSelectedItem().toString());
 		put("TEST", (test.getSelectedItem() == null) ? "" : test.getSelectedItem().toString());
 
 		// Additional parameters
@@ -216,7 +216,7 @@ public class Parameters extends Properties {
 		// Standard parameters
 		domain = new JTextField((String) get("DOMAIN"), WIDTH);
 
-		browsers();
+		platforms();
 		tests();
 	}
 

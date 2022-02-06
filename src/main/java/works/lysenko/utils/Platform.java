@@ -4,17 +4,16 @@ package works.lysenko.utils;
  * @author Sergii Lysenko
  */
 @SuppressWarnings("javadoc")
-public enum Browser {
-	CHROME("Chrome"), FIREFOX("Firefox"), OPERA("Opera"), EDGE("Edge"),
-	SAFARI("Safari");
+public enum Platform {
+	CHROME("Chrome"), FIREFOX("Firefox"), OPERA("Opera"), EDGE("Edge"), ANDROID("Android"), SAFARI("Safari");
 
 	private String name;
 
-	Browser(String name) {
+	Platform(String name) {
 		this.name = name;
 	}
 
-	public static Browser get(String string) {
+	public static Platform get(String string) {
 		switch (string) {
 		case "Firefox":
 			return FIREFOX;
@@ -25,6 +24,9 @@ public enum Browser {
 		case "Safari":
 			return SAFARI;
 		case "Chrome":
+			return CHROME;
+		case "Android":
+			return ANDROID;
 		default:
 			return CHROME;
 		}

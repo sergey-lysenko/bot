@@ -1,7 +1,6 @@
 package works.lysenko.scenarios.docCoach;
 
 import org.junit.jupiter.api.Assertions;
-import org.openqa.selenium.WebElement;
 
 import works.lysenko.Execution;
 import works.lysenko.scenarios.AbstractLeafScenario;

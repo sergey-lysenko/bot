@@ -25,20 +25,26 @@ public class Constants {
 	public static final String CONFIGURATION_CONJOINT = "conjoint";
 	public static final String CONFIGURATION_UPSTREAM = "include_upstream";
 	public static final String CONFIGURATION_CYCLES = "cycles";
+	public static final String CONFIGURATION_ADEBUG = "adebug";
 	public static final String CONFIGURATION_DEBUG = "debug";
 	public static final String CONFIGURATION_EWAIT = "ewait";
 	public static final String CONFIGURATION_IWAIT = "iwait";
 	public static final String CONFIGURATION_ROOT = "root";
+	public static final String CONFIGURATION_APP = "app";
+	public static final String CONFIGURATION_DIR = "dir";
 
 	public static final String DEFAULT_SCENARIO_WEIGHT = "0.0";
 	public static final String DEFAULT_DOWNSTREAM = "false";
 	public static final String DEFAULT_CONJOINT = "true";
 	public static final String DEFAULT_UPSTREAM = "false";
 	public static final String DEFAULT_CYCLES = "1";
+	public static final String DEFAULT_ADEBUG = "false";
 	public static final String DEFAULT_DEBUG = "false";
 	public static final String DEFAULT_EWAIT = "30";
 	public static final String DEFAULT_IWAIT = "1";
 	public static final String DEFAULT_ROOT = "";
+	public static final String DEFAULT_APP = "";
+	public static final String DEFAULT_DIR = "";
 
 	public static final int DEFAULT_SUFFICIENCY_RETRIES = 11; // 13, 17
 

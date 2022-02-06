@@ -3,7 +3,7 @@ package works.lysenko;
 import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.FILENAME;
 import static works.lysenko.Constants.RUN_LOG_FILENAME;
-import static works.lysenko.utils.Browser.CHROME;
+import static works.lysenko.utils.Platform.CHROME;
 
 import java.io.BufferedWriter;
 import java.io.File;

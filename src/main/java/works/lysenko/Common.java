@@ -4,8 +4,9 @@ import static works.lysenko.Constants.EXCEPTION_RETRIES;
 import static works.lysenko.Constants.RESOURCES;
 import static works.lysenko.Constants.SCREENSHOTS;
 import static works.lysenko.Constants.SILENT_SLEEPING_TRESHHOLD;
-import static works.lysenko.utils.Browser.FIREFOX;
-import static works.lysenko.utils.Browser.CHROME;
+import static works.lysenko.utils.Platform.FIREFOX;
+import static works.lysenko.utils.Platform.ANDROID;
+import static works.lysenko.utils.Platform.CHROME;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -40,10 +41,13 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import io.appium.java_client.service.local.AppiumDriverLocalService;
+
 import org.openqa.selenium.JavascriptExecutor;
 
 import works.lysenko.utils.Ansi;
-import works.lysenko.utils.Browser;
+import works.lysenko.utils.Platform;
 import works.lysenko.utils.Severity;
 
 /**
@@ -280,6 +284,11 @@ public class Common {
 	 * 
 	 */
 	public WebDriverWait w;
+
+	/**
+	 * 
+	 */
+	AppiumDriverLocalService service = null;
 
 	/**
 	 * 
@@ -545,7 +554,7 @@ public class Common {
 	/**
 	 * @return browser in which current execution takes place
 	 */
-	public Browser in() {
+	public Platform in() {
 		return x.in();
 	}
 
@@ -553,7 +562,7 @@ public class Common {
 	 * @param b
 	 * @return true if current is in defined browser
 	 */
-	public boolean in(Browser b) {
+	public boolean in(Platform b) {
 		return x.in(b);
 	}
 
@@ -574,7 +583,7 @@ public class Common {
 		l.log("Checking whether " + lc + " is enabled");
 		return d.findElement(by(lc)).isEnabled();
 	}
-	
+
 	/**
 	 * @param lc
 	 * @return true is this Web Element is present in DOM
@@ -614,8 +623,9 @@ public class Common {
 	}
 
 	private void makeCodeshot(String p, String f) {
+		String ext = (x.in(ANDROID)) ? ".xml" : ".html";
 		try {
-			Files.writeString(Path.of(p, f + ".html"), d.getPageSource());
+			Files.writeString(Path.of(p, f + ext), d.getPageSource());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1084,7 +1094,6 @@ public class Common {
 		click(x, y, lc);
 	}
 
-	
 	/**
 	 * Find visible instance of the defined element and the click on it
 	 * 

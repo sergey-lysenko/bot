@@ -6,17 +6,23 @@ import static org.openqa.selenium.logging.LogType.DRIVER;
 import static org.openqa.selenium.logging.LogType.PERFORMANCE;
 import static org.openqa.selenium.logging.LogType.PROFILER;
 import static org.openqa.selenium.logging.LogType.SERVER;
+import static works.lysenko.Constants.CONFIGURATION_ADEBUG;
+import static works.lysenko.Constants.CONFIGURATION_APP;
 import static works.lysenko.Constants.CONFIGURATION_CONJOINT;
 import static works.lysenko.Constants.CONFIGURATION_CYCLES;
 import static works.lysenko.Constants.CONFIGURATION_DEBUG;
+import static works.lysenko.Constants.CONFIGURATION_DIR;
 import static works.lysenko.Constants.CONFIGURATION_DOWNSTREAM;
 import static works.lysenko.Constants.CONFIGURATION_EWAIT;
 import static works.lysenko.Constants.CONFIGURATION_IWAIT;
 import static works.lysenko.Constants.CONFIGURATION_ROOT;
 import static works.lysenko.Constants.CONFIGURATION_UPSTREAM;
+import static works.lysenko.Constants.DEFAULT_ADEBUG;
+import static works.lysenko.Constants.DEFAULT_APP;
 import static works.lysenko.Constants.DEFAULT_CONJOINT;
 import static works.lysenko.Constants.DEFAULT_CYCLES;
 import static works.lysenko.Constants.DEFAULT_DEBUG;
+import static works.lysenko.Constants.DEFAULT_DIR;
 import static works.lysenko.Constants.DEFAULT_DOWNSTREAM;
 import static works.lysenko.Constants.DEFAULT_EWAIT;
 import static works.lysenko.Constants.DEFAULT_IWAIT;
@@ -26,6 +32,7 @@ import static works.lysenko.Constants.KNOWN_ISSUES;
 import static works.lysenko.Constants.TEST;
 import static works.lysenko.Constants.TESTS;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,14 +49,17 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.openqa.selenium.Point;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.service.local.AppiumServiceBuilder;
 import works.lysenko.scenarios.AbstractScenario;
 import works.lysenko.scenarios.Scenario;
-import works.lysenko.utils.Browser;
+import works.lysenko.utils.Platform;
 import works.lysenko.utils.Severity;
 import works.lysenko.utils.Stopwatch;
 import works.lysenko.utils.WebDrivers;
@@ -150,7 +160,7 @@ public class Execution extends Common {
 		o = new Output(this);
 
 		// Web driver components
-		d = WebDrivers.get(Browser.get(browser), false);
+		d = WebDrivers.get(Platform.get(browser), false);
 		d.manage().window().setPosition(new Point(0, 0));
 
 		// Web driver parameters
@@ -179,14 +189,40 @@ public class Execution extends Common {
 		l = new Logger(this, logsToRead);
 		o = new Output(this);
 
-		// Web driver components
-		d = WebDrivers.get(Browser.get(parameters.string("BROWSER")), false);
-		d.manage().window().setPosition(new Point(0, 0));
-
 		// Test properties
 		data = new Properties();
 		know = readProperties(KNOWN_ISSUES);
 		prop = readProperties(TESTS + (String) parameters.get("TEST") + TEST);
+
+		// Web driver components
+		String platform = parameters.string("PLATFORM");
+		if (Platform.get(platform).equals(Platform.ANDROID)) {
+
+			if (_adebug())
+				service = new AppiumServiceBuilder().withArgument(() -> "--base-path", "/wd/hub/")
+						.withLogFile(new File("appium.log")).build();
+			else
+				service = new AppiumServiceBuilder().withArgument(() -> "--base-path", "/wd/hub/")
+						.withArgument(() -> "--log-level", "warn").withLogFile(new File("appium.log")).build();
+
+			service.start();
+			File appDir = new File(new File(System.getProperty("user.dir")), _dir());
+			File app = null;
+			try {
+				app = new File(appDir.getCanonicalPath(), _app());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			DesiredCapabilities capabilities = new DesiredCapabilities();
+			capabilities.setCapability("appium:automationName", "UiAutomator2");
+			capabilities.setCapability("app", app.getAbsolutePath());
+			d = new AndroidDriver(service.getUrl(), capabilities);
+
+		} else {
+			d = WebDrivers.get(Platform.get(parameters.string("PLATFORM")), false);
+			d.manage().window().setPosition(new Point(0, 0));
+
+		}
 
 		// Web driver parameters
 		d.manage().timeouts().implicitlyWait(Duration.ofSeconds(_iwait()));
@@ -194,6 +230,20 @@ public class Execution extends Common {
 
 		// That's one dirty trick :)
 		notReproduced = new HashSet<String>((Set<String>) (Set<?>) know.keySet());
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean _adebug() {
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_ADEBUG, DEFAULT_ADEBUG));
+	}
+
+	/**
+	 * @return
+	 */
+	public String _app() {
+		return String.valueOf(prop.getProperty("_" + CONFIGURATION_APP, DEFAULT_APP));
 	}
 
 	/**
@@ -215,6 +265,13 @@ public class Execution extends Common {
 	 */
 	public boolean _debug() {
 		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DEBUG, DEFAULT_DEBUG));
+	}
+
+	/**
+	 * @return
+	 */
+	public String _dir() {
+		return String.valueOf(prop.getProperty("_" + CONFIGURATION_DIR, DEFAULT_DIR));
 	}
 
 	/**
@@ -353,16 +410,16 @@ public class Execution extends Common {
 	/**
 	 * @return browser in which current execution takes place
 	 */
-	public Browser in() {
-		return Browser.get(x.parameters.string("BROWSER"));
+	public Platform in() {
+		return Platform.get(x.parameters.string("PLATFORM"));
 	}
 
 	/**
 	 * @param b
 	 * @return true if current is in defined browser
 	 */
-	public boolean in(Browser b) {
-		return (x.parameters.string("BROWSER").equals(b.getName()));
+	public boolean in(Platform b) {
+		return (x.parameters.string("PLATFORM").equals(b.getName()));
 	}
 
 	/**
