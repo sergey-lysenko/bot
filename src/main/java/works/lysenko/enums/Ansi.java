@@ -1,4 +1,4 @@
-package works.lysenko.utils;
+package works.lysenko.enums;
 
 /**
  * @author Sergii Lysenko
@@ -48,7 +48,7 @@ public enum Ansi {
 
 	/**
 	 * Execute {@link Ansi#colorize(s)} based on content of the provided sting.
-	 * Contents - to - color mapping defined in {@link works.lysenko.utils.Severity}
+	 * Contents - to - color mapping defined in {@link works.lysenko.enums.Severity}
 	 * 
 	 * @param s string to be colored
 	 * @return same string with added ANSI coloring escape sequences

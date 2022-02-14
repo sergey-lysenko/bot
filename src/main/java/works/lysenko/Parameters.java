@@ -29,7 +29,7 @@ import javax.swing.JTextField;
 
 import org.apache.commons.lang3.StringUtils;
 
-import works.lysenko.utils.Platform;
+import works.lysenko.enums.Platform;
 
 /**
  * @author Sergii Lysenko
@@ -55,7 +55,7 @@ public class Parameters extends Properties {
 		super();
 		load();
 		read("DOMAIN", "");
-		read("PLATFORM", Platform.CHROME.getName());
+		read("PLATFORM", Platform.CHROME.title());
 		read("TEST", "");
 
 		if (null != list) {
@@ -119,7 +119,7 @@ public class Parameters extends Properties {
 	private List<String> platformNames() {
 		List<String> platformNames = new LinkedList<String>();
 		for (Platform b : Platforms.available())
-			platformNames.add(b.getName());
+			platformNames.add(b.title());
 		platformNames.sort(null);
 		return platformNames;
 	}

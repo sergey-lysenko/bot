@@ -3,7 +3,7 @@ package works.lysenko;
 import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.FILENAME;
 import static works.lysenko.Constants.RUN_LOG_FILENAME;
-import static works.lysenko.utils.Platform.CHROME;
+import static works.lysenko.enums.Platform.CHROME;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,6 +21,8 @@ import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 
+import works.lysenko.enums.Ansi;
+import works.lysenko.enums.Severity;
 import works.lysenko.logs.AbstractLogData;
 import works.lysenko.logs.KnownIssue;
 import works.lysenko.logs.LineFeed;
@@ -29,8 +31,6 @@ import works.lysenko.logs.LogRecord;
 import works.lysenko.logs.Notice;
 import works.lysenko.logs.Severe;
 import works.lysenko.logs.Warning;
-import works.lysenko.utils.Ansi;
-import works.lysenko.utils.Severity;
 
 /**
  * @author Sergii Lysenko
@@ -198,7 +198,7 @@ public class Logger {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Path target = Paths.get(".", name);
+		// Path target = Paths.get(".", name);
 		Path link = Paths.get(location, Common.fill(FILENAME, "latest", n, ex));
 		try {
 			// if (Files.exists(link))
@@ -206,11 +206,12 @@ public class Logger {
 		} catch (IOException e1) {
 			// NOP
 		}
-		try {
+		/*try {
 			Files.createSymbolicLink(link, target);
+			TODO: fix for windows   
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	/**

@@ -1,9 +1,9 @@
 package works.lysenko.scenarios;
 
-import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
+import static works.lysenko.Constants.DEFAULT_WEIGHT;
 import static works.lysenko.Constants.DEFAULT_SUFFICIENCY_RETRIES;
-import static works.lysenko.utils.Severity.S2;
-import static works.lysenko.utils.Severity.S3;
+import static works.lysenko.enums.Severity.S2;
+import static works.lysenko.enums.Severity.S3;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +20,7 @@ import org.apache.commons.math3.util.Pair;
 
 import works.lysenko.Common;
 import works.lysenko.Execution;
-import works.lysenko.utils.SortedStringSet;
+import works.lysenko.utils.SortedScenarioSet;
 
 /**
  * This class used for managing of nested scenarios of Abstract Node Scenario
@@ -41,7 +41,10 @@ public class Scenarios extends Common {
 	 */
 	private static double weight(Scenario s, Execution x) {
 		String propName = StringUtils.removeStart(s.getClass().getName(), x._root().concat("."));
-		Double d = Double.valueOf(x.prop(propName, DEFAULT_SCENARIO_WEIGHT));
+		String propValue = x.prop(propName, DEFAULT_WEIGHT);
+		if (propValue.equals("-"))
+			propValue = "NaN";
+		Double d = Double.valueOf(propValue);
 		return d.equals(Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : d;
 	}
 
@@ -216,8 +219,7 @@ public class Scenarios extends Common {
 						try { // Select a scenario among permeates
 							s = (AbstractScenario) new EnumeratedDistribution<Scenario>(permeates).sample();
 						} catch (MathArithmeticException e1) {
-							l.logProblem(S3, "Unable to select a scenario among " + list(candidates, true)
-									+ ": no downstream weights");
+							l.logProblem(S3, "Unable to select a scenario among " + list(candidates, true));
 							doubleBreak = true;
 							break;
 						}
@@ -237,7 +239,7 @@ public class Scenarios extends Common {
 				if (null != s)
 					sufficed = s.sufficed(); // to eliminate triple call
 				if (!sufficed && null != s) {
-					l.logProblem(S3, s.name() + " is not sufficed");
+					l.logProblem(S3, "Scenario '" + s.shortName() + "' not sufficed");
 					Pair<Scenario, Double> toBeRemoved = null;
 					for (Pair<Scenario, Double> pair : candidates) {
 						if (pair.getKey() == s)
@@ -248,20 +250,16 @@ public class Scenarios extends Common {
 			} while (!sufficed && --retries >= 0 && !candidates.isEmpty());
 			sleep(1, true); // tiny holdup in order to avoid having warnings sorted up above retry message
 			if (sufficed) {
-				l.log(0, s.name() + " sufficed, executing ...");
+				l.log(0, "Scenario '" + s.shortName() + "' sufficed, executing ...");
 				s.execute();
 			}
 			if (candidates.isEmpty())
 				l.logProblem(S2, "Unable to suffice a scenario among " + list(scenarios, false)
 						+ ": all scenarios have unmet requirements or are not executable");
-			if (!(retries >= 0)) {
+			if (!(retries >= 0))
 				l.logProblem(S2, "Scenario selection exausted after " + this.retries + " retries");
-			}
 		} else
-
-		{
 			l.logProblem(S2, "Current Node scenario have no nested scenarios. Is it just a Leaf scenario?");
-		}
 	}
 
 	protected List<Pair<Scenario, Double>> get() {
@@ -269,14 +267,12 @@ public class Scenarios extends Common {
 	}
 
 	/**
-	 * @param shortened
-	 * @param decorated
 	 * @return list of underlying scenarios
 	 */
-	public Set<String> list(boolean shortened, boolean decorated) {
-		Set<String> c = new SortedStringSet();
+	public Set<Scenario> list() {
+		Set<Scenario> c = new SortedScenarioSet();
 		for (Pair<Scenario, Double> s : scenarios)
-			c.addAll(s.getKey().list(shortened, decorated));
+			c.addAll(s.getKey().list());
 		return c;
 	}
 
@@ -308,8 +304,11 @@ public class Scenarios extends Common {
 	public Double upstream() {
 		Double p = 0.0;
 		for (Pair<Scenario, Double> s : scenarios) {
-			p = p + s.getValue(); // weight of a scenario
-			p = p + s.getKey().upstream(); // weight of underlying
+			// if (!(s.getValue()).isNaN()) {
+			if (s.getKey().executable()) {
+				p = p + s.getValue(); // weight of a scenario
+				p = p + s.getKey().upstream(); // weight of underlying
+			}
 		}
 		return p;
 	}

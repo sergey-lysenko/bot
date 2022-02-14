@@ -50,7 +50,7 @@ public class ScenarioLoader {
 					ClassLoader.getSystemClassLoader().getResourceAsStream(s.replaceAll("[.]", "/")))).lines()
 							.filter(l -> l.endsWith(".class")).map(l -> getClass(l, s)).collect(Collectors.toSet());
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Unable to find nested scenarios in package '" + s + "'");
+			throw new IllegalArgumentException("Unable to find '" + s + "' package of nested scenarios");
 		}
 		return a;
 	}

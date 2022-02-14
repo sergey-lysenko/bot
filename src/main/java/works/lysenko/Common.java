@@ -4,9 +4,9 @@ import static works.lysenko.Constants.EXCEPTION_RETRIES;
 import static works.lysenko.Constants.RESOURCES;
 import static works.lysenko.Constants.SCREENSHOTS;
 import static works.lysenko.Constants.SILENT_SLEEPING_TRESHHOLD;
-import static works.lysenko.utils.Platform.FIREFOX;
-import static works.lysenko.utils.Platform.ANDROID;
-import static works.lysenko.utils.Platform.CHROME;
+import static works.lysenko.enums.Platform.ANDROID;
+import static works.lysenko.enums.Platform.CHROME;
+import static works.lysenko.enums.Platform.FIREFOX;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
+import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
@@ -46,9 +47,9 @@ import io.appium.java_client.service.local.AppiumDriverLocalService;
 
 import org.openqa.selenium.JavascriptExecutor;
 
-import works.lysenko.utils.Ansi;
-import works.lysenko.utils.Platform;
-import works.lysenko.utils.Severity;
+import works.lysenko.enums.Ansi;
+import works.lysenko.enums.Platform;
+import works.lysenko.enums.Severity;
 
 /**
  * @author Sergii Lysenko
@@ -117,6 +118,15 @@ public class Common {
 			n = new RandomDataGenerator().nextInt(l, u);
 		while (Arrays.asList(x).contains(n));
 		return n;
+	}
+
+	/**
+	 * Return 'true' of 'false' with equal probability
+	 * 
+	 * @return random boolean value
+	 */
+	public static boolean isTrue() {
+		return isTrue(0.5);
 	}
 
 	/**
@@ -307,17 +317,6 @@ public class Common {
 	}
 
 	/**
-	 * Populate links to sub-objects from Execution
-	 */
-	public void populateShortcuts() {
-		this.d = x.d;
-		this.l = x.l;
-		this.o = x.o;
-		this.r = x.r;
-		this.w = x.w;
-	}
-
-	/**
 	 * 
 	 * @param lc
 	 */
@@ -334,25 +333,6 @@ public class Common {
 	public void clear(WebElement e) {
 		l.log("Clearing " + describe(e));
 		e.clear();
-	}
-
-	/**
-	 * @param lc string locator of element to be clicked on
-	 */
-	public void click(String... lc) {
-		boolean done = false;
-		int attempt = 0;
-		do {
-			try {
-				WebElement e = find(false, true, lc);
-				l.log("Clicking " + describe(lc));
-				e.click();
-				done = true;
-			} catch (StaleElementReferenceException ex) {
-				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
-						+ ", while trying to click(), during attempt " + ++attempt + " ...");
-			}
-		} while ((!done) && (attempt <= EXCEPTION_RETRIES));
 	}
 
 	/**
@@ -383,6 +363,25 @@ public class Common {
 		actions.moveByOffset(offsetX, offsetY);
 		actions.click();
 		actions.perform();
+	}
+
+	/**
+	 * @param lc string locator of element to be clicked on
+	 */
+	public void click(String... lc) {
+		boolean done = false;
+		int attempt = 0;
+		do {
+			try {
+				WebElement e = find(false, true, lc);
+				l.log("Clicking " + describe(lc));
+				e.click();
+				done = true;
+			} catch (StaleElementReferenceException ex) {
+				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
+						+ ", while trying to click(), during attempt " + ++attempt + " ...");
+			}
+		} while ((!done) && (attempt <= EXCEPTION_RETRIES));
 	}
 
 	/**
@@ -425,7 +424,7 @@ public class Common {
 		return tg + ((an.isEmpty()) ? "" : " '" + an + "'") + ((geometry) ? (" @ " + describe(e.getRect())) : "");
 	}
 
-	public boolean exist(String lc) {
+	public boolean exists(String lc) {
 		int oc = findAll(lc).size();
 		log("... found " + oc + " occurence(s)");
 		return oc > 0;
@@ -521,6 +520,31 @@ public class Common {
 	public List<WebElement> findAll(String lc) {
 		l.log("Finding all " + lc + " elements");
 		return d.findElements(by(lc));
+	}
+
+	/**
+	 * Find visible instance of the defined element and the click on it
+	 * 
+	 * @param lc string locator of an element to be waited for
+	 */
+	public void findThenClick(String lc) {
+		List<WebElement> list = findAll(lc);
+		WebElement target = null;
+		boolean done = false;
+		int attempt = 0;
+		do {
+			try {
+				for (WebElement e : list) {
+					if (e.isDisplayed())
+						target = e;
+				}
+				done = true;
+			} catch (TimeoutException ex) {
+				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
+						+ ", while trying to findThenClick(), during attempt " + ++attempt + " ...");
+			}
+		} while ((!done) || (attempt > EXCEPTION_RETRIES));
+		target.click();
 	}
 
 	/**
@@ -699,6 +723,17 @@ public class Common {
 	public void openDomain(String u) {
 		l.log("Opening https://" + u);
 		d.get("https://" + u);
+	}
+
+	/**
+	 * Populate links to sub-objects from Execution
+	 */
+	public void populateShortcuts() {
+		this.d = x.d;
+		this.l = x.l;
+		this.o = x.o;
+		this.r = x.r;
+		this.w = x.w;
 	}
 
 	/**
@@ -1025,6 +1060,17 @@ public class Common {
 	}
 
 	/**
+	 * Verify that defined element is enabled and then click on it
+	 * 
+	 * @param lc string locator of an element to be waited for
+	 */
+	public void verifyThenClick(String lc) {
+		WebElement e = find(lc);
+		Assertions.assertTrue(e.isEnabled());
+		click(lc);
+	}
+
+	/**
 	 * Wait for appearance of the defined element
 	 * 
 	 * @param lc string locator of an element to be waited for
@@ -1076,16 +1122,6 @@ public class Common {
 	 * Wait for appearance of the defined element and the click on it
 	 * 
 	 * @param lc string locator of an element to be waited for
-	 */
-	public void waitThenClick(String lc) {
-		wait(lc);
-		click(lc);
-	}
-
-	/**
-	 * Wait for appearance of the defined element and the click on it
-	 * 
-	 * @param lc string locator of an element to be waited for
 	 * @param x
 	 * @param y
 	 */
@@ -1095,28 +1131,13 @@ public class Common {
 	}
 
 	/**
-	 * Find visible instance of the defined element and the click on it
+	 * Wait for appearance of the defined element and the click on it
 	 * 
 	 * @param lc string locator of an element to be waited for
 	 */
-	public void findThenClick(String lc) {
-		List<WebElement> list = findAll(lc);
-		WebElement target = null;
-		boolean done = false;
-		int attempt = 0;
-		do {
-			try {
-				for (WebElement e : list) {
-					if (e.isDisplayed())
-						target = e;
-				}
-				done = true;
-			} catch (TimeoutException ex) {
-				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
-						+ ", while trying to findThenClick(), during attempt " + ++attempt + " ...");
-			}
-		} while ((!done) || (attempt > EXCEPTION_RETRIES));
-		target.click();
+	public void waitThenClick(String lc) {
+		wait(lc);
+		click(lc);
 	}
 
 	/**

@@ -1,10 +1,8 @@
 package works.lysenko.scenarios;
 
-import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
-import static works.lysenko.ScenarioType.LEAF;
-import static works.lysenko.ScenarioType.NODE;
-import static works.lysenko.utils.Ansi.BLUE_BOLD_BRIGHT;
-import static works.lysenko.utils.Ansi.colorize;
+import static works.lysenko.Constants.DEFAULT_WEIGHT;
+import static works.lysenko.enums.Ansi.BLUE_BOLD_BRIGHT;
+import static works.lysenko.enums.Ansi.colorize;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -13,7 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import works.lysenko.Common;
 import works.lysenko.Execution;
-import works.lysenko.utils.SortedStringSet;
+import works.lysenko.enums.ScenarioType;
+import works.lysenko.utils.SortedScenarioSet;
 
 /**
  * This is basic implementation of Scenario interface
@@ -24,9 +23,8 @@ import works.lysenko.utils.SortedStringSet;
 public abstract class AbstractScenario extends Common implements Scenario {
 
 	private long startAt = 0;
-	protected double uWeight = 0.0;
-	private double dWeight = 0.0;
-	private String marker = "?";
+	public double uWeight = 0.0;
+	public double dWeight = 0.0;
 
 	/**
 	 * @param x instance of Run object associated with this scenario
@@ -121,10 +119,10 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	protected void done() {
 		long r = x.timer() - startAt;
 		if (standalone()) {
-			l.log(0, "Standalone " + this.name() + " done in " + timeH(r));
+			l.log(0, "Standalone " + this.shortName() + " done in " + timeH(r));
 			l.logln();
 		} else {
-			l.log(0, this.name() + " done in " + timeH(r));
+			l.log(0, "'" + this.shortName() + "' done in " + timeH(r));
 		}
 		x.current.pop();
 	}
@@ -147,7 +145,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	 * @return whether this scenario is able to be executed
 	 */
 	public boolean executable() {
-		return true;
+		return !(weight().isNaN());
 	}
 
 	/**
@@ -157,8 +155,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 		startAt = x.timer();
 		x.current.push(this);
 		l.logln();
-		l.log(0, colorize(name(true), BLUE_BOLD_BRIGHT) + " : " + x.r.count(shortName(true),
-				((this instanceof AbstractNodeScenario) ? NODE : LEAF), weight(), uWeight, dWeight));
+		l.log(0, colorize(type().tag() + " " + shortName(), BLUE_BOLD_BRIGHT) + " : " + x.r.count(this));
 	}
 
 	private int gauge() {
@@ -201,27 +198,22 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	}
 
 	/**
-	 * @param shortened if true, the list will contain short form of scenario names
-	 * @param decorated if true, scenario name will be supplied with type marker
-	 * @return list of underlying scenarios
-	 *
+	 * This is a stub implementation of empty finals() routine which is to be
+	 * redefined in scenarios as needed
 	 */
-	public Set<String> list(boolean shortened, boolean decorated) {
-		Set<String> c = new SortedStringSet();
-		if (shortened)
-			c.add(this.shortName(decorated));
-		else
-			c.add(this.name(decorated));
-		return c;
+	@Override
+	public void finals() {
+
 	}
 
 	/**
-	 * Define type marker for this scenario TODO: migrate to Enum
-	 * 
-	 * @param marker
+	 * @return list of underlying scenarios
+	 *
 	 */
-	public void marker(String marker) {
-		this.marker = marker;
+	public Set<Scenario> list() {
+		Set<Scenario> c = new SortedScenarioSet();
+		c.add(this);
+		return c;
 	}
 
 	/**
@@ -229,17 +221,6 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	 */
 	public String name() {
 		return this.getClass().getName();
-	}
-
-	/**
-	 * @param decorated defines whether to append a type marker to a name or not
-	 * @return full-length scenario name with optional type marker
-	 */
-	public String name(boolean decorated) {
-		String s = name();
-		if (decorated)
-			return s + " " + marker;
-		return s;
 	}
 
 	/**
@@ -281,17 +262,6 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	}
 
 	/**
-	 * @param decorated defines whether to append a type marker to a name or not
-	 * @return shortened scenario name with optional type marker
-	 */
-	public String shortName(boolean decorated) {
-		String s = shortName();
-		if (decorated)
-			return s + " " + marker;
-		return s;
-	}
-
-	/**
 	 * @return whether current scenario is a standalone one
 	 */
 	public boolean standalone() {
@@ -306,6 +276,19 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	}
 
 	/**
+	 * @return
+	 */
+	public ScenarioType type() {
+		if (this instanceof AbstractLeafScenario)
+			return ScenarioType.LEAF;
+		if (this instanceof AbstractNodeScenario)
+			return ScenarioType.NODE;
+		if (this instanceof AbstractMonoScenario)
+			return ScenarioType.MONO;
+		return null;
+	}
+
+	/**
 	 * @return current upstream weight
 	 */
 	public double upstream() {
@@ -316,8 +299,12 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	 * @return current weight coefficient of this scenario acquired from run
 	 *         properties
 	 */
-	private Double weight() {
-		return Double.valueOf(x.prop(StringUtils.removeStart(this.getClass().getName(), x._root().concat(".")),
-				DEFAULT_SCENARIO_WEIGHT));
+	public Double weight() {
+		String w = x.prop(StringUtils.removeStart(this.getClass().getName(), x._root().concat(".")),
+				DEFAULT_WEIGHT);
+		if (w.equals("-"))
+			return Double.NaN;
+		return Double.valueOf(w);
 	}
+
 }

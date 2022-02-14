@@ -3,7 +3,7 @@ package works.lysenko;
 @SuppressWarnings("javadoc")
 public class Constants {
 
-	public static final int EXCEPTION_RETRIES = 5;
+	public static final int EXCEPTION_RETRIES = 15;
 	public static final String DEFAULT_TEST = "bot";
 	public static final String DEFAULT_DOMAIN = "";
 
@@ -33,12 +33,12 @@ public class Constants {
 	public static final String CONFIGURATION_APP = "app";
 	public static final String CONFIGURATION_DIR = "dir";
 
-	public static final String DEFAULT_SCENARIO_WEIGHT = "0.0";
 	public static final String DEFAULT_DOWNSTREAM = "false";
 	public static final String DEFAULT_CONJOINT = "true";
 	public static final String DEFAULT_UPSTREAM = "false";
-	public static final String DEFAULT_CYCLES = "1";
 	public static final String DEFAULT_ADEBUG = "false";
+	public static final String DEFAULT_CYCLES = "1";
+	public static final String DEFAULT_WEIGHT = "0.0";
 	public static final String DEFAULT_DEBUG = "false";
 	public static final String DEFAULT_EWAIT = "30";
 	public static final String DEFAULT_IWAIT = "1";
@@ -68,10 +68,5 @@ public class Constants {
 	public static final String _DIV_TEXT = "//div[text()='%1$s']";
 	public static final String _A_TEXT = "//a[text()='%1$s']";
 	public static final String _P_TEXT = "//p[text()='%1$s']";
-
-	public static final String NODE_SCENARIO_MARKER = "▷";
-	public static final String LEAF_SCENARIO_MARKER = "◆";
-	public static final String MONO_SCENARIO_MARKER = "◼";
-	
 	public static final String CHECKED = "checked";
 }

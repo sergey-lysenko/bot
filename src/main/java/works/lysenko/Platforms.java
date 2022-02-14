@@ -17,7 +17,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
-import works.lysenko.utils.Platform;
+import works.lysenko.enums.Platform;
 import works.lysenko.utils.WebDrivers;
 
 @SuppressWarnings("javadoc")
@@ -92,7 +92,7 @@ public class Platforms {
 	private static void save(List<Platform> browsers) {
 		List<String> browserNames = new LinkedList<String>();
 		for (Platform b : browsers) {
-			browserNames.add(b.getName());
+			browserNames.add(b.title());
 		}
 		new File(STORED_BROWSERS_FILE).getParentFile().mkdirs(); // Create parent directory
 		try {

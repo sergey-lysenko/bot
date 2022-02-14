@@ -2,9 +2,11 @@ package works.lysenko.scenarios;
 
 import java.util.Set;
 
+import works.lysenko.enums.ScenarioType;
+
 @SuppressWarnings("javadoc") 
 public interface Scenario {
-
+	
 	public abstract void action();
 
 	public abstract int combinations(boolean onlyConfigured);
@@ -19,7 +21,7 @@ public interface Scenario {
 
 	public abstract void finals();
 
-	public abstract Set<String> list(boolean shortened, boolean decorated);
+	public abstract Set<Scenario> list();
 
 	public abstract String name();
 
@@ -27,5 +29,11 @@ public interface Scenario {
 
 	public abstract boolean sufficed();
 
+	public abstract ScenarioType type();
+	
 	public abstract double upstream();
+
+	public abstract Double weight();
+
+	
 }

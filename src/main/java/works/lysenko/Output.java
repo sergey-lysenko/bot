@@ -4,15 +4,15 @@ import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
 import static works.lysenko.Constants.RUN_JSON_FILENAME;
 import static works.lysenko.Constants.RUN_SVG_FILENAME;
-import static works.lysenko.utils.Ansi.RED_BACKGROUND;
-import static works.lysenko.utils.Ansi.GREEN_BACKGROUND;
-import static works.lysenko.utils.Ansi.BLACK;
-import static works.lysenko.utils.Ansi.WHITE_BOLD_BRIGHT;
-import static works.lysenko.utils.Ansi.GREEN;
-import static works.lysenko.utils.Ansi.RED;
-import static works.lysenko.utils.Ansi.MAGENTA;
-import static works.lysenko.utils.Ansi.YELLOW;
-import static works.lysenko.utils.Ansi.colorize;
+import static works.lysenko.enums.Ansi.BLACK;
+import static works.lysenko.enums.Ansi.GREEN;
+import static works.lysenko.enums.Ansi.GREEN_BACKGROUND;
+import static works.lysenko.enums.Ansi.MAGENTA;
+import static works.lysenko.enums.Ansi.RED;
+import static works.lysenko.enums.Ansi.RED_BACKGROUND;
+import static works.lysenko.enums.Ansi.WHITE_BOLD_BRIGHT;
+import static works.lysenko.enums.Ansi.YELLOW;
+import static works.lysenko.enums.Ansi.colorize;
 
 import java.awt.Color;
 import java.io.BufferedWriter;
@@ -30,9 +30,10 @@ import java.util.TreeMap;
 import org.jfree.svg.SVGGraphics2D;
 import org.jfree.svg.SVGUtils;
 
+import works.lysenko.enums.Ansi;
 import works.lysenko.output.Groups;
 import works.lysenko.output.Parts;
-import works.lysenko.utils.Ansi;
+import works.lysenko.scenarios.Scenario;
 
 /**
  * @author Sergii Lysenko
@@ -83,12 +84,17 @@ public class Output {
 		// Head
 		Parts parts = Parts.flence(group.getValue());
 		for (Entry<String, Result> sgr : parts.head.entrySet()) {
-			if (sgr.getValue().executions == 0)
-				g.setColor(java.awt.Color.GRAY);
-			else if (sgr.getValue().problems.isEmpty())
-				g.setColor(new Color(0, 128, 0));
-			else
-				g.setColor(new Color(255, 128, 0));
+			if (sgr.getValue().executions == 0) {
+				if ((sgr.getValue().cWeight + sgr.getValue().dWeight + sgr.getValue().uWeight) > 0)
+					g.setColor(new Color(164, 164, 255));
+				else
+					g.setColor(java.awt.Color.GRAY);
+			} else {
+				if (sgr.getValue().problems.isEmpty())
+					g.setColor(new Color(0, 128, 0));
+				else
+					g.setColor(new Color(255, 128, 0));
+			}
 			int myDy = dy[col]++;
 			myDys.put(sgr.getKey().toLowerCase().split(" ")[0], myDy);
 			g.drawString(sgr.getKey() + " : " + sgr.getValue().toString(), (col * cW) + 15, myDy * rH);
@@ -113,7 +119,7 @@ public class Output {
 	 */
 	protected void jsonStats() {
 		// TODO: migrate to Gson (?)
-		TreeMap<String, Result> sorted = x.r.getSorted();
+		TreeMap<Scenario, Result> sorted = x.r.getSorted();
 		BufferedWriter w;
 		try {
 			int i;
@@ -142,7 +148,7 @@ public class Output {
 			}
 			w.write("]},\"run\":[");
 			i = sorted.size();
-			for (Entry<String, Result> s : sorted.entrySet()) {
+			for (Entry<Scenario, Result> s : sorted.entrySet()) {
 				w.write("{\"scenario\":\"" + s.getKey() + "\"" + ",\"cWeight\": " + jsonify(s.getValue().cWeight)
 						+ ",\"dWeight\": " + jsonify(s.getValue().dWeight) + ",\"uWeight\": "
 						+ jsonify(s.getValue().uWeight) + ",\"executions\":" + s.getValue().executions);
@@ -210,7 +216,7 @@ public class Output {
 		// It works, but this is kinda wrong. It is very non-elegant cross-reference.
 		// TODO: rework this to proper implementation
 		if (!status) {
-			failed = x.current.peek().shortName(false);
+			failed = x.current.peek().shortName();
 			x.current.removeAllElements();
 		}
 		x.l.logln();
@@ -249,14 +255,14 @@ public class Output {
 		// Scenarios statistics
 		x.l.logln();
 		x.l.log(0, "Scenarios statistics:");
-		TreeMap<String, Result> sorted = x.r.getSorted();
+		TreeMap<Scenario, Result> sorted = x.r.getSorted();
 		x.l.log(0, total + " paths were possible with current set of Scenarios");
 		x.l.log(0, active + " (" + persentage + ") among these were allowed by current configuration");
 		if (sorted.entrySet().isEmpty())
 			x.l.log(0, colorize("[WARNING] No Test Execution Data available"));
 		else
-			for (Map.Entry<String, Result> e : sorted.entrySet()) {
-				x.l.log(0, e.getKey() + " : " + e.getValue().toString());
+			for (Entry<Scenario, Result> e : sorted.entrySet()) {
+				x.l.log(0, e.getKey().type().tag() + " " + e.getKey().shortName() + " : " + e.getValue().toString());
 			}
 		x.l.logln();
 
@@ -276,7 +282,7 @@ public class Output {
 	}
 
 	protected void svgStats() {
-		TreeMap<String, Result> sorted = x.r.getSorted(false, true);
+		TreeMap<String, Result> sorted = x.r.getSortedStrings();
 		SVGGraphics2D g = new SVGGraphics2D(2560, 1440);
 
 		int[] dy = new int[100];

@@ -57,10 +57,10 @@ import com.google.gson.GsonBuilder;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
+import works.lysenko.enums.Platform;
+import works.lysenko.enums.Severity;
 import works.lysenko.scenarios.AbstractScenario;
 import works.lysenko.scenarios.Scenario;
-import works.lysenko.utils.Platform;
-import works.lysenko.utils.Severity;
 import works.lysenko.utils.Stopwatch;
 import works.lysenko.utils.WebDrivers;
 
@@ -221,7 +221,7 @@ public class Execution extends Common {
 		} else {
 			d = WebDrivers.get(Platform.get(parameters.string("PLATFORM")), false);
 			d.manage().window().setPosition(new Point(0, 0));
-
+			d.manage().window().maximize();
 		}
 
 		// Web driver parameters
@@ -419,7 +419,7 @@ public class Execution extends Common {
 	 * @return true if current is in defined browser
 	 */
 	public boolean in(Platform b) {
-		return (x.parameters.string("PLATFORM").equals(b.getName()));
+		return (x.parameters.string("PLATFORM").equals(b.title()));
 	}
 
 	/**

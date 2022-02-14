@@ -13,9 +13,14 @@ import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import works.lysenko.enums.Platform;
 
 @SuppressWarnings("javadoc")
 public class WebDrivers {
+
+	public static WebDriver get() {
+		return get(Platform.CHROME, false);
+	}
 
 	public static WebDriver get(Platform browser) {
 		return get(browser, false);

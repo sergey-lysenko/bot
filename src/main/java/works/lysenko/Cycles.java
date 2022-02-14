@@ -8,20 +8,20 @@ import static works.lysenko.Constants.DEFAULT_CONJOINT;
 import static works.lysenko.Constants.DEFAULT_CYCLES;
 import static works.lysenko.Constants.DEFAULT_DOWNSTREAM;
 import static works.lysenko.Constants.DEFAULT_UPSTREAM;
-import static works.lysenko.Constants.DEFAULT_SCENARIO_WEIGHT;
+import static works.lysenko.Constants.DEFAULT_WEIGHT;
 import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
-import static works.lysenko.utils.Severity.S1;
-import static works.lysenko.utils.Severity.S2;
-import static works.lysenko.utils.Severity.S3;
+import static works.lysenko.enums.Severity.S1;
+import static works.lysenko.enums.Severity.S2;
+import static works.lysenko.enums.Severity.S3;
 
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
+import works.lysenko.enums.Ansi;
 import works.lysenko.scenarios.Scenario;
 import works.lysenko.scenarios.ScenarioLoader;
 import works.lysenko.scenarios.Scenarios;
-import works.lysenko.utils.Ansi;
 import works.lysenko.utils.SortedStringSet;
 
 /**
@@ -104,10 +104,11 @@ public class Cycles {
 				x.l.logProblem(S3,
 						"Test properties are absent. Wrong configuration? Template of Test Run Properties file '"
 								+ GENERATED_CONFIG_FILE + "' was updated");
-			if (x.service != null)
+			if (x.service != null) {
 				x.l.log("Closing test service ...");
 				x.service.close();
 				x.l.log(" ... done.");
+			}
 		} catch (Exception e) {
 			x.exception = e;
 			x.l.logProblem(S1, "Uncaught exception during cycles execution: " + e.getMessage());
@@ -126,13 +127,13 @@ public class Cycles {
 		c.add("_" + CONFIGURATION_CONJOINT + " = " + DEFAULT_CONJOINT);
 		c.add("_" + CONFIGURATION_UPSTREAM + " = " + DEFAULT_UPSTREAM);
 		c.add("_" + CONFIGURATION_DOWNSTREAM + " = " + DEFAULT_DOWNSTREAM);
-		scenarios.list(false, false).forEach((s) -> {
-			c.add(StringUtils.removeStart(s, x._root().concat(".")) + " = " + DEFAULT_SCENARIO_WEIGHT);
+		scenarios.list().forEach((s) -> {
+			c.add(StringUtils.removeStart(s.name(), x._root().concat(".")) + " = " + DEFAULT_WEIGHT);
 		});
 		return c;
 	}
 
-	protected Set<String> scenariosList(boolean shortened, boolean decorated) {
-		return scenarios.list(shortened, decorated);
+	protected Set<Scenario> scenariosList() {
+		return scenarios.list();
 	}
 }

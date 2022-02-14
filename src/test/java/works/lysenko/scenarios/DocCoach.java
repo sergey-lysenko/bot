@@ -1,7 +1,6 @@
 package works.lysenko.scenarios;
 
 import works.lysenko.Execution;
-import works.lysenko.scenarios.AbstractNodeScenario;
 
 @SuppressWarnings("javadoc")
 public class DocCoach extends AbstractNodeScenario {

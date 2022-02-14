@@ -1,7 +1,7 @@
 package works.lysenko.logs;
 
-import works.lysenko.utils.Ansi;
-import works.lysenko.utils.Severity;
+import works.lysenko.enums.Ansi;
+import works.lysenko.enums.Severity;
 
 /**
  * @author Sergii Lysenko

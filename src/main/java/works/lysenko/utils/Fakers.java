@@ -88,6 +88,11 @@ public class Fakers {
 		return quote;
 	}
 
+	public static String quote(int maxLength) {
+		String s = quote();
+		return s.substring(0, Math.min(s.length(), maxLength));
+	}
+
 	/**
 	 * @return random character from one of Fakers
 	 */

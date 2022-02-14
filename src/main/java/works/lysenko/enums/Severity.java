@@ -1,4 +1,4 @@
-package works.lysenko.utils;
+package works.lysenko.enums;
 
 @SuppressWarnings("javadoc")
 public enum Severity {

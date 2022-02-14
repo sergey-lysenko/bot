@@ -1,7 +1,5 @@
 package works.lysenko.scenarios;
 
-import static works.lysenko.Constants.NODE_SCENARIO_MARKER;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +28,6 @@ public class AbstractNodeScenario extends AbstractScenario {
 	 */
 	public AbstractNodeScenario(Execution x, Scenario... ss) {
 		super(x);
-		marker(NODE_SCENARIO_MARKER);
 		scenarios = new Scenarios(x);
 		if (null != ss)
 			scenarios.add(new HashSet<Scenario>(Arrays.asList(ss)), x);
@@ -47,7 +44,6 @@ public class AbstractNodeScenario extends AbstractScenario {
 	 */
 	public AbstractNodeScenario(Execution x, String s) {
 		super(x);
-		marker(NODE_SCENARIO_MARKER);
 		scenarios = new Scenarios(x);
 		scenarios.add((Set<Scenario>) ScenarioLoader.read(s, x), x);
 		uWeight = scenarios.upstream();
@@ -61,7 +57,6 @@ public class AbstractNodeScenario extends AbstractScenario {
 	 */
 	public AbstractNodeScenario(Execution x) {
 		super(x);
-		marker(NODE_SCENARIO_MARKER);
 		scenarios = new Scenarios(x);
 		String name = this.getClass().getName();
 		{ // Strings are immutable, we need to create a new one
@@ -107,25 +102,13 @@ public class AbstractNodeScenario extends AbstractScenario {
 	}
 
 	/**
-	 * This is a stub implementation of empty finals() routine which is to be
-	 * redefined in scenarios as needed
-	 */
-	@Override
-	public void finals() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
 	 * Returns the set with names of all underlying
 	 * 
-	 * @param shortened or not by removing the common part of package names
-	 * @param decorated or not by scenario type marker
-	 * @return set object with name of this scenario as single element
+	 * @return
 	 */
-	public Set<String> list(boolean shortened, boolean decorated) {
-		Set<String> c = super.list(shortened, decorated);
-		c.addAll(scenarios.list(shortened, decorated));
+	public Set<Scenario> list() {
+		Set<Scenario> c = super.list();
+		c.addAll(scenarios.list());
 		return c;
 	}
 
