@@ -10,3 +10,4 @@
 /target/
 /_env.bash
 /_**.bash
+/appium.log
