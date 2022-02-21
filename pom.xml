@@ -4,7 +4,7 @@
 
 	<groupId>works.lysenko</groupId>
 	<artifactId>bot</artifactId>
-	<version>0.22.07</version>
+	<version>0.22.08.01</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

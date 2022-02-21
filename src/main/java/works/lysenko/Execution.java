@@ -31,6 +31,7 @@ import static works.lysenko.Constants.DEFAULT_UPSTREAM;
 import static works.lysenko.Constants.KNOWN_ISSUES;
 import static works.lysenko.Constants.TEST;
 import static works.lysenko.Constants.TESTS;
+import static works.lysenko.enums.Ansi.y;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -464,5 +465,10 @@ public class Execution extends Common {
 	 */
 	public Long timer() {
 		return t.millis();
+	}
+
+	public String testDescription() {
+		String domain = (x.parameters.get("DOMAIN").equals("")) ? "" : " on " + y(x.parameters.get("DOMAIN"));
+		return (y(x.parameters.get("TEST")) + domain);
 	}
 }

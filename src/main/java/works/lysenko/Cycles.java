@@ -1,15 +1,20 @@
 package works.lysenko;
 
-import static works.lysenko.Constants.*;
+import static works.lysenko.Constants.CONFIGURATION_CONJOINT;
 import static works.lysenko.Constants.CONFIGURATION_CYCLES;
+import static works.lysenko.Constants.CONFIGURATION_DEBUG;
 import static works.lysenko.Constants.CONFIGURATION_DOWNSTREAM;
+import static works.lysenko.Constants.CONFIGURATION_ROOT;
 import static works.lysenko.Constants.CONFIGURATION_UPSTREAM;
 import static works.lysenko.Constants.DEFAULT_CONJOINT;
 import static works.lysenko.Constants.DEFAULT_CYCLES;
+import static works.lysenko.Constants.DEFAULT_DEBUG;
 import static works.lysenko.Constants.DEFAULT_DOWNSTREAM;
+import static works.lysenko.Constants.DEFAULT_ROOT;
 import static works.lysenko.Constants.DEFAULT_UPSTREAM;
 import static works.lysenko.Constants.DEFAULT_WEIGHT;
 import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
+import static works.lysenko.enums.Ansi.y;
 import static works.lysenko.enums.Severity.S1;
 import static works.lysenko.enums.Severity.S2;
 import static works.lysenko.enums.Severity.S3;
@@ -18,7 +23,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
-import works.lysenko.enums.Ansi;
 import works.lysenko.scenarios.Scenario;
 import works.lysenko.scenarios.ScenarioLoader;
 import works.lysenko.scenarios.Scenarios;
@@ -80,10 +84,6 @@ public class Cycles {
 		x.cycles = this;
 	}
 
-	private String y(Object s) {
-		return Ansi.colorize(String.valueOf(s), Ansi.YELLOW_BOLD);
-	}
-
 	/**
 	 * Execute configured cycles
 	 */
@@ -91,8 +91,7 @@ public class Cycles {
 		try {
 			if (cyclesToDo == 0)
 				x.l.logProblem(S2, "No test cycles were perfomed");
-			x.l.log(0, "Executing " + y(cyclesToDo) + " cycles of " + y(x.parameters.get("TEST")) + " on "
-					+ y(x.parameters.get("DOMAIN")));
+			x.l.log(0, "Executing " + x._cycles() + " cycle(s) of " + x.testDescription());
 			while (cyclesToDo-- > 0) {
 				scenarios.execute();
 				x.l.logln();

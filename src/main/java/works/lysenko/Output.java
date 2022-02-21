@@ -1,7 +1,7 @@
 package works.lysenko;
 
-import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
+import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.RUN_JSON_FILENAME;
 import static works.lysenko.Constants.RUN_SVG_FILENAME;
 import static works.lysenko.enums.Ansi.BLACK;
@@ -12,6 +12,7 @@ import static works.lysenko.enums.Ansi.RED;
 import static works.lysenko.enums.Ansi.RED_BACKGROUND;
 import static works.lysenko.enums.Ansi.WHITE_BOLD_BRIGHT;
 import static works.lysenko.enums.Ansi.YELLOW;
+import static works.lysenko.enums.Ansi.y;
 import static works.lysenko.enums.Ansi.colorize;
 
 import java.awt.Color;
@@ -219,8 +220,7 @@ public class Output {
 			failed = x.current.peek().shortName();
 			x.current.removeAllElements();
 		}
-		x.l.logln();
-		x.l.log(0, "Test execution stopped");
+		x.l.log(0, y(x.currentCycle()) + " cycle(s) of " + x.testDescription() + " done");
 
 		// New issues output
 		x.l.logln();

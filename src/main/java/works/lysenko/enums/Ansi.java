@@ -71,4 +71,8 @@ public enum Ansi {
 		return (c == null) ? s : c.code() + s + Ansi.RESET.code();
 	}
 
+	public static String y(Object s) {
+		return colorize(String.valueOf(s), YELLOW_BOLD);
+	}
+
 }
