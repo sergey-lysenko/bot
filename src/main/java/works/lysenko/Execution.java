@@ -143,6 +143,8 @@ public class Execution extends Common {
 
 	/**
 	 * Start legacy-compatible execution with defined Implicit and Explicit waits
+	 * @param iwait 
+	 * @param ewait 
 	 * 
 	 * @param browser
 	 * 
@@ -234,80 +236,80 @@ public class Execution extends Common {
 	}
 
 	/**
-	 * @return
+	 * @return _adebug parameter 
 	 */
 	public boolean _adebug() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_ADEBUG, DEFAULT_ADEBUG));
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_ADEBUG, DEFAULT_ADEBUG).trim());
 	}
 
 	/**
-	 * @return
+	 * @return app parameter
 	 */
 	public String _app() {
-		return String.valueOf(prop.getProperty("_" + CONFIGURATION_APP, DEFAULT_APP));
+		return String.valueOf(prop.getProperty("_" + CONFIGURATION_APP, DEFAULT_APP).trim());
 	}
 
 	/**
 	 * @return whether current test execution have "conjoint" mode active
 	 */
 	public boolean _conjoint() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_CONJOINT, DEFAULT_CONJOINT));
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_CONJOINT, DEFAULT_CONJOINT).trim());
 	}
 
 	/**
 	 * @return configured number of cycles to be executed
 	 */
 	public int _cycles() {
-		return Integer.valueOf(prop.getProperty("_" + CONFIGURATION_CYCLES, DEFAULT_CYCLES));
+		return Integer.valueOf(prop.getProperty("_" + CONFIGURATION_CYCLES, DEFAULT_CYCLES).trim());
 	}
 
 	/**
 	 * @return true if debug mode is configured in current test run
 	 */
 	public boolean _debug() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DEBUG, DEFAULT_DEBUG));
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DEBUG, DEFAULT_DEBUG).trim());
 	}
 
 	/**
-	 * @return
+	 * @return dir parameter
 	 */
 	public String _dir() {
-		return String.valueOf(prop.getProperty("_" + CONFIGURATION_DIR, DEFAULT_DIR));
+		return String.valueOf(prop.getProperty("_" + CONFIGURATION_DIR, DEFAULT_DIR).trim());
 	}
 
 	/**
 	 * @return true if downstream weight distribution is activated in configuration
 	 */
 	public boolean _downstream() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DOWNSTREAM, DEFAULT_DOWNSTREAM));
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_DOWNSTREAM, DEFAULT_DOWNSTREAM).trim());
 	}
 
 	/**
 	 * @return configured number of cycles to be executed
 	 */
 	private int _ewait() {
-		return Integer.valueOf(prop.getProperty("_" + CONFIGURATION_EWAIT, DEFAULT_EWAIT));
+		return Integer.valueOf(prop.getProperty("_" + CONFIGURATION_EWAIT, DEFAULT_EWAIT).trim());
 	}
 
 	/**
 	 * @return configured number of cycles to be executed
 	 */
 	private int _iwait() {
-		return Integer.valueOf(prop.getProperty("_" + CONFIGURATION_IWAIT, DEFAULT_IWAIT));
+		return Integer.valueOf(prop.getProperty("_" + CONFIGURATION_IWAIT, DEFAULT_IWAIT).trim());
 	}
 
 	/**
 	 * @return configured root of scenarios
 	 */
 	public String _root() {
-		return prop.getProperty("_" + CONFIGURATION_ROOT, DEFAULT_ROOT);
+		return prop.getProperty("_" + CONFIGURATION_ROOT, DEFAULT_ROOT).trim();
 	}
 
 	/**
 	 * @return true if upstream weight distribution is activated in configuration
 	 */
 	public boolean _upstream() {
-		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_UPSTREAM, DEFAULT_UPSTREAM));
+		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_UPSTREAM, DEFAULT_UPSTREAM).trim());
 	}
 
 	/**
@@ -374,7 +376,8 @@ public class Execution extends Common {
 				String a = s.getClass().getName().toLowerCase();
 				String b = k.toLowerCase();
 				if (a.contains(b)) {
-					v = v + Double.valueOf((String) p.getValue());
+					if (!(p.getValue().equals("-")))
+						v = v + Double.valueOf((String) p.getValue());
 				}
 			}
 		}
@@ -467,8 +470,10 @@ public class Execution extends Common {
 		return t.millis();
 	}
 
+	/**
+	 * @return test description
+	 */
 	public String testDescription() {
-		String domain = (x.parameters.get("DOMAIN").equals("")) ? "" : " on " + y(x.parameters.get("DOMAIN"));
-		return (y(x.parameters.get("TEST")) + domain);
+		return (y(x.parameters.get("TEST") + " on " + y(x.parameters.get("DOMAIN"))));
 	}
 }

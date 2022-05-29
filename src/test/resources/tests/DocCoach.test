@@ -1,7 +1,0 @@
-_cycles = 10
-_conjoint = true
-_debug = true
-_include_downstream = true
-_include_upstream = true
-_root = works.lysenko.scenarios
-DocCoach = 1.0

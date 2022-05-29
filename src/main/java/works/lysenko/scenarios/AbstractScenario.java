@@ -22,8 +22,19 @@ import works.lysenko.utils.SortedScenarioSet;
  */
 public abstract class AbstractScenario extends Common implements Scenario {
 
+	/**
+	 * 
+	 */
 	private long startAt = 0;
+
+	/**
+	 * 
+	 */
+
 	public double uWeight = 0.0;
+	/**
+	 * 
+	 */
 	public double dWeight = 0.0;
 
 	/**
@@ -276,7 +287,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	}
 
 	/**
-	 * @return
+	 * @return Type of Scenario
 	 */
 	public ScenarioType type() {
 		if (this instanceof AbstractLeafScenario)

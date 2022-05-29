@@ -19,6 +19,7 @@ import works.lysenko.Execution;
 public class AbstractNodeScenario extends AbstractScenario {
 
 	private Scenarios scenarios;
+	private boolean halted = false;
 
 	/**
 	 * Create an instance of Node Scenario with defined set of sub-scenarios
@@ -96,15 +97,25 @@ public class AbstractNodeScenario extends AbstractScenario {
 	public void execute() {
 		super.execute();
 		action();
-		scenarios.execute();
+		if (!halted)
+			scenarios.execute();
+		else
+			halted = false;
 		finals();
 		done();
 	}
 
 	/**
-	 * Returns the set with names of all underlying
+	 * Avoid starting of sub-scenarios.
+	 */
+	public void halt() {
+		halted = true;
+	}
+	
+	/**
+	 * Returns the set with names of all underlying scenarios
 	 * 
-	 * @return
+	 * @return set of scenarios
 	 */
 	public Set<Scenario> list() {
 		Set<Scenario> c = super.list();

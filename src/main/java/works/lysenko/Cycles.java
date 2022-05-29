@@ -91,11 +91,11 @@ public class Cycles {
 		try {
 			if (cyclesToDo == 0)
 				x.l.logProblem(S2, "No test cycles were perfomed");
-			x.l.log(0, "Executing " + x._cycles() + " cycle(s) of " + x.testDescription());
-			while (cyclesToDo-- > 0) {
+			x.l.log(0, "Executing " + y(x._cycles()) + " cycle(s) of " + x.testDescription());
+			while (cyclesToDo > 0) {
 				scenarios.execute();
 				x.l.logln();
-				if (cyclesToDo > 0)
+				if (--cyclesToDo > 0)
 					x.l.log(0, "Cycles to do: " + y(cyclesToDo));
 			}
 			x.o.writeDefConf(defConf());

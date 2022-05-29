@@ -13,7 +13,7 @@ public class Google extends AbstractNodeScenario {
 	@Override
 	public void action() {
 		section("Opening Google");
-		openDomain(GoogleDomains.getGoogleDomain());
+		open(GoogleDomains.getGoogleDomain());
 	}
 
 	@Override

@@ -257,7 +257,7 @@ public class Output {
 		x.l.log(0, "Scenarios statistics:");
 		TreeMap<Scenario, Result> sorted = x.r.getSorted();
 		x.l.log(0, total + " paths were possible with current set of Scenarios");
-		x.l.log(0, active + " (" + persentage + ") among these were allowed by current configuration");
+		x.l.log(0, active + " (" + persentage + ") among these had a chance to be executed");
 		if (sorted.entrySet().isEmpty())
 			x.l.log(0, colorize("[WARNING] No Test Execution Data available"));
 		else

@@ -28,13 +28,11 @@ public class ScenarioLoader {
 		Set<Scenario> ss = new HashSet<Scenario>();
 		for (Class<?> z : zz) {
 			try {
-
 				Class<?>[] t = { Execution.class };
 				Constructor<?> c = z.getConstructor(t);
 				Object[] o = { x };
 				Object i = c.newInstance(o);
 				ss.add((Scenario) i);
-
 			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				e.printStackTrace();
@@ -48,9 +46,9 @@ public class ScenarioLoader {
 		try {
 			a = new BufferedReader(new InputStreamReader(
 					ClassLoader.getSystemClassLoader().getResourceAsStream(s.replaceAll("[.]", "/")))).lines()
-							.filter(l -> l.endsWith(".class")).map(l -> getClass(l, s)).collect(Collectors.toSet());
+					.filter(l -> l.endsWith(".class")).map(l -> getClass(l, s)).collect(Collectors.toSet());
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Unable to find '" + s + "' package of nested scenarios");
+			System.out.println("There are no '" + s + "' package of nested scenarios");
 		}
 		return a;
 	}

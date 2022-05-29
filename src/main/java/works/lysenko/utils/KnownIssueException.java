@@ -1,7 +1,13 @@
 package works.lysenko.utils;
 
+/**
+ * @author Sergii Lysenko
+ */
 public class KnownIssueException extends RuntimeException {
 
+	/**
+	 * @param string
+	 */
 	public KnownIssueException(String string) {
 		super(string);
 	}

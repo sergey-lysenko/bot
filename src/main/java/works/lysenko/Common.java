@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -328,7 +330,7 @@ public class Common {
 
 	/**
 	 * 
-	 * @param lc
+	 * @param e
 	 */
 	public void clear(WebElement e) {
 		l.log("Clearing " + describe(e));
@@ -369,19 +371,27 @@ public class Common {
 	 * @param lc string locator of element to be clicked on
 	 */
 	public void click(String... lc) {
-		boolean done = false;
-		int attempt = 0;
-		do {
-			try {
-				WebElement e = find(false, true, lc);
-				l.log("Clicking " + describe(lc));
-				e.click();
-				done = true;
-			} catch (StaleElementReferenceException ex) {
-				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
-						+ ", while trying to click(), during attempt " + ++attempt + " ...");
-			}
-		} while ((!done) && (attempt <= EXCEPTION_RETRIES));
+		if (lc.length > 0) {
+			boolean done = false;
+			int attempt = 0;
+			do {
+				try {
+					WebElement e = find(false, true, lc);
+					l.log("Clicking " + describe(lc));
+					if (e != null) {
+						e.click();
+						done = true;
+					} else {
+						l.logProblem(Severity.S2, "e is null");
+						return;
+					}
+				} catch (StaleElementReferenceException ex) {
+					l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
+							+ ", while trying to click(), during attempt " + ++attempt + " ...");
+				}
+			} while ((!done) && (attempt <= EXCEPTION_RETRIES));
+		} else
+			l.logProblem(Severity.S3, "Empty locators list in click()");
 	}
 
 	/**
@@ -424,6 +434,10 @@ public class Common {
 		return tg + ((an.isEmpty()) ? "" : " '" + an + "'") + ((geometry) ? (" @ " + describe(e.getRect())) : "");
 	}
 
+	/**
+	 * @param lc locator of element
+	 * @return true if element exists
+	 */
 	public boolean exists(String lc) {
 		int oc = findAll(lc).size();
 		log("... found " + oc + " occurence(s)");
@@ -463,6 +477,7 @@ public class Common {
 			} catch (TimeoutException | NoSuchElementException | StaleElementReferenceException ex) {
 				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
 						+ ", while trying to find(), during attempt " + ++attempt + " ...");
+				sleep(333);
 			}
 		} while ((!done) && (attempt < EXCEPTION_RETRIES));
 		if (attempt >= EXCEPTION_RETRIES) {
@@ -703,26 +718,49 @@ public class Common {
 	}
 
 	/**
-	 * Open a page defined by protocol and domain
+	 * Open a page defined by url or domain.
 	 * 
-	 * @param p protocol
-	 * @param u domain
+	 * @param u domain or full url
+	 */
+	public void open(String u) {
+		URL url = null;
+		try {
+			url = new URL(u);
+		} catch (MalformedURLException e) {
+			try {
+				url = new URL("https://" + u);
+			} catch (MalformedURLException f1) {
+				try {
+					url = new URL("http://" + u);
+				} catch (MalformedURLException f2) {
+					f2.printStackTrace();
+				}
+			}
+		}
+		l.log("Opening " + url.toString());
+		d.get(url.toString());
+	}
+	
+	/**
+	 * Open a page defined by protocol and domain. Protocol parameter could be
+	 * overridden by directly specifying protocol in the domain parameter value
+	 * 
+	 * @param p default protocol
+	 * @param u domain or full url
 	 */
 	public void open(String p, String u) {
-		String a = p + "://" + u;
-		l.log("Opening " + a);
-		d.get(a);
-	}
-
-	/**
-	 * Open a page defined by domain using https:// protocol
-	 * 
-	 * @param u domain
-	 * @param x
-	 */
-	public void openDomain(String u) {
-		l.log("Opening https://" + u);
-		d.get("https://" + u);
+		URL url = null;
+		try {
+			url = new URL(u);
+		} catch (MalformedURLException e) {
+			try {
+				url = new URL(p + "://" + u);
+			} catch (MalformedURLException f) {
+				f.printStackTrace();
+			}
+		}
+		l.log("Opening " + url.toString());
+		d.get(url.toString());
 	}
 
 	/**
@@ -823,6 +861,27 @@ public class Common {
 	public void section(String s) {
 		l.logln();
 		l.log(0, Ansi.colorize("= " + s + " =", Ansi.BLUE_BOLD_BRIGHT));
+	}
+
+	/**
+	 * Send keys as Action
+	 * 
+	 * @param s CharSequence to send
+	 */
+	public void sendKeys(CharSequence s) {
+		sendKeys(s, 1);
+	}
+
+	/**
+	 * Send keys as Action defined number of times
+	 * 
+	 * @param s CharSequence to send
+	 * @param i times to repeat
+	 */
+	public void sendKeys(CharSequence s, int i) {
+		do
+			new Actions(x.d).sendKeys(s).build().perform();
+		while (--i > 0);
 	}
 
 	/**
@@ -1205,6 +1264,7 @@ public class Common {
 	public String waitValueNotEmpty(String lc) {
 		l.log("Waiting while " + lc + " is still empty");
 		w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), "")));
+		sleep(333);
 		String t = read(lc);
 		l.log("The text of " + lc + " is now '" + t + "'");
 		return t;

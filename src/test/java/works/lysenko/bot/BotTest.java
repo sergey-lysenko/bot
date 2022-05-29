@@ -12,7 +12,7 @@ public class BotTest {
 
 	private static Execution x;
 	private static Cycles cycles;
-	
+
 	@BeforeAll
 	public static void setupTest() {
 		x = new Execution();
@@ -25,7 +25,7 @@ public class BotTest {
 	}
 
 	public static void init(Execution x) {
-	
+
 	}
 
 	@Test
