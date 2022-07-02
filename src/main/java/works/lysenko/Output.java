@@ -12,8 +12,8 @@ import static works.lysenko.enums.Ansi.RED;
 import static works.lysenko.enums.Ansi.RED_BACKGROUND;
 import static works.lysenko.enums.Ansi.WHITE_BOLD_BRIGHT;
 import static works.lysenko.enums.Ansi.YELLOW;
-import static works.lysenko.enums.Ansi.y;
 import static works.lysenko.enums.Ansi.colorize;
+import static works.lysenko.enums.Ansi.y;
 
 import java.awt.Color;
 import java.io.BufferedWriter;
@@ -41,8 +41,15 @@ import works.lysenko.scenarios.Scenario;
  */
 public class Output {
 
+	static String name(Execution x, String t) {
+		String path = RUNS + x.parameters.get("TEST") + "/";
+		String name = path + Common.fill(t, String.valueOf(x.t.startedAt()));
+		new File(path).mkdirs();
+		return name;
+	}
+
 	/**
-	 * 
+	 *
 	 */
 	public Execution x;
 
@@ -56,15 +63,15 @@ public class Output {
 
 	private void drawGroup(SVGGraphics2D g, int col, int[] dy, TreeMap<String, Result> sorted) {
 		Groups t = new Groups("cycles", sorted);
-		for (Entry<String, TreeMap<String, Result>> group : t.entrySet()) {
+		for (Entry<String, TreeMap<String, Result>> group : t.entrySet())
 			drawGroup(g, null, col, dy, group);
-		}
 	}
 
+	@SuppressWarnings("boxing")
 	private void drawGroup(SVGGraphics2D g, Map<String, Integer> parentDys, int col, int[] dy,
 			Entry<String, TreeMap<String, Result>> group) {
-		Map<String, Integer> myDys = new HashMap<String, Integer>();
-		Integer pDy = (null == parentDys) ? null : parentDys.get(group.getKey().toLowerCase());
+		Map<String, Integer> myDys = new HashMap<>();
+		Integer pDy = null == parentDys ? null : parentDys.get(group.getKey().toLowerCase());
 		// Title
 		dy[col]++;
 		int tDy = dy[col]++;
@@ -74,42 +81,39 @@ public class Output {
 		int rH = 15; // Row Height
 
 		if (null != pDy) {
-			g.drawLine((col * cW) - 90, (pDy * rH) - 4, (col * cW) - 70, (pDy * rH) - 4);
-			g.drawLine((col * cW) - 70, (pDy * rH) - 4, (col * cW) - 10, (tDy * rH) - 4);
-			g.drawLine((col * cW) - 10, (tDy * rH) - 4, (col * cW) + 10, (tDy * rH) - 4);
+			g.drawLine(col * cW - 90, pDy * rH - 4, col * cW - 70, pDy * rH - 4);
+			g.drawLine(col * cW - 70, pDy * rH - 4, col * cW - 10, tDy * rH - 4);
+			g.drawLine(col * cW - 10, tDy * rH - 4, col * cW + 10, tDy * rH - 4);
 		}
 
 		g.setColor(java.awt.Color.BLACK);
-		g.drawString(group.getKey(), (col * 300) + 15, tDy * 15);
+		g.drawString(group.getKey(), col * 300 + 15, tDy * 15);
 
 		// Head
 		Parts parts = Parts.flence(group.getValue());
 		for (Entry<String, Result> sgr : parts.head.entrySet()) {
 			if (sgr.getValue().executions == 0) {
-				if ((sgr.getValue().cWeight + sgr.getValue().dWeight + sgr.getValue().uWeight) > 0)
+				if (sgr.getValue().cWeight + sgr.getValue().dWeight + sgr.getValue().uWeight > 0)
 					g.setColor(new Color(164, 164, 255));
 				else
 					g.setColor(java.awt.Color.GRAY);
-			} else {
-				if (sgr.getValue().problems.isEmpty())
-					g.setColor(new Color(0, 128, 0));
-				else
-					g.setColor(new Color(255, 128, 0));
-			}
+			} else if (sgr.getValue().problems.isEmpty())
+				g.setColor(new Color(0, 128, 0));
+			else
+				g.setColor(new Color(255, 128, 0));
 			int myDy = dy[col]++;
 			myDys.put(sgr.getKey().toLowerCase().split(" ")[0], myDy);
-			g.drawString(sgr.getKey() + " : " + sgr.getValue().toString(), (col * cW) + 15, myDy * rH);
+			g.drawString(sgr.getKey() + " : " + sgr.getValue().toString(), col * cW + 15, myDy * rH);
 		}
 
 		// Body
 		Groups groups = Groups.flence(parts.body);
-		for (Entry<String, TreeMap<String, Result>> subgroup : groups.entrySet()) {
-			drawGroup(g, myDys, (col + 1), dy, subgroup);
-		}
+		for (Entry<String, TreeMap<String, Result>> subgroup : groups.entrySet())
+			drawGroup(g, myDys, col + 1, dy, subgroup);
 	}
 
-	protected double jsonify(Double i) {
-		return (i == Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : i;
+	protected static double jsonify(double i) {
+		return i == Double.POSITIVE_INFINITY ? Double.MAX_VALUE : i;
 	}
 
 	/**
@@ -118,31 +122,32 @@ public class Output {
 	 * then manageable. File location defined by DEFAULT_RUNS_LOCATION, file name
 	 * template defined by RUN_JSON_FILENAME
 	 */
+	@SuppressWarnings("boxing")
 	protected void jsonStats() {
 		// TODO: migrate to Gson (?)
-		TreeMap<Scenario, Result> sorted = x.r.getSorted();
+		TreeMap<Scenario, Result> sorted = this.x.r.getSorted();
 		BufferedWriter w;
 		try {
 			int i;
-			w = new BufferedWriter(new FileWriter(name(x, RUN_JSON_FILENAME)));
-			w.write("{\"startAt\":" + x.t.startedAt() + ",\"issues\":{");
+			w = new BufferedWriter(new FileWriter(name(this.x, RUN_JSON_FILENAME)));
+			w.write("{\"startAt\":" + this.x.t.startedAt() + ",\"issues\":{");
 			w.write("\"newIssues\":[");
-			i = x.newIssues.size();
-			for (String str : x.newIssues) {
+			i = this.x.newIssues.size();
+			for (String str : this.x.newIssues) {
 				w.write('"' + str.replaceAll("\n", " ").replace("\"", "\\\"") + '"');
 				if (i-- > 1)
 					w.write(",");
 			}
-			i = x.knownIssues.size();
+			i = this.x.knownIssues.size();
 			w.write("],\"knownIssues\":[");
-			for (String str : x.knownIssues) {
+			for (String str : this.x.knownIssues) {
 				w.write("\"" + str.replaceAll("\n", " ").replace("\"", "\\\"") + "\"");
 				if (i-- > 1)
 					w.write(",");
 			}
-			i = x.notReproduced.size();
+			i = this.x.notReproduced.size();
 			w.write("],\"notReproduced\":[");
-			for (String str : x.notReproduced) {
+			for (String str : this.x.notReproduced) {
 				w.write("\"" + str.replaceAll("\n", " ").replace("\"", "\\\"") + "\"");
 				if (i-- > 1)
 					w.write(",");
@@ -153,7 +158,7 @@ public class Output {
 				w.write("{\"scenario\":\"" + s.getKey() + "\"" + ",\"cWeight\": " + jsonify(s.getValue().cWeight)
 						+ ",\"dWeight\": " + jsonify(s.getValue().dWeight) + ",\"uWeight\": "
 						+ jsonify(s.getValue().uWeight) + ",\"executions\":" + s.getValue().executions);
-				if ((s.getValue().problems != null) && (s.getValue().problems.size() > 0)) {
+				if (s.getValue().problems != null && s.getValue().problems.size() > 0) {
 					w.write(",\"problems\":[");
 					int j = s.getValue().problems.size();
 					for (Problem p : s.getValue().problems) {
@@ -170,9 +175,9 @@ public class Output {
 							type = p0;
 						}
 						w.write("{\"time\":" + p.time + ",");
-						if (shift.isEmpty()) {
+						if (shift.isEmpty())
 							text = p.text.substring(type.length() + 1);
-						} else {
+						else {
 							text = p.text.substring(shift.length() + type.length() + 4);
 							w.write("\"shift\":" + shift + ",");
 						}
@@ -196,93 +201,86 @@ public class Output {
 		}
 	}
 
-	static String name(Execution x, String t) {
-		String path = RUNS + x.parameters.get("TEST") + "/";
-		String name = path + Common.fill(t, String.valueOf(x.t.startedAt()));
-		new File(path).mkdirs();
-		return name;
+	private void plaque(String message, Ansi foreground, Ansi background) {
+		this.x.l.log(0, colorize(colorize(" ".repeat(message.length()), background), foreground));
+		this.x.l.log(0, colorize(colorize(message, background), foreground));
+		this.x.l.log(0, colorize(colorize(" ".repeat(message.length()), background), foreground));
 	}
 
+	@SuppressWarnings("boxing")
 	protected void stats() {
 		// If scenarios stack is not empty at that point, it means that normal execution
 		// was halted due to an error
-		boolean status = x.current.empty();
+		boolean status = this.x.current.empty();
 		String failed = null;
 
-		int total = x.cycles.scenarios.combinations(false);
-		int active = x.cycles.scenarios.combinations(true);
-		String persentage = new DecimalFormat("####0.0").format((Double.valueOf(active) / Double.valueOf(total)) * 100)
+		int total = this.x.cycles.scenarios.combinations(false);
+		int active = this.x.cycles.scenarios.combinations(true);
+		String persentage = new DecimalFormat("####0.0").format(Double.valueOf(active) / Double.valueOf(total) * 100)
 				+ "%";
 
 		// It works, but this is kinda wrong. It is very non-elegant cross-reference.
 		// TODO: rework this to proper implementation
 		if (!status) {
-			failed = x.current.peek().shortName();
-			x.current.removeAllElements();
+			failed = this.x.current.peek().shortName();
+			this.x.current.removeAllElements();
 		}
-		x.l.log(0, y(x.currentCycle()) + " cycle(s) of " + x.testDescription() + " done");
+		this.x.l.log(0, y(this.x.currentCycle()) + " cycle(s) of " + this.x.testDescription() + " done");
 
 		// New issues output
-		x.l.logln();
-		if (x.newIssues.isEmpty())
-			x.l.log(0, colorize("No new Issues", GREEN));
+		this.x.l.logln();
+		if (this.x.newIssues.isEmpty())
+			this.x.l.log(0, colorize("No new Issues", GREEN));
 		else {
-			x.l.log(0, colorize("New Issues:", RED));
-			for (String s : x.newIssues)
-				x.l.log(0, colorize(s));
+			this.x.l.log(0, colorize("New Issues:", RED));
+			for (String s : this.x.newIssues)
+				this.x.l.log(0, colorize(s));
 		}
 
 		// Known issues
-		x.l.logln();
-		if (x.knownIssues.isEmpty())
-			x.l.log(0, colorize("No Known Issues were reproduced", RED));
+		this.x.l.logln();
+		if (this.x.knownIssues.isEmpty())
+			this.x.l.log(0, colorize("No Known Issues were reproduced", RED));
 		else {
-			x.l.log(0, colorize("Confirmed Known Issues:", MAGENTA));
-			x.l.log(0, colorize(String.join(", ", x.knownIssues), MAGENTA));
+			this.x.l.log(0, colorize("Confirmed Known Issues:", MAGENTA));
+			this.x.l.log(0, colorize(String.join(", ", this.x.knownIssues), MAGENTA));
 		}
 
 		// Not reproduced issues
-		if (!(x.knownIssues.isEmpty())) {
-			x.l.logln();
-			if (x.notReproduced.isEmpty())
-				x.l.log(0, colorize("All Known Issues were reproduced", GREEN));
+		if (!this.x.knownIssues.isEmpty()) {
+			this.x.l.logln();
+			if (this.x.notReproduced.isEmpty())
+				this.x.l.log(0, colorize("All Known Issues were reproduced", GREEN));
 			else {
-				x.l.log(0, colorize("Not reproduced Known Issues:", YELLOW));
-				x.l.log(0, colorize(String.join(", ", x.notReproduced), YELLOW));
+				this.x.l.log(0, colorize("Not reproduced Known Issues:", YELLOW));
+				this.x.l.log(0, colorize(String.join(", ", this.x.notReproduced), YELLOW));
 			}
 		}
 
 		// Scenarios statistics
-		x.l.logln();
-		x.l.log(0, "Scenarios statistics:");
-		TreeMap<Scenario, Result> sorted = x.r.getSorted();
-		x.l.log(0, total + " paths were possible with current set of Scenarios");
-		x.l.log(0, active + " (" + persentage + ") among these had a chance to be executed");
+		this.x.l.logln();
+		this.x.l.log(0, "Scenarios statistics:");
+		TreeMap<Scenario, Result> sorted = this.x.r.getSorted();
+		this.x.l.log(0, total + " paths were possible with current set of Scenarios");
+		this.x.l.log(0, active + " (" + persentage + ") among these had a chance to be executed");
 		if (sorted.entrySet().isEmpty())
-			x.l.log(0, colorize("[WARNING] No Test Execution Data available"));
+			this.x.l.log(0, colorize("[WARNING] No Test Execution Data available"));
 		else
-			for (Entry<Scenario, Result> e : sorted.entrySet()) {
-				x.l.log(0, e.getKey().type().tag() + " " + e.getKey().shortName() + " : " + e.getValue().toString());
-			}
-		x.l.logln();
+			for (Entry<Scenario, Result> e : sorted.entrySet())
+				this.x.l.log(0, e.getKey().type().tag() + " " + e.getKey().shortName() + " : " + e.getValue().toString());
+		this.x.l.logln();
 
 		// Result marker
-		if (status) {
+		if (status)
 			plaque(" = Execution passed successfuly = ", BLACK, GREEN_BACKGROUND);
-		} else {
+		else {
 			plaque(" = Execution of '" + failed + "' failed = ", WHITE_BOLD_BRIGHT, RED_BACKGROUND);
-			x.makeSnapshot("_[EXIT]_");
+			this.x.makeSnapshot("_[EXIT]_");
 		}
 	}
 
-	private void plaque(String message, Ansi foreground, Ansi background) {
-		x.l.log(0, colorize(colorize(" ".repeat(message.length()), background), foreground));
-		x.l.log(0, colorize(colorize(message, background), foreground));
-		x.l.log(0, colorize(colorize(" ".repeat(message.length()), background), foreground));
-	}
-
 	protected void svgStats() {
-		TreeMap<String, Result> sorted = x.r.getSortedStrings();
+		TreeMap<String, Result> sorted = this.x.r.getSortedStrings();
 		SVGGraphics2D g = new SVGGraphics2D(2560, 1440);
 
 		int[] dy = new int[100];
@@ -290,7 +288,7 @@ public class Output {
 
 		drawGroup(g, 0, dy, sorted);
 		try {
-			SVGUtils.writeToSVG(new File(Common.fill(name(x, RUN_SVG_FILENAME))), g.getSVGElement());
+			SVGUtils.writeToSVG(new File(Common.fill(name(this.x, RUN_SVG_FILENAME))), g.getSVGElement());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -298,11 +296,11 @@ public class Output {
 
 	/**
 	 * Write default configuration to a file
-	 * 
+	 *
 	 * @param defConf
 	 * @param fileName
 	 */
-	public void writeDefConf(Set<String> defConf) {
+	public static void writeDefConf(Set<String> defConf) {
 		Common.writeToFile(null, defConf, GENERATED_CONFIG_FILE);
 	}
 }

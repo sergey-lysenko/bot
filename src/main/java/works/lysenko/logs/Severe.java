@@ -1,15 +1,22 @@
 package works.lysenko.logs;
 
-@SuppressWarnings("javadoc")
+/**
+ * @author Sergii Lysenko
+ */
 public class Severe extends AbstractProblemLogData {
 
-	public Severe(int depth, String text) {
+	/**
+	 * @param depth in the output log
+	 * @param text describing the problem
+	 */
+    public Severe(int depth, String text) {
 		super(depth, text);
-		tag = "[SEVERE]";
+		this.tag = "[SEVERE]";
 	}
 
+	@Override
 	public String toString() {
-		return "Severe [depth=" + depth + ", tag=" + tag + ", text=" + text + "]";
+		return "Severe [depth=" + this.depth + ", tag=" + this.tag + ", text=" + this.text + "]";
 	}
 
 }

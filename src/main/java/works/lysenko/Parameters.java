@@ -60,11 +60,10 @@ public class Parameters extends Properties {
 
 		if (null != list) {
 			String[] data = list.split(";");
-			params = data[0].split(":");
-			types = data[1].split(":");
-			for (String param : params) {
+			this.params = data[0].split(":");
+			this.types = data[1].split(":");
+			for (String param : this.params)
 				read(param);
-			}
 		}
 
 		if (!(Execution.insideDocker() || Execution.insideCI())) {
@@ -73,8 +72,7 @@ public class Parameters extends Properties {
 		}
 	}
 
-	private void add(String l, Component m, Container n) {
-
+	private static void add(String l, Component m, Container n) {
 		n.add(new JLabel(l));
 		n.add(m);
 	}
@@ -82,46 +80,20 @@ public class Parameters extends Properties {
 	private void additionalParameters() {
 
 		// Additional parameters
-		if (null != params) {
-			aparams = new LinkedList<JTextField>();
+		if (null != this.params) {
+			this.aparams = new LinkedList<>();
 			int i = 0;
-			for (String param : params) {
-				switch (types[i++]) {
+			for (String param : this.params)
+				switch (this.types[i++]) {
 				case "t":
-					aparams.add(new JTextField((String) get(param), WIDTH));
+					this.aparams.add(new JTextField((String) get(param), WIDTH));
 					break;
 				case "p":
-					aparams.add(new JPasswordField((String) get(param), WIDTH));
+					this.aparams.add(new JPasswordField((String) get(param), WIDTH));
 					break;
 				default:
 				}
-			}
 		}
-	}
-
-	private void platforms() {
-
-		List<String> platformNames = platformNames();
-
-		// Creating Browsers ComboBox
-		platform = new JComboBox<Object>(platformNames.toArray());
-		platform.setSelectedItem((String) get("PLATFORM"));
-
-		reset = new JButton("reset");
-		reset.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Platforms.reset();
-				System.exit(2);
-			}
-		});
-	}
-
-	private List<String> platformNames() {
-		List<String> platformNames = new LinkedList<String>();
-		for (Platform b : Platforms.available())
-			platformNames.add(b.title());
-		platformNames.sort(null);
-		return platformNames;
 	}
 
 	private JPanel dialogueBox() {
@@ -130,20 +102,20 @@ public class Parameters extends Properties {
 		JPanel p = new JPanel();
 
 		p.setLayout(new GridLayout(size() + 1, 2, 5, 5));
-		add("DOMAIN", domain, p);
-		add("PLATFORM", platform, p);
-		add("TEST", test, p);
+		add("DOMAIN", this.domain, p);
+		add("PLATFORM", this.platform, p);
+		add("TEST", this.test, p);
 
 		// Additional parameters
-		if (null != aparams) {
+		if (null != this.aparams) {
 			int i = 0;
-			for (JTextField aparam : aparams) {
-				p.add(new JLabel(params[i++]));
+			for (JTextField aparam : this.aparams) {
+				p.add(new JLabel(this.params[i++]));
 				p.add(aparam);
 			}
 		}
 
-		add("available browsers", reset, p);
+		add("available browsers", this.reset, p);
 		return p;
 	}
 
@@ -163,23 +135,49 @@ public class Parameters extends Properties {
 	private void load() {
 		try {
 			load(new FileInputStream(STORED_PARAMETERS_FILE));
-		} catch (IOException e) {
+		} catch (@SuppressWarnings("unused") IOException e) {
 			// NOP
 		}
+	}
+
+	private static List<String> platformNames() {
+		List<String> platformNames = new LinkedList<>();
+		for (Platform b : Platforms.available())
+			platformNames.add(b.title());
+		platformNames.sort(null);
+		return platformNames;
+	}
+
+	private void platforms() {
+
+		List<String> platformNames = platformNames();
+
+		// Creating Browsers ComboBox
+		this.platform = new JComboBox<>(platformNames.toArray());
+		this.platform.setSelectedItem(get("PLATFORM"));
+
+		this.reset = new JButton("reset");
+		this.reset.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Platforms.reset();
+				System.exit(2);
+			}
+		});
 	}
 
 	private void propagate() {
 
 		// Propagation of the user input
-		put("DOMAIN", domain.getText());
-		put("PLATFORM", (platform.getSelectedItem() == null) ? "" : platform.getSelectedItem().toString());
-		put("TEST", (test.getSelectedItem() == null) ? "" : test.getSelectedItem().toString());
+		put("DOMAIN", this.domain.getText());
+		put("PLATFORM", this.platform.getSelectedItem() == null ? "" : this.platform.getSelectedItem().toString());
+		put("TEST", this.test.getSelectedItem() == null ? "" : this.test.getSelectedItem().toString());
 
 		// Additional parameters
-		if (null != aparams) {
+		if (null != this.aparams) {
 			int i = 0;
-			for (JTextField aparam : aparams)
-				put(params[i++], aparam.getText());
+			for (JTextField aparam : this.aparams)
+				put(this.params[i++], aparam.getText());
 		}
 	}
 
@@ -214,7 +212,7 @@ public class Parameters extends Properties {
 	private void standardParameters() {
 
 		// Standard parameters
-		domain = new JTextField((String) get("DOMAIN"), WIDTH);
+		this.domain = new JTextField((String) get("DOMAIN"), WIDTH);
 
 		platforms();
 		tests();
@@ -231,12 +229,13 @@ public class Parameters extends Properties {
 	private void tests() {
 
 		// Tests
-		List<String> tests = new LinkedList<String>();
+		List<String> tests = new LinkedList<>();
 		tests.add((String) get("TEST"));
 
 		// Retrieving possible test names
-		File dir = new File(TESTS);
-		File[] files = dir.listFiles(new FilenameFilter() {
+		File directory = new File(TESTS);
+		File[] files = directory.listFiles(new FilenameFilter() {
+			@Override
 			public boolean accept(File dir, String name) {
 				return name.endsWith(TEST);
 			}
@@ -245,15 +244,15 @@ public class Parameters extends Properties {
 		// Filling up the list of available tests
 		if (null != files) {
 			for (File f : files) {
-				String test = StringUtils.removeEnd(f.getName(), TEST);
-				if (!tests.contains(test))
-					tests.add(test);
+				String aTest = StringUtils.removeEnd(f.getName(), TEST);
+				if (!tests.contains(aTest))
+					tests.add(aTest);
 			}
 			tests.sort(null);
 		}
 
 		// Creating Tests ComboBox
-		test = new JComboBox<Object>(tests.toArray());
-		test.setSelectedItem((String) get("TEST"));
+		this.test = new JComboBox<>(tests.toArray());
+		this.test.setSelectedItem(get("TEST"));
 	}
 }

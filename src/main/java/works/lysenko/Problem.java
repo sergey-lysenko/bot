@@ -1,17 +1,32 @@
 package works.lysenko;
 
-@SuppressWarnings("javadoc")
+/**
+ * @author Sergii Lysenko
+ *
+ */
 public class Problem {
+	/**
+	 * Timestamp of the problem occurence
+	 */
 	public long time;
+
+	/**
+	 * Description of the problem
+	 */
 	public String text;
 
-	public Problem(long tm, String tx) {
+	/**
+	 * @param m time
+	 * @param s description
+	 */
+	public Problem(long m, String s) {
 		super();
-		this.time = tm;
-		this.text = tx;
+		this.time = m;
+		this.text = s;
 	}
 
+	@Override
 	public String toString() {
-		return "(" + time + ") " + text;
+		return "(" + this.time + ") " + this.text;
 	}
 }

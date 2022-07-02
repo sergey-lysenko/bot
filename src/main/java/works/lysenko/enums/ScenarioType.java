@@ -1,9 +1,24 @@
 package works.lysenko.enums;
 
-@SuppressWarnings("javadoc")
+/**
+ * @author Sergii Lysenko
+ */
 public enum ScenarioType {
 
-	LEAF("◆"), NODE("▷"), MONO("◼");
+	/**
+	 * Leaf
+	 */
+	LEAF("◆"),
+	
+	/**
+	 * Node
+	 */
+	NODE("▷"),
+	
+	/**
+	 * Mono
+	 */
+	MONO("◼");
 
 	private String tag;
 
@@ -11,7 +26,10 @@ public enum ScenarioType {
 		this.tag = tag;
 	}
 
+	/**
+	 * @return tag of this Type
+	 */
 	public String tag() {
-		return tag;
+		return this.tag;
 	}
 }

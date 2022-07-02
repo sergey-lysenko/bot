@@ -1,7 +1,7 @@
 package works.lysenko;
 
-import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.FILENAME;
+import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.RUN_LOG_FILENAME;
 import static works.lysenko.enums.Platform.CHROME;
 
@@ -66,28 +66,29 @@ public class Logger {
 		super();
 		this.x = x;
 		try {
-			logWriter = new BufferedWriter(new FileWriter(Output.name(x, RUN_LOG_FILENAME)));
-		} catch (IOException e) {
+			this.logWriter = new BufferedWriter(new FileWriter(Output.name(x, RUN_LOG_FILENAME)));
+		} catch (@SuppressWarnings("unused") IOException e) {
 			throw new RuntimeException("Unable to open log file for writting");
 		}
-		this.logsToRead = (null == logsToRead) ? new HashSet<String>() : logsToRead;
-		this.log = new PriorityQueue<LogRecord>((new Comparator<LogRecord>() {
+		this.logsToRead = null == logsToRead ? new HashSet<>() : logsToRead;
+		this.log = new PriorityQueue<>(new Comparator<LogRecord>() {
+			@Override
 			public int compare(LogRecord o1, LogRecord o2) {
 				return o1.time().compareTo(o2.time());
 			}
-		}));
+		});
 	}
 
 	/**
 	 * Write a string of text to test execution log with defined logical level as
 	 * visual queues, for example:
-	 * 
+	 *
 	 * This is the level 0 record
-	 * 
+	 *
 	 * • This is the level 1 record
-	 * 
+	 *
 	 * •• This is the level 2 record
-	 * 
+	 *
 	 * @param l log level, 0 is for no markers, 1-n is for number of '•' markers
 	 *          before a string
 	 * @param s string of text to be written to log
@@ -99,7 +100,7 @@ public class Logger {
 	/**
 	 * Write a string of text to test execution log with preceding check of browser
 	 * console for present errors and eventual output of found browser console logs
-	 * 
+	 *
 	 * @param l log level, 0 is for no markers, 1-n is for number of '•' markers
 	 *          before a string
 	 * @param s string of text to be written to log
@@ -107,50 +108,49 @@ public class Logger {
 	 *          this method
 	 * @param x
 	 */
+	@SuppressWarnings("boxing")
 	public void log(int l, String s, Long t) {
 		LogEntries ls;
 		LogRecord lr;
-		int depth = x.currentDepth();
+		int depth = this.x.currentDepth();
 
-		if (x.in(CHROME)) {
-			if (logsToRead.contains(LogType.BROWSER)) {
-				ls = x.d.manage().logs().get(LogType.BROWSER);
-				long time = ((null == t) ? x.timer() : t);
+		if (this.x.in(CHROME)) {
+			if (this.logsToRead.contains(LogType.BROWSER)) {
+				ls = this.x.d.manage().logs().get(LogType.BROWSER);
+				long time = null == t ? this.x.timer() : t;
 				for (LogEntry e : ls) {
-					long timestamp = e.getTimestamp() - x.t.startedAt(); // since test start
+					long timestamp = e.getTimestamp() - this.x.t.startedAt(); // since test start
 					long difference = time - timestamp; // since capturing
-					log.add(problem(timestamp, depth, "[" + difference + "]" + " [BROWSER] " + e.toString()));
+					this.log.add(problem(timestamp, depth, "[" + difference + "]" + " [BROWSER] " + e.toString()));
 				}
 			}
-			if (logsToRead.contains(LogType.CLIENT)) {
-				ls = x.d.manage().logs().get(LogType.CLIENT);
-				long time = ((null == t) ? x.timer() : t);
-				for (LogEntry e : ls) {
-					log.add(problem(time, depth, "[CLIENT] " + e.toString()));
-				}
+			if (this.logsToRead.contains(LogType.CLIENT)) {
+				ls = this.x.d.manage().logs().get(LogType.CLIENT);
+				long time = null == t ? this.x.timer() : t;
+				for (LogEntry e : ls)
+					this.log.add(problem(time, depth, "[CLIENT] " + e.toString()));
 			}
-			if (logsToRead.contains(LogType.DRIVER)) {
-				ls = x.d.manage().logs().get(LogType.DRIVER);
-				long time = ((null == t) ? x.timer() : t);
-				for (LogEntry e : ls) {
-					log.add(problem(time, depth, "[DRIVER] " + e.toString()));
-				}
+			if (this.logsToRead.contains(LogType.DRIVER)) {
+				ls = this.x.d.manage().logs().get(LogType.DRIVER);
+				long time = null == t ? this.x.timer() : t;
+				for (LogEntry e : ls)
+					this.log.add(problem(time, depth, "[DRIVER] " + e.toString()));
 			}
 		}
 
-		AbstractLogData ld = new Log(x.currentDepth(), l, s);
-		long time = ((null == t) ? x.timer() : t);
+		AbstractLogData ld = new Log(this.x.currentDepth(), l, s);
+		long time = null == t ? this.x.timer() : t;
 		lr = new LogRecord(time, ld);
-		log.add(lr);
+		this.log.add(lr);
 		process();
 	}
 
 	/**
 	 * Write a string of text into the test execution log with logical level 1, for
 	 * example:
-	 * 
+	 *
 	 * • This is the level 1 record
-	 * 
+	 *
 	 * @param s string of text to be written to log
 	 */
 	public void log(String s) {
@@ -159,10 +159,10 @@ public class Logger {
 
 	private void logFile(String s) {
 		try {
-			if (null == logWriter)
+			if (null == this.logWriter)
 				log(0, Ansi.colorize("[SEVERE] Log Writer is not initialised, unable to write log"));
 			else
-				logWriter.write(s + System.lineSeparator());
+				this.logWriter.write(s + System.lineSeparator());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -170,14 +170,15 @@ public class Logger {
 
 	/**
 	 * Write a string to a named log file
-	 * 
+	 *
 	 * @param s  text to write
 	 * @param n  name of log file
 	 * @param ex extension of log file
 	 */
 	public void logFile(String s, String n, String ex) {
-		String location = RUNS + x.parameters.get("TEST") + "/" + x.t.startedAt() + "/";
-		String timestamp = String.format("%013d", x.t.millis());
+		String location = RUNS + this.x.parameters.get("TEST") + "/" + this.x.t.startedAt() + "/";
+		@SuppressWarnings("boxing")
+		String timestamp = String.format("%013d", this.x.t.millis());
 		String name = Common.fill(FILENAME, timestamp, n, ex);
 		String filename = location + name;
 
@@ -185,7 +186,7 @@ public class Logger {
 		try {
 			new File(location).mkdirs();
 			writer = new BufferedWriter(new FileWriter(filename));
-		} catch (IOException e) {
+		} catch (@SuppressWarnings("unused") IOException e) {
 			throw new RuntimeException("Unable to open a file for writting");
 		}
 		try {
@@ -203,20 +204,14 @@ public class Logger {
 		try {
 			// if (Files.exists(link))
 			Files.delete(link);
-		} catch (IOException e1) {
+		} catch (@SuppressWarnings("unused") IOException e1) {
 			// NOP
 		}
-		/*try {
-			Files.createSymbolicLink(link, target);
-			TODO: fix for windows   
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
 	}
 
 	/**
 	 * Log a problem as Known Issue
-	 * 
+	 *
 	 * @param s description of known issue
 	 */
 	public void logKnownIssue(String s) {
@@ -226,63 +221,67 @@ public class Logger {
 	/**
 	 * Log an empty line
 	 */
+	@SuppressWarnings("boxing")
 	public void logln() {
 		LogRecord lr;
-		lr = new LogRecord(x.timer(), new LineFeed());
-		log.add(lr);
+		lr = new LogRecord(this.x.timer(), new LineFeed());
+		this.log.add(lr);
 	}
 
 	/**
 	 * Log a problem
-	 * 
+	 *
 	 * @param se severity of the problem
 	 * @param st description of the problem
 	 */
+	@SuppressWarnings("boxing")
 	public void logProblem(Severity se, String st) {
-		int depth = x.currentDepth();
-		log.add(problem(x.timer(), depth, se.tag() + " " + st));
+		int depth = this.x.currentDepth();
+		this.log.add(problem(this.x.timer(), depth, se.tag() + " " + st));
 	}
 
 	private LogRecord problem(long t, int d, String p) {
 		LogRecord lr;
-		Set<String> ki = x.getKnownIssue(p);
-		if (ki.size() > 0) {
+		Set<String> ki = this.x.getKnownIssue(p);
+		if (ki.size() > 0)
 			lr = new LogRecord(t, new KnownIssue(d, "[KNOWN-ISSUE]:" + ki.toString() + ":" + p));
-		} else if (p.contains("[SEVERE]")) {
+		else if (p.contains("[SEVERE]")) {
 			lr = new LogRecord(t, new Severe(d, p));
-			x.newIssues.add(p);
+			this.x.newIssues.add(p);
 		} else if (p.contains("[WARNING]")) {
 			lr = new LogRecord(t, new Warning(d, p));
-			x.newIssues.add(p);
+			this.x.newIssues.add(p);
 		} else if (p.contains("[NOTICE]")) {
 			lr = new LogRecord(t, new Notice(d, p));
-		} else if (p.contains("[KNOWN-ISSUE]")) {
+			if (this.x._debug())
+				this.x.newIssues.add(p);
+		} else if (p.contains("[KNOWN-ISSUE]"))
 			lr = new LogRecord(t, new KnownIssue(d, p));
-		} else {
+		else
 			lr = new LogRecord(t, new Notice(d, p));
-		}
 
-		x.r.problem(lr);
+		this.x.r.problem(lr);
 		return lr;
 	}
 
+	@SuppressWarnings("boxing")
 	private void process() {
-		while (!log.isEmpty()) {
+		while (!this.log.isEmpty()) {
 			long since = 0;
 			String debug = "";
-			LogRecord r = log.poll();
+			LogRecord r = this.log.poll();
 			Long time = r.time();
 			String line = r.render();
-			if (x._debug()) {
-				since = time - prev;
+			if (this.x._debug()) {
+				since = time - this.prev;
 				int thisLength = String.valueOf(since).length();
-				if (thisLength > length)
-					length = thisLength;
-				debug = "[" + String.format("%1$" + length + "s", time - prev) + "]";
+				if (thisLength > this.length)
+					this.length = thisLength;
+				debug = "[" + String.format("%1$" + this.length + "s", time - this.prev) + "]";
 			}
 			logConsole(debug + line);
 			logFile(debug + line);
-			prev = time;
+			this.prev = time;
 		}
 	}
 }

@@ -1,22 +1,36 @@
 package works.lysenko.utils;
 
-@SuppressWarnings("javadoc")
+/**
+ * @author Sergii Lysenko
+ */
 public class Stopwatch {
-    private long start;
+	private long start;
 
-    public Stopwatch() {
-        start = System.currentTimeMillis();
-    }
+	/**
+	 * Create and start the Stopwatch instance
+	 */
+	public Stopwatch() {
+		this.start = System.currentTimeMillis();
+	}
 
-    public long startedAt() {
-        return start;
-    }
+	/**
+	 * @return milliseconds since Stopwatch instantiation
+	 */
+	public long millis() {
+		return System.currentTimeMillis() - this.start;
+	}
 
-    public String read() {
-        return String.valueOf(millis()) + " ms";
-    }
+	/**
+	 * @return readable string of Stopwatch uptime
+	 */
+	public String read() {
+		return String.valueOf(millis()) + " ms";
+	}
 
-    public long millis() {
-        return (System.currentTimeMillis() - start);
-    }
+	/**
+	 * @return moment of Stopwatch instantiation
+	 */
+	public long startedAt() {
+		return this.start;
+	}
 }

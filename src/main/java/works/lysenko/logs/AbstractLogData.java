@@ -11,6 +11,6 @@ public abstract class AbstractLogData implements LogData {
 	 * @return value of text field
 	 */
 	public String text() {
-		return text;
+		return this.text;
 	}
 }

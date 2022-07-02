@@ -31,6 +31,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
@@ -46,9 +47,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import io.appium.java_client.service.local.AppiumDriverLocalService;
-
-import org.openqa.selenium.JavascriptExecutor;
-
 import works.lysenko.enums.Ansi;
 import works.lysenko.enums.Platform;
 import works.lysenko.enums.Severity;
@@ -61,7 +59,7 @@ public class Common {
 	/**
 	 * Generate {@link org.openqa.selenium.By} object corresponding to given string
 	 * locator
-	 * 
+	 *
 	 * @param lc string with either xpath or css locator
 	 * @return proper locator object based on contents of source string contents
 	 */
@@ -69,14 +67,13 @@ public class Common {
 		if (lc.substring(0, 2).equals("//") || lc.substring(0, 2).equals("./") || lc.substring(0, 3).equals(".//")
 				|| lc.substring(0, 4).equals("(.//"))
 			return By.xpath(lc);
-		else
-			return By.cssSelector(lc);
+		return By.cssSelector(lc);
 	}
 
 	/**
 	 * Generate {@link org.openqa.selenium.By} object corresponding to given string
 	 * locator
-	 * 
+	 *
 	 * @param lc array of strings with either xpath or css locator
 	 * @return proper locator object based on contents of source string contents
 	 */
@@ -86,7 +83,7 @@ public class Common {
 
 	/**
 	 * Shortcut for {@link java.lang.String#format(t, v)}
-	 * 
+	 *
 	 * @param t template
 	 * @param v value
 	 * @return filled in string template
@@ -97,24 +94,25 @@ public class Common {
 
 	/**
 	 * Generate random integer in the defined range
-	 * 
+	 *
 	 * @param l minimum value
 	 * @param u maximum value
 	 * @return random integer
 	 */
-	public static Integer integer(int l, int u) {
+	public static int integer(int l, int u) {
 		return new RandomDataGenerator().nextInt(l, u);
 	}
 
 	/**
 	 * Generate random integer in the defined range with list of values to exclude
-	 * 
+	 *
 	 * @param l minimum value
 	 * @param u maximum value
 	 * @param x list of values to exclude
 	 * @return random integer
 	 */
-	public static Integer integer(int l, int u, Integer... x) {
+	@SuppressWarnings("boxing")
+	public static int integer(int l, int u, Integer... x) {
 		Integer n; // Non-primitive for asList() compatibility
 		do
 			n = new RandomDataGenerator().nextInt(l, u);
@@ -124,7 +122,7 @@ public class Common {
 
 	/**
 	 * Return 'true' of 'false' with equal probability
-	 * 
+	 *
 	 * @return random boolean value
 	 */
 	public static boolean isTrue() {
@@ -133,19 +131,19 @@ public class Common {
 
 	/**
 	 * Return 'true' with defined probability, or 'false' otherwise
-	 * 
+	 *
 	 * @param d probability of 'true' selection
 	 * @return random boolean value
 	 */
 	public static boolean isTrue(double d) {
-		if ((d > 1.0) || (d < 0.0))
+		if (d > 1.0 || d < 0.0)
 			throw new IllegalArgumentException("Given probability " + d + " is outside the valid range of [0.0 - 1.0]");
 		return new Random().nextFloat() < d;
 	}
 
 	/**
 	 * Repeat defined key given number of times
-	 * 
+	 *
 	 * @param k key to be repeated
 	 * @param t times to repeat
 	 * @return requested sequence
@@ -159,7 +157,7 @@ public class Common {
 
 	/**
 	 * Get random object from a list of objects
-	 * 
+	 *
 	 * @param <T> type of objects in a list
 	 * @param l   list of objects
 	 * @return random object from a list of objects
@@ -170,7 +168,7 @@ public class Common {
 
 	/**
 	 * Get random object from an array of objects
-	 * 
+	 *
 	 * @param a array of objects
 	 * @return random element from an array of objects
 	 */
@@ -180,7 +178,7 @@ public class Common {
 
 	/**
 	 * Get random object from a set of objects
-	 * 
+	 *
 	 * @param <T> type of objects in a set
 	 * @param s   set of objects
 	 * @return random object from a set of objects
@@ -194,7 +192,7 @@ public class Common {
 	 * Get an element from a list of strings different from defined one. There is no
 	 * check that a list contains defined string, only the exclusion of defined
 	 * value is performed.
-	 * 
+	 *
 	 * @param e string to be excluded from selection
 	 * @param l list of string to select from
 	 * @return an element from a list of strings which differs from specified one
@@ -214,13 +212,12 @@ public class Common {
 		String s = String.valueOf(t);
 		if (s.length() > 3)
 			return String.valueOf(ArrayUtils.insert(s.length() - 3, String.valueOf(t).toCharArray(), '.')) + " s";
-		else
-			return s + " ms";
+		return s + " ms";
 	}
 
 	/**
 	 * Generate equally probable true or false value
-	 * 
+	 *
 	 * @return 'true' or 'false' with equal probability
 	 */
 	public static boolean trueOrFalse() {
@@ -229,7 +226,7 @@ public class Common {
 
 	/**
 	 * Supply visual representation for non-printable character
-	 * 
+	 *
 	 * @param k key to be screened
 	 * @return visual representation for non-printable character
 	 */
@@ -246,7 +243,7 @@ public class Common {
 
 	/**
 	 * Write lines of the provided set to a file
-	 * 
+	 *
 	 * @param fl optional first line of the text to be added to a file (title)
 	 * @param ss set of lines to be stored in a file
 	 * @param fn name of the file to be written
@@ -258,9 +255,8 @@ public class Common {
 			writer = new BufferedWriter(new FileWriter(fn));
 			if (null != fl)
 				writer.write(fl + System.lineSeparator());
-			for (String s : ss) {
+			for (String s : ss)
 				writer.write(s + System.lineSeparator());
-			}
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -268,42 +264,42 @@ public class Common {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public Output o;
 
 	/**
-	 * 
+	 *
 	 */
 	public Logger l;
 
 	/**
-	 * 
+	 *
 	 */
 	public Results r;
 
 	/**
-	 * 
+	 *
 	 */
 	public Execution x;
 
 	/**
-	 * 
+	 *
 	 */
 	public WebDriver d;
 
 	/**
-	 * 
+	 *
 	 */
 	public WebDriverWait w;
 
 	/**
-	 * 
+	 *
 	 */
 	AppiumDriverLocalService service = null;
 
 	/**
-	 * 
+	 *
 	 */
 	public Common() {
 		super();
@@ -319,22 +315,64 @@ public class Common {
 	}
 
 	/**
-	 * 
-	 * @param lc
+	 * Clear an input by either executing
+	 * {@link org.openqa.selenium.WebElement#clear()} method or by simulating the
+	 * <strong>Ctrl+A</strong> and <strong>Backspace</strong> keystrokes
+	 *
+	 * @param sendKeys <strong>Ctrl+A*</strong> and <strong>Backspace</strong> if
+	 *                 true
+	 * @param lc       locator(s) of elements to clear
 	 */
-	public void clear(String... lc) {
-		l.log("Clearing " + describe(lc));
-		find(true, true, lc).clear();
-		; // Silent find during clear
+	public void clear(boolean sendKeys, String... lc) {
+		WebElement e = find(false, true, lc);
+		clear(sendKeys, e);
 	}
 
 	/**
-	 * 
-	 * @param e
+	 * Clear an input by either executing
+	 * {@link org.openqa.selenium.WebElement#clear()} method or by simulating the
+	 * <strong>Ctrl+A</strong> and <strong>Backspace</strong> keystrokes
+	 *
+	 * @param sendKeys <strong>Ctrl+A*</strong> and <strong>Backspace</strong> if
+	 *                 true
+	 * @param e        element to clear
+	 */
+	public void clear(boolean sendKeys, WebElement e) {
+		this.l.log("Clearing " + describe(e));
+		if (this.x._debug())
+			this.l.log(" text in " + describe(e) + " before clearing: '" + e.getAttribute("value") + "'");
+		if (sendKeys) {
+			e.sendKeys(Keys.CONTROL, "a");
+			e.sendKeys(Keys.BACK_SPACE);
+		} else
+			e.clear();
+		if (this.x._debug())
+			this.l.log(" text in " + describe(e) + " after clearing: '" + e.getAttribute("value") + "'");
+	}
+
+	/**
+	 * Clear an input by executing {@link org.openqa.selenium.WebElement#clear()}
+	 * method
+	 *
+	 * @param sendKeys <strong>Ctrl+A*</strong> and <strong>Backspace</strong> if
+	 *                 true
+	 * @param lc       locator(s) of elements to clear
+	 */
+	public void clear(String... lc) {
+		WebElement e = find(false, true, lc);
+		clear(e);
+	}
+
+	/**
+	 * Clear an input by executing {@link org.openqa.selenium.WebElement#clear()}
+	 * method
+	 *
+	 * @param sendKeys <strong>Ctrl+A*</strong> and <strong>Backspace</strong> if
+	 *                 true
+	 * @param e        element to clear
 	 */
 	public void clear(WebElement e) {
-		l.log("Clearing " + describe(e));
-		e.clear();
+		clear(false, e);
 	}
 
 	/**
@@ -342,25 +380,25 @@ public class Common {
 	 * by two double typed relative x and y coordinates, where value 0.0 corresponds
 	 * to leftmost or upmost part of the element, as 1.0 is for rightmost of lowest
 	 * part of an object.
-	 * 
+	 *
 	 * Consequently, coordinates (0.5, 0.5) defining a center of the object
-	 * 
+	 *
 	 * @param x  requested x coordinate offset
 	 * @param y
 	 * @param lc string locator(s) of element to be clicked on
 	 */
-	public void click(double x, double y, String... lc) {
-		l.log("Clicking " + describe(lc) + " at (x" + x + ",y" + y + ")");
-		l.log(2, "Locating the element " + describe(lc) + " ...");
+	public void click(@SuppressWarnings("hiding") double x, double y, String... lc) {
+		this.l.log("Clicking " + describe(lc) + " at (x" + x + ",y" + y + ")");
+		this.l.log(2, "Locating the element " + describe(lc) + " ...");
 		WebElement e = find(true, true, lc);
 		Rectangle re = e.getRect();
-		l.log(2, "Element's rectangle is " + describe(re) + " ...");
+		this.l.log(2, "Element's rectangle is " + describe(re) + " ...");
 		Point c = getCenter(re);
 		Point p = getPoint(x, y, re);
 		int offsetX = p.x - c.x;
 		int offsetY = p.y - c.y;
-		l.log(2, "Calculated offset in pixels from center is  (x" + offsetX + ",y" + offsetY + ") ...");
-		Actions actions = new Actions(d);
+		this.l.log(2, "Calculated offset in pixels from center is  (x" + offsetX + ",y" + offsetY + ") ...");
+		Actions actions = new Actions(this.d);
 		actions.moveToElement(e);
 		actions.moveByOffset(offsetX, offsetY);
 		actions.click();
@@ -374,24 +412,24 @@ public class Common {
 		if (lc.length > 0) {
 			boolean done = false;
 			int attempt = 0;
-			do {
+			do
 				try {
 					WebElement e = find(false, true, lc);
-					l.log("Clicking " + describe(lc));
+					this.l.log("Clicking " + describe(lc));
 					if (e != null) {
 						e.click();
 						done = true;
 					} else {
-						l.logProblem(Severity.S2, "e is null");
+						this.l.logProblem(Severity.S2, "e is null");
 						return;
 					}
 				} catch (StaleElementReferenceException ex) {
-					l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
+					this.l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
 							+ ", while trying to click(), during attempt " + ++attempt + " ...");
 				}
-			} while ((!done) && (attempt <= EXCEPTION_RETRIES));
+			while (!done && attempt <= EXCEPTION_RETRIES);
 		} else
-			l.logProblem(Severity.S3, "Empty locators list in click()");
+			this.l.logProblem(Severity.S3, "Empty locators list in click()");
 	}
 
 	/**
@@ -406,15 +444,15 @@ public class Common {
 	 * @param geometry
 	 */
 	public void click(WebElement e, boolean geometry) {
-		l.log("Clicking " + describe(e, true));
+		this.l.log("Clicking " + describe(e, true));
 		e.click();
 	}
 
-	private String describe(Rectangle r) {
+	private static String describe(Rectangle r) {
 		return "h" + r.height + " w" + r.width + " @ " + "x" + r.x + " y" + r.y;
 	}
 
-	private String describe(String[] lc) {
+	private static String describe(String[] lc) {
 		if (lc.length == 0)
 			return "";
 		if (lc.length == 1)
@@ -429,9 +467,9 @@ public class Common {
 	}
 
 	private String describe(WebElement e, boolean geometry) {
-		String an = (x.in(CHROME)) ? e.getAccessibleName() : "";
+		String an = this.x.in(CHROME) ? e.getAccessibleName() : "";
 		String tg = e.getTagName();
-		return tg + ((an.isEmpty()) ? "" : " '" + an + "'") + ((geometry) ? (" @ " + describe(e.getRect())) : "");
+		return tg + (an.isEmpty() ? "" : " '" + an + "'") + (geometry ? " @ " + describe(e.getRect()) : "");
 	}
 
 	/**
@@ -440,13 +478,12 @@ public class Common {
 	 */
 	public boolean exists(String lc) {
 		int oc = findAll(lc).size();
-		log("... found " + oc + " occurence(s)");
 		return oc > 0;
 	}
 
 	/**
 	 * Find an element defined by one or several nested String locators
-	 * 
+	 *
 	 * @param silent   if true, no output will be added to log
 	 * @param scrollTo if true, window will be scrolled to make this element visible
 	 *                 on screen
@@ -459,38 +496,38 @@ public class Common {
 		WebElement e = null;
 		boolean done = false;
 		int attempt = 0;
-		do {
+		do
 			try {
 				if (!silent && lc.length > 0)
-					l.log("Finding " + lc[0]);
+					this.l.log("Finding " + lc[0]);
 				if (lc.length == 0)
-					e = d.findElement(by("//body"));
+					e = this.d.findElement(by("//body"));
 				if (lc.length > 0)
-					e = d.findElement(by(lc[0]));
+					e = this.d.findElement(by(lc[0]));
 				if (lc.length > 1)
 					for (int i = 1; i < lc.length; i++) {
 						if (!silent)
-							l.log(" ... and child " + lc[i]);
-						e = e.findElement(by(lc[i]));
+							this.l.log(" ... and child " + lc[i]);
+						if (null != e)
+							e = e.findElement(by(lc[i]));
 					}
 				done = true;
 			} catch (TimeoutException | NoSuchElementException | StaleElementReferenceException ex) {
-				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
+				this.l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
 						+ ", while trying to find(), during attempt " + ++attempt + " ...");
 				sleep(333);
 			}
-		} while ((!done) && (attempt < EXCEPTION_RETRIES));
+		while (!done && attempt < EXCEPTION_RETRIES);
 		if (attempt >= EXCEPTION_RETRIES) {
 			logProblem(Severity.S1, "Maximum retries amount reached, find() returns null, test failure imminent");
 			return null;
-		} else {
-			return (scrollTo) ? find(e) : e;
 		}
+		return scrollTo ? find(e) : e;
 	}
 
 	/**
 	 * Find an element defined by one or several nested String locators
-	 * 
+	 *
 	 * @param lc one or several nested String locators
 	 * @return WebElement object
 	 */
@@ -501,16 +538,16 @@ public class Common {
 	/**
 	 * "Find" an element which could be located outside of current view by
 	 * performing moveToElement() call
-	 * 
+	 *
 	 * @param e WebElement to scroll to
 	 * @return same web element
 	 */
 	public WebElement find(WebElement e) {
 
 		if (in(FIREFOX))
-			((JavascriptExecutor) x.d).executeScript("arguments[0].scrollIntoView(true);", e);
+			((JavascriptExecutor) this.x.d).executeScript("arguments[0].scrollIntoView(true);", e);
 		else {
-			Actions actions = new Actions(d);
+			Actions actions = new Actions(this.d);
 			actions.moveToElement(e);
 			actions.perform();
 		}
@@ -522,24 +559,25 @@ public class Common {
 	 * @param c
 	 * @return child element of e defined by c
 	 */
-	public WebElement find(WebElement e, String c) {
+	public static WebElement find(WebElement e, String c) {
 		return e.findElement(by(c));
 	}
 
 	/**
 	 * Find all elements defined by string locator
-	 * 
+	 *
 	 * @param lc locator of 1-n elements to be found
 	 * @return list of located element references
 	 */
 	public List<WebElement> findAll(String lc) {
-		l.log("Finding all " + lc + " elements");
-		return d.findElements(by(lc));
+		List<WebElement> e = this.d.findElements(by(lc));
+		this.l.log("Finding all " + lc + " > " + e.size() + " elements");
+		return e;
 	}
 
 	/**
 	 * Find visible instance of the defined element and the click on it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void findThenClick(String lc) {
@@ -547,28 +585,28 @@ public class Common {
 		WebElement target = null;
 		boolean done = false;
 		int attempt = 0;
-		do {
+		do
 			try {
-				for (WebElement e : list) {
+				for (WebElement e : list)
 					if (e.isDisplayed())
 						target = e;
-				}
 				done = true;
 			} catch (TimeoutException ex) {
-				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
+				this.l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
 						+ ", while trying to findThenClick(), during attempt " + ++attempt + " ...");
 			}
-		} while ((!done) || (attempt > EXCEPTION_RETRIES));
-		target.click();
+		while (!done || attempt > EXCEPTION_RETRIES);
+		if (null != target)
+			target.click();
 	}
 
 	/**
 	 * Calculate a point placed in a center of a rectangle
-	 * 
+	 *
 	 * @param r Rectangle
 	 * @return Point located in a center of the given Rectangle
 	 */
-	public Point getCenter(Rectangle r) {
+	public static Point getCenter(Rectangle r) {
 		return new Point(r.x + r.width / 2, r.y + r.height / 2);
 	}
 
@@ -576,7 +614,7 @@ public class Common {
 	 * Calculate a point based on a rectangle and relative coefficients of x and y
 	 * coordinates. Coordinate 0.0 corresponds to leftmost or upper part of the
 	 * rectangle, and 1.0 is for rightmost of lowest part of an object.
-	 * 
+	 *
 	 * @param x horizontal location of the requested point relative to the given
 	 *          rectangle
 	 * @param y vertical location of the requested point relative to the given
@@ -584,7 +622,8 @@ public class Common {
 	 * @param r base rectangle
 	 * @return Point object based on given parameters
 	 */
-	public Point getPoint(double x, double y, Rectangle r) {
+	@SuppressWarnings("boxing")
+	public static Point getPoint(double x, double y, Rectangle r) {
 		int offsetX = (int) Math.round(Double.valueOf(r.width) * x);
 		int offsetY = (int) Math.round(Double.valueOf(r.height) * y);
 		return new Point(r.x + offsetX, r.y + offsetY);
@@ -594,7 +633,7 @@ public class Common {
 	 * @return browser in which current execution takes place
 	 */
 	public Platform in() {
-		return x.in();
+		return this.x.in();
 	}
 
 	/**
@@ -602,7 +641,7 @@ public class Common {
 	 * @return true if current is in defined browser
 	 */
 	public boolean in(Platform b) {
-		return x.in(b);
+		return this.x.in(b);
 	}
 
 	/**
@@ -610,8 +649,8 @@ public class Common {
 	 * @return true is this Web Element is disabled
 	 */
 	public boolean isDisabled(String lc) {
-		l.log("Checking whether " + lc + " is disabled");
-		return !d.findElement(by(lc)).isEnabled();
+		this.l.log("Checking whether " + lc + " is disabled");
+		return !this.d.findElement(by(lc)).isEnabled();
 	}
 
 	/**
@@ -619,8 +658,8 @@ public class Common {
 	 * @return true is this Web Element is disabled
 	 */
 	public boolean isEnabled(String lc) {
-		l.log("Checking whether " + lc + " is enabled");
-		return d.findElement(by(lc)).isEnabled();
+		this.l.log("Checking whether " + lc + " is enabled");
+		return this.d.findElement(by(lc)).isEnabled();
 	}
 
 	/**
@@ -628,43 +667,43 @@ public class Common {
 	 * @return true is this Web Element is present in DOM
 	 */
 	public boolean isPresent(String lc) {
-		l.log("Checking visibility of " + lc);
-		return !d.findElements(by(lc)).isEmpty();
+		this.l.log("Checking visibility of " + lc);
+		return !this.d.findElements(by(lc)).isEmpty();
 	}
 
 	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.log(ll, s)}
-	 * 
+	 *
 	 * @param ll
 	 * @param s
 	 */
 	public void log(int ll, String s) {
-		l.log(ll, s);
+		this.l.log(ll, s);
 	}
 
 	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.log(s)}
-	 * 
+	 *
 	 * @param s
 	 */
 	public void log(String s) {
-		l.log(s);
+		this.l.log(s);
 	}
 
 	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.logProblem(s)}
-	 * 
+	 *
 	 * @param se
 	 * @param st
 	 */
 	public void logProblem(Severity se, String st) {
-		l.logProblem(se, st);
+		this.l.logProblem(se, st);
 	}
 
 	private void makeCodeshot(String p, String f) {
-		String ext = (x.in(ANDROID)) ? ".xml" : ".html";
+		String ext = this.x.in(ANDROID) ? ".xml" : ".html";
 		try {
-			Files.writeString(Path.of(p, f + ext), d.getPageSource());
+			Files.writeString(Path.of(p, f + ext), this.d.getPageSource());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -673,7 +712,7 @@ public class Common {
 	/**
 	 * Produce a full-screen PNG Screenshot and save it in a location defined by
 	 * DEFAULT_SHOTS_LOCATION
-	 * 
+	 *
 	 * @param n of the screenshot
 	 */
 	public void makeScreenshot(String n) {
@@ -683,7 +722,7 @@ public class Common {
 	/**
 	 * Produce a framed PNG Screenshot of defined element and save it in a location
 	 * defined by DEFAULT_SHOTS_LOCATION
-	 * 
+	 *
 	 * @param element to be used for local framed screenshot
 	 * @param name    of the screenshot
 	 * @param x
@@ -695,7 +734,7 @@ public class Common {
 	private void makeScreenshot(WebElement element, String path, String name) {
 		File src = null;
 		if (element == null)
-			src = ((TakesScreenshot) d).getScreenshotAs(OutputType.FILE);
+			src = ((TakesScreenshot) this.d).getScreenshotAs(OutputType.FILE);
 		else
 			src = ((TakesScreenshot) element).getScreenshotAs(OutputType.FILE);
 		try {
@@ -708,7 +747,7 @@ public class Common {
 	/**
 	 * Simultaneously make a full-screen screenshot and a copy of page html code and
 	 * save in a location defined by DEFAULT_SHOTS_LOCATION
-	 * 
+	 *
 	 * @param f name of snapshot
 	 * @param x
 	 */
@@ -719,17 +758,17 @@ public class Common {
 
 	/**
 	 * Open a page defined by url or domain.
-	 * 
+	 *
 	 * @param u domain or full url
 	 */
 	public void open(String u) {
 		URL url = null;
 		try {
 			url = new URL(u);
-		} catch (MalformedURLException e) {
+		} catch (@SuppressWarnings("unused") MalformedURLException e) {
 			try {
 				url = new URL("https://" + u);
-			} catch (MalformedURLException f1) {
+			} catch (@SuppressWarnings("unused") MalformedURLException f1) {
 				try {
 					url = new URL("http://" + u);
 				} catch (MalformedURLException f2) {
@@ -737,14 +776,16 @@ public class Common {
 				}
 			}
 		}
-		l.log("Opening " + url.toString());
-		d.get(url.toString());
+		if (null != url) {
+			this.l.log("Opening " + url.toString());
+			this.d.get(url.toString());
+		}
 	}
-	
+
 	/**
 	 * Open a page defined by protocol and domain. Protocol parameter could be
 	 * overridden by directly specifying protocol in the domain parameter value
-	 * 
+	 *
 	 * @param p default protocol
 	 * @param u domain or full url
 	 */
@@ -752,42 +793,44 @@ public class Common {
 		URL url = null;
 		try {
 			url = new URL(u);
-		} catch (MalformedURLException e) {
+		} catch (@SuppressWarnings("unused") MalformedURLException e) {
 			try {
 				url = new URL(p + "://" + u);
 			} catch (MalformedURLException f) {
 				f.printStackTrace();
 			}
 		}
-		l.log("Opening " + url.toString());
-		d.get(url.toString());
+		if (null != url) {
+			this.l.log("Opening " + url.toString());
+			this.d.get(url.toString());
+		}
 	}
 
 	/**
 	 * Populate links to sub-objects from Execution
 	 */
 	public void populateShortcuts() {
-		this.d = x.d;
-		this.l = x.l;
-		this.o = x.o;
-		this.r = x.r;
-		this.w = x.w;
+		this.d = this.x.d;
+		this.l = this.x.l;
+		this.o = this.x.o;
+		this.r = this.x.r;
+		this.w = this.x.w;
 	}
 
 	/**
 	 * Read contents of the element defined by string locator
-	 * 
+	 *
 	 * @param lc string locator of an element
 	 * @return result of .getText() for this element
 	 */
 	public String read(String lc) {
-		l.log("Reading from " + lc);
-		return d.findElement(by(lc)).getText();
+		this.l.log("Reading from " + lc);
+		return this.d.findElement(by(lc)).getText();
 	}
 
 	/**
 	 * Read contents of the WebElement
-	 * 
+	 *
 	 * @param e WebElement to read text from
 	 * @return text
 	 */
@@ -798,20 +841,20 @@ public class Common {
 	/**
 	 * Read contents of given WebElement with optional logging of geometry
 	 * information
-	 * 
+	 *
 	 * @param e
 	 * @param geometry
 	 * @return result of .getText() for this element
 	 */
 	public String read(WebElement e, boolean geometry) {
-		l.log("Reading from " + describe(e, geometry));
+		this.l.log("Reading from " + describe(e, geometry));
 		return e.getText();
 	}
 
 	/**
 	 * @return contents of Clipboard as String
 	 */
-	public String readClipboard() {
+	public static String readClipboard() {
 		String result = null;
 		try {
 			result = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
@@ -823,49 +866,49 @@ public class Common {
 
 	/**
 	 * Read value attribute of the element defined by String locator
-	 * 
+	 *
 	 * @param lc string locator of an element
 	 * @return contents of value attribute of the element
 	 */
 	public String readInput(String lc) {
-		l.log("Reading from " + lc);
-		return d.findElement(by(lc)).getAttribute("value");
+		this.l.log("Reading from " + lc);
+		return this.d.findElement(by(lc)).getAttribute("value");
 	}
 
 	/**
 	 * Read value attribute of the element
-	 * 
+	 *
 	 * @param e an element
 	 * @return contents of value attribute of the element
 	 */
 	public String readInput(WebElement e) {
-		l.log("Reading from " + describe(e));
+		this.l.log("Reading from " + describe(e));
 		return e.getAttribute("value");
 	}
 
 	/**
 	 * Produce BASE64 encoded string screenshot of an element
-	 * 
+	 *
 	 * @param lc string locator of requested element
 	 * @return BASE64 encoded string screenshot
 	 */
 	public String screenShot(String lc) {
-		return ((TakesScreenshot) d.findElement(by(lc))).getScreenshotAs(OutputType.BASE64);
+		return ((TakesScreenshot) this.d.findElement(by(lc))).getScreenshotAs(OutputType.BASE64);
 	}
 
 	/**
 	 * Add a section title to the test log
-	 * 
+	 *
 	 * @param s string to be added as section title
 	 */
 	public void section(String s) {
-		l.logln();
-		l.log(0, Ansi.colorize("= " + s + " =", Ansi.BLUE_BOLD_BRIGHT));
+		this.l.logln();
+		this.l.log(0, Ansi.colorize("= " + s + " =", Ansi.BLUE_BOLD_BRIGHT));
 	}
 
 	/**
 	 * Send keys as Action
-	 * 
+	 *
 	 * @param s CharSequence to send
 	 */
 	public void sendKeys(CharSequence s) {
@@ -874,19 +917,20 @@ public class Common {
 
 	/**
 	 * Send keys as Action defined number of times
-	 * 
+	 *
 	 * @param s CharSequence to send
 	 * @param i times to repeat
 	 */
 	public void sendKeys(CharSequence s, int i) {
+		int i2 = i;
 		do
-			new Actions(x.d).sendKeys(s).build().perform();
-		while (--i > 0);
+			new Actions(this.x.d).sendKeys(s).build().perform();
+		while (--i2 > 0);
 	}
 
 	/**
 	 * Send keys to the element defined by string locator
-	 * 
+	 *
 	 * @param lc string locator of target input element
 	 * @param s  CharSequence to send
 	 */
@@ -895,12 +939,12 @@ public class Common {
 	}
 
 	private String shotLocation() {
-		return SCREENSHOTS + x.t.startedAt() + "/";
+		return SCREENSHOTS + this.x.t.startedAt() + "/";
 	}
 
 	/**
 	 * Sleep during defined amount of milliseconds
-	 * 
+	 *
 	 * @param ms
 	 */
 	public void sleep(long ms) {
@@ -910,7 +954,7 @@ public class Common {
 	/**
 	 * Sleep during defined amount of milliseconds with optional bypassing of
 	 * logging
-	 * 
+	 *
 	 * @param ms
 	 * @param silent
 	 */
@@ -920,13 +964,13 @@ public class Common {
 
 	/**
 	 * Sleep during defined amount of milliseconds with optional custom message
-	 * 
+	 *
 	 * @param ms amount of milliseconds to pause for
 	 * @param s
 	 */
 	public void sleep(long ms, String s) {
 		if (ms < SILENT_SLEEPING_TRESHHOLD)
-			l.log(0, Ansi.colorize("[WARNING]: " + "Sleeping for less then " + SILENT_SLEEPING_TRESHHOLD
+			this.l.log(0, Ansi.colorize("[WARNING]: " + "Sleeping for less then " + SILENT_SLEEPING_TRESHHOLD
 					+ " ms is better to be perfomed in silent mode"));
 		sleep(ms, s, false);
 	}
@@ -934,7 +978,7 @@ public class Common {
 	/**
 	 * Sleep during defined amount of milliseconds with optional custom message and
 	 * optional bypassing of logging
-	 * 
+	 *
 	 * @param ms     amount of milliseconds to pause for
 	 * @param s      text to displey in log, can be set to null for default
 	 *               "Sleeping X ms" message
@@ -943,7 +987,7 @@ public class Common {
 	public void sleep(long ms, String s, boolean silent) {
 		try {
 			if (!silent)
-				l.log((null == s) ? "Sleeping " + ms + " ms" : s);
+				this.l.log(null == s ? "Sleeping " + ms + " ms" : s);
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -952,19 +996,19 @@ public class Common {
 
 	/**
 	 * Switch to other WebDriver window
-	 * 
-	 * @param w window handle to switch to
+	 *
+	 * @param window handle to switch to
 	 */
-	public void switchTo(String w) {
-		l.log("Switching to " + w);
-		d.switchTo().window(w);
+	public void switchTo(String window) {
+		this.l.log("Switching to " + window);
+		this.d.switchTo().window(window);
 	}
 
 	/**
 	 * Call {@link Common#typeInto(String, Object, double, boolean)} with
 	 * {@code pasteProbability} set to {@value 0} and {@code secret} set to
 	 * {@value false}
-	 * 
+	 *
 	 * @param lc single String locator. To facilitate multilevel search, use
 	 *           {@code typeInto(find(str1, str2, ...), ...);}
 	 * @param c  Content to type, Object.toString() in used to get string
@@ -978,7 +1022,7 @@ public class Common {
 	/**
 	 * Call {@link Common#typeInto(String, Object, double, boolean)} with
 	 * {@code pasteProbability} set to {@value 0}
-	 * 
+	 *
 	 * @param lc     single String locator. To facilitate multilevel search, use
 	 *               {@code typeInto(find(str1, str2, ...), ...);}
 	 * @param c      Content to type, Object.toString() in used to get string
@@ -994,7 +1038,7 @@ public class Common {
 	/**
 	 * Call {@link Common#typeInto(String, Object, double, boolean)} with
 	 * {@code secret} set to {@value false}
-	 * 
+	 *
 	 * @param lc single String locator. To facilitate multilevel search, use
 	 *           {@code typeInto(find(str1, str2, ...), ...);}
 	 * @param c  Content to type, Object.toString() in used to get string
@@ -1010,7 +1054,7 @@ public class Common {
 	/**
 	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
 	 * WebElement defined by String locator
-	 * 
+	 *
 	 * @param lc     single String locator. To facilitate multilevel search, use
 	 *               {@code typeInto(find(str1, str2, ...), ...);}
 	 * @param c      Content to type, Object.toString() in used to get string
@@ -1030,7 +1074,7 @@ public class Common {
 	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
 	 * {@code pasteProbability} set to {@value 0} and {@code secret} set to
 	 * {@value false}
-	 * 
+	 *
 	 * @param e WebElement to type into
 	 * @param c Content to type, Object.toString() in used to get string
 	 *          representation
@@ -1043,7 +1087,7 @@ public class Common {
 	/**
 	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
 	 * {@code pasteProbability} set to {@value 0}
-	 * 
+	 *
 	 * @param e      WebElement to type into
 	 * @param c      Content to type, Object.toString() in used to get string
 	 *               representation
@@ -1058,7 +1102,7 @@ public class Common {
 	/**
 	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
 	 * {@code secret} set to {@value false}
-	 * 
+	 *
 	 * @param e  WebElement to type into
 	 * @param c  Content to type, Object.toString() in used to get string
 	 *           representation
@@ -1072,7 +1116,7 @@ public class Common {
 
 	/**
 	 * Simulate typing the value into the WebElement
-	 * 
+	 *
 	 * @param e      WebElement to type into
 	 * @param c      Content to type, Object.toString() in used to get string
 	 *               representation
@@ -1084,26 +1128,25 @@ public class Common {
 	 */
 	public boolean typeInto(WebElement e, Object c, double pp, boolean secret) {
 		CharSequence symbols = String.valueOf(c);
-		l.log("Typing '" + ((secret) ? "•".repeat(symbols.length()) : c) + "' into " + describe(e));
+		this.l.log("Typing '" + (secret ? "•".repeat(symbols.length()) : c) + "' into " + describe(e));
 		try {
 			if (isTrue(pp)) {
 				// simulation of pasting from clipboard by instant addition of all content
 				e.sendKeys(symbols);
 				return true;
-			} else {
-				char[] chars = symbols.toString().toCharArray();
-				for (char ch : chars) {
-					sleep(integer(0, 50), true); // silent sleep
-					e.sendKeys(String.valueOf(ch));
-				}
-				return false;
 			}
+			char[] chars = symbols.toString().toCharArray();
+			for (char ch : chars) {
+				sleep(integer(0, 50), true); // silent sleep
+				e.sendKeys(String.valueOf(ch));
+			}
+			return false;
 		} catch (Exception ex) {
 			logProblem(Severity.S2,
 					"Exception " + ex.getClass().getName() + " caught while trying to type '"
-							+ ((secret) ? "•".repeat(symbols.length()) : c) + "' into " + describe(e)
+							+ (secret ? "•".repeat(symbols.length()) : c) + "' into " + describe(e)
 							+ ", attempting workaround ...");
-			Actions action = new Actions(x.d);
+			Actions action = new Actions(this.x.d);
 			action.moveToElement(e).click().sendKeys(String.valueOf(c)).build().perform();
 			return true;
 		}
@@ -1114,13 +1157,13 @@ public class Common {
 	 * @param name     filename of file to upload
 	 */
 	public void upload(String uploader, String name) {
-		l.log("Uploading '" + name + "' through " + uploader);
+		this.l.log("Uploading '" + name + "' through " + uploader);
 		find(false, false, uploader).sendKeys(System.getProperty("user.dir") + "/" + RESOURCES + name);
 	}
 
 	/**
 	 * Verify that defined element is enabled and then click on it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void verifyThenClick(String lc) {
@@ -1131,7 +1174,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void wait(String lc) {
@@ -1140,7 +1183,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void wait(String[] lc) {
@@ -1149,37 +1192,37 @@ public class Common {
 
 	/**
 	 * Wait for an element to be clickable
-	 * 
+	 *
 	 * @param lc string locator of an element expected to be clickable
 	 */
 	public void waitClickable(String lc) {
-		l.log("Waiting for clickability of " + lc);
-		w.until(ExpectedConditions.elementToBeClickable(by(lc)));
+		this.l.log("Waiting for clickability of " + lc);
+		this.w.until(ExpectedConditions.elementToBeClickable(by(lc)));
 	}
 
 	/**
 	 * Wait for an element to be not visible
-	 * 
+	 *
 	 * @param lc string locator of an element expected to be invisible
 	 */
 	public void waitInvisibility(String lc) {
-		l.log("Waiting for invisibility of " + lc);
-		w.until(ExpectedConditions.invisibilityOfElementLocated(by(lc)));
+		this.l.log("Waiting for invisibility of " + lc);
+		this.w.until(ExpectedConditions.invisibilityOfElementLocated(by(lc)));
 	}
 
 	/**
 	 * Wait for an element to be selected
-	 * 
+	 *
 	 * @param lc string locator of an element expected to be selected
 	 */
 	public void waitSeleted(String lc) {
-		l.log("Waiting for " + lc + "to be selected");
-		w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
+		this.l.log("Waiting for " + lc + "to be selected");
+		this.w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
 	}
 
 	/**
 	 * Wait for appearance of the defined element and the click on it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 * @param x
 	 * @param y
@@ -1191,7 +1234,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element and the click on it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void waitThenClick(String lc) {
@@ -1201,7 +1244,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element and the click on it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void waitThenClick(String[] lc) {
@@ -1211,7 +1254,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element and return reference to it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 * @return element
 	 */
@@ -1222,7 +1265,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element and return reference to it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 * @return element
 	 */
@@ -1233,61 +1276,62 @@ public class Common {
 
 	/**
 	 * Wait for a text value of an element to be as defined
-	 * 
+	 *
 	 * @param lc string locator of an element
 	 * @param s  expected value
 	 */
 	public void waitValue(String lc, String s) {
-		l.log("Waiting for " + lc + " to have value '" + s + "'");
-		w.until(ExpectedConditions.textToBe(by(lc), s));
+		this.l.log("Waiting for " + lc + " to have value '" + s + "'");
+		this.w.until(ExpectedConditions.textToBe(by(lc), s));
 	}
 
 	/**
 	 * Wait for a text value of an element to change from defined one
-	 * 
+	 *
 	 * @param lc string locator of an element
 	 * @param s  the value to change from
 	 * @return value after the detected change
 	 */
 	public String waitValueNot(String lc, String s) {
-		l.log("Waiting while " + lc + " still have value '" + s + "'");
-		w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), s)));
+		this.l.log("Waiting while " + lc + " still have value '" + s + "'");
+		this.w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), s)));
 		return read(lc);
 	}
 
 	/**
 	 * Wait for a text value to be not empty
-	 * 
+	 *
 	 * @param lc string locator of an element
 	 * @return value after the detected change
 	 */
 	public String waitValueNotEmpty(String lc) {
-		l.log("Waiting while " + lc + " is still empty");
-		w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), "")));
+		// TODO: this routine seems to be working not as expected
+		this.l.log("Waiting while " + lc + " is still empty");
+		this.w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), "")));
 		sleep(333);
 		String t = read(lc);
-		l.log("The text of " + lc + " is now '" + t + "'");
+		this.l.log("The text of " + lc + " is now '" + t + "'");
 		return t;
 	}
 
 	/**
 	 * Wait for appearance of the defined element
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void waitVisibility(String lc) {
-		l.log("Waiting for visibility of " + lc);
-		w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
+		this.l.log("Waiting for visibility of " + lc);
+		this.w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
 	}
 
 	/**
 	 * Wait for appearance of the defined element
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void waitVisibility(String[] lc) {
-		l.log("Waiting for visibility of " + Arrays.toString(lc));
-		w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
+		this.l.log("Waiting for visibility of " + Arrays.toString(lc));
+		this.w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
 	}
 
 }

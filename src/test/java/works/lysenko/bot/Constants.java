@@ -10,6 +10,7 @@ public class Constants { // C for Constants & Common
 	public static final String TEST = (null == System.getenv("TEST")) ? DEFAULT_TEST : System.getenv("TEST");
 
 	// try to increase this limit and see the failures
+	@SuppressWarnings("boxing")
 	public static final Integer MAX_QUOTE_LENGHT_FOR_BUTTONS = 30;
 	// Selectors
 	public static final String GOOGLE_INPUT = "//input[@class='gLFyf gsfi']";
@@ -18,6 +19,7 @@ public class Constants { // C for Constants & Common
 	// public static final String GOOGLE_LUCKY_BUTTON = "//input[@name='btnI']";
 	public static final String GOOGLE_LUCKY_BUTTON = "//form/div/div/div/center/input[2]";
 
+	@SuppressWarnings("boxing")
 	public static final boolean quoteShortEnough(Execution x) {
 		return (null == x.data.get("quote")) ? true
 				: (Integer) x.data.get("quote") < Constants.MAX_QUOTE_LENGHT_FOR_BUTTONS;

@@ -33,23 +33,10 @@ public enum Ansi {
 	BLUE_BACKGROUND_BRIGHT("\033[0;104m"), MAGENTA_BACKGROUND_BRIGHT("\033[0;105m"),
 	CYAN_BACKGROUND_BRIGHT("\033[0;106m"), WHITE_BACKGROUND_BRIGHT("\033[0;107m");
 
-	private final String code;
-
-	Ansi(String code) {
-		this.code = code;
-	}
-
-	/**
-	 * @return ANSI code for color
-	 */
-	public String code() {
-		return code;
-	}
-
 	/**
 	 * Execute {@link Ansi#colorize(s)} based on content of the provided sting.
 	 * Contents - to - color mapping defined in {@link works.lysenko.enums.Severity}
-	 * 
+	 *
 	 * @param s string to be colored
 	 * @return same string with added ANSI coloring escape sequences
 	 */
@@ -62,17 +49,30 @@ public enum Ansi {
 
 	/**
 	 * Wrap a sting into ANSI escape sequence of defined color
-	 * 
+	 *
 	 * @param s string to be colored
 	 * @param c color escape sequence to be applied
 	 * @return string surrounded by defined color sequence and RESET
 	 */
 	public static String colorize(String s, Ansi c) {
-		return (c == null) ? s : c.code() + s + Ansi.RESET.code();
+		return c == null ? s : c.code() + s + Ansi.RESET.code();
 	}
 
 	public static String y(Object s) {
 		return colorize(String.valueOf(s), YELLOW_BOLD);
+	}
+
+	private final String code;
+
+	Ansi(String code) {
+		this.code = code;
+	}
+
+	/**
+	 * @return ANSI code for color
+	 */
+	public String code() {
+		return this.code;
 	}
 
 }

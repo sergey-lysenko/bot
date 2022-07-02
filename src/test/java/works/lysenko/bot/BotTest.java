@@ -24,13 +24,8 @@ public class BotTest {
 		x.complete();
 	}
 
-	public static void init(Execution x) {
-
-	}
-
 	@Test
-	public void test() throws InterruptedException {
-		init(x);
+	public static void test() {
 		cycles.execute();
 	}
 }

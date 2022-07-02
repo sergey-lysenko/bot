@@ -16,11 +16,11 @@ public class Search extends AbstractLeafScenario {
 	public void action() {
 		section("Pressing 'Search' button");
 		findThenClick(GOOGLE_SEARCH_BUTTON);
-		makeScreenshot("cycle" + x.currentCycle() + "-" + name());
+		makeScreenshot("cycle" + this.x.currentCycle() + "-" + name());
 	}
 
 	@Override
 	public boolean sufficed() {
-		return quoteShortEnough(x);
+		return quoteShortEnough(this.x);
 	}
 }

@@ -7,35 +7,45 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.opera.OperaDriver;
-import org.openqa.selenium.opera.OperaOptions;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import works.lysenko.enums.Platform;
 
-@SuppressWarnings("javadoc")
+/**
+ * @author Sergii Lysenko
+ */
 public class WebDrivers {
 
+	/**
+	 * @return default Chrome {@link org.openqa.selenium.WebDriver} instance
+	 */
 	public static WebDriver get() {
 		return get(Platform.CHROME, false);
 	}
 
-	public static WebDriver get(Platform browser) {
-		return get(browser, false);
+	/**
+	 * @param p {@link works.lysenko.enums.Platform} to create
+	 *          {@link org.openqa.selenium.WebDriver} for
+	 * @return correspondent {@link org.openqa.selenium.WebDriver} object
+	 */
+	public static WebDriver get(Platform p) {
+		return get(p, false);
 	}
 
-	public static WebDriver get(Platform browser, boolean maximize) {
+	/**
+	 * @param p        {@link works.lysenko.enums.Platform} to create
+	 *                 {@link org.openqa.selenium.WebDriver} for
+	 * @param maximize the browser window of not
+	 * @return correspondent {@link org.openqa.selenium.WebDriver} object
+	 */
+	public static WebDriver get(Platform p, boolean maximize) {
 		WebDriver d = null;
-		switch (browser) {
+		switch (p) {
 		case FIREFOX:
 			WebDriverManager.firefoxdriver().setup();
 			d = new FirefoxDriver(getFireFoxOptions());
-			break;
-		case OPERA:
-			WebDriverManager.operadriver().setup();
-			d = new OperaDriver(getOperaOptions());
 			break;
 		case EDGE:
 			WebDriverManager.edgedriver().setup();
@@ -55,7 +65,8 @@ public class WebDrivers {
 			System.exit(3);
 		}
 		if (maximize)
-			d.manage().window().maximize();
+			if (null != d)
+				d.manage().window().maximize();
 		return d;
 	}
 
@@ -73,19 +84,14 @@ public class WebDrivers {
 		return options;
 	}
 
-	private static FirefoxOptions getFireFoxOptions() {
-		FirefoxOptions options = new FirefoxOptions();
-		options.setCapability("devtools.console.stdout.content", true);
-		return options;
-	}
-
 	private static EdgeOptions getEdgeOptions() {
 		EdgeOptions options = new EdgeOptions();
 		return options;
 	}
 
-	private static OperaOptions getOperaOptions() {
-		OperaOptions options = new OperaOptions();
+	private static FirefoxOptions getFireFoxOptions() {
+		FirefoxOptions options = new FirefoxOptions();
+		options.setCapability("devtools.console.stdout.content", true);
 		return options;
 	}
 

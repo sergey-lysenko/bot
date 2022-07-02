@@ -17,7 +17,7 @@ public class Enter extends AbstractLeafScenario {
 	public void action() {
 		section("Pressing 'Enter' button");
 		sendKeys(GOOGLE_INPUT, Keys.ENTER);
-		makeScreenshot("cycle" + x.currentCycle() + "-" + name());
+		makeScreenshot("cycle" + this.x.currentCycle() + "-" + name());
 	}
 
 	@Override

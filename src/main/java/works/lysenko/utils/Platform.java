@@ -1,17 +1,13 @@
 package works.lysenko.utils;
 
 /**
+ * Supported platforms
+ *
  * @author Sergii Lysenko
  */
 @SuppressWarnings("javadoc")
 public enum Platform {
 	CHROME("Chrome"), FIREFOX("Firefox"), OPERA("Opera"), EDGE("Edge"), ANDROID("Android"), SAFARI("Safari");
-
-	private String name;
-
-	Platform(String name) {
-		this.name = name;
-	}
 
 	public static Platform get(String string) {
 		switch (string) {
@@ -32,7 +28,13 @@ public enum Platform {
 		}
 	}
 
+	private String name;
+
+	Platform(String name) {
+		this.name = name;
+	}
+
 	public String getName() {
-		return name;
+		return this.name;
 	}
 }

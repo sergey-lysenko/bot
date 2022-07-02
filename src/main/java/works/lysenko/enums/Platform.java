@@ -3,22 +3,40 @@ package works.lysenko.enums;
 /**
  * @author Sergii Lysenko
  */
-@SuppressWarnings("javadoc")
 public enum Platform {
-	CHROME("Chrome"), FIREFOX("Firefox"), OPERA("Opera"), EDGE("Edge"), ANDROID("Android"), SAFARI("Safari");
+	/**
+	 * Chrome
+	 */
+	CHROME("Chrome"),
 
-	private String title;
+	/**
+	 * Firefox
+	 */
+	FIREFOX("Firefox"),
 
-	Platform(String title) {
-		this.title = title;
-	}
+	/**
+	 * Edge
+	 */
+	EDGE("Edge"),
 
-	public static Platform get(String string) {
-		switch (string) {
+	/**
+	 * Android
+	 */
+	ANDROID("Android"),
+
+	/**
+	 * Safari
+	 */
+	SAFARI("Safari");
+
+	/**
+	 * @param s
+	 * @return Platform by String
+	 */
+	public static Platform get(String s) {
+		switch (s) {
 		case "Firefox":
 			return FIREFOX;
-		case "Opera":
-			return OPERA;
 		case "Edge":
 			return EDGE;
 		case "Safari":
@@ -32,7 +50,16 @@ public enum Platform {
 		}
 	}
 
+	private String title;
+
+	Platform(String title) {
+		this.title = title;
+	}
+
+	/**
+	 * @return title of this Platform
+	 */
 	public String title() {
-		return title;
+		return this.title;
 	}
 }

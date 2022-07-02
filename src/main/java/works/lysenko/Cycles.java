@@ -45,15 +45,29 @@ public class Cycles {
 	private String root = DEFAULT_ROOT;
 
 	/**
+	 * @param s
+	 * @param x
+	 */
+	public Cycles(Execution x) {
+		super();
+		this.x = x;
+		this.root = x._root();
+		this.scenarios = new Scenarios(x);
+		this.scenarios.add(ScenarioLoader.read(this.root, x), x);
+		this.cyclesToDo = x._cycles();
+		x.cycles = this;
+	}
+
+	/**
 	 * @param ss
 	 * @param x
 	 */
 	public Cycles(Set<Scenario> ss, Execution x) {
 		super();
 		this.x = x;
-		scenarios = new Scenarios(x);
-		scenarios.add(ss, x);
-		cyclesToDo = x._cycles();
+		this.scenarios = new Scenarios(x);
+		this.scenarios.add(ss, x);
+		this.cyclesToDo = x._cycles();
 		x.cycles = this;
 	}
 
@@ -64,55 +78,10 @@ public class Cycles {
 	public Cycles(String s, Execution x) {
 		super();
 		this.x = x;
-		scenarios = new Scenarios(x);
-		scenarios.add(ScenarioLoader.read(s, x), x);
-		cyclesToDo = x._cycles();
+		this.scenarios = new Scenarios(x);
+		this.scenarios.add(ScenarioLoader.read(s, x), x);
+		this.cyclesToDo = x._cycles();
 		x.cycles = this;
-	}
-
-	/**
-	 * @param s
-	 * @param x
-	 */
-	public Cycles(Execution x) {
-		super();
-		this.x = x;
-		root = x._root();
-		scenarios = new Scenarios(x);
-		scenarios.add(ScenarioLoader.read(root, x), x);
-		cyclesToDo = x._cycles();
-		x.cycles = this;
-	}
-
-	/**
-	 * Execute configured cycles
-	 */
-	public void execute() {
-		try {
-			if (cyclesToDo == 0)
-				x.l.logProblem(S2, "No test cycles were perfomed");
-			x.l.log(0, "Executing " + y(x._cycles()) + " cycle(s) of " + x.testDescription());
-			while (cyclesToDo > 0) {
-				scenarios.execute();
-				x.l.logln();
-				if (--cyclesToDo > 0)
-					x.l.log(0, "Cycles to do: " + y(cyclesToDo));
-			}
-			x.o.writeDefConf(defConf());
-			if (x.propEmpty())
-				x.l.logProblem(S3,
-						"Test properties are absent. Wrong configuration? Template of Test Run Properties file '"
-								+ GENERATED_CONFIG_FILE + "' was updated");
-			if (x.service != null) {
-				x.l.log("Closing test service ...");
-				x.service.close();
-				x.l.log(" ... done.");
-			}
-		} catch (Exception e) {
-			x.exception = e;
-			x.l.logProblem(S1, "Uncaught exception during cycles execution: " + e.getMessage());
-			throw e;
-		}
 	}
 
 	/**
@@ -120,19 +89,51 @@ public class Cycles {
 	 */
 	public Set<String> defConf() {
 		Set<String> c = new SortedStringSet();
-		c.add("_" + CONFIGURATION_ROOT + " = " + root);
+		c.add("_" + CONFIGURATION_ROOT + " = " + this.root);
 		c.add("_" + CONFIGURATION_DEBUG + " = " + DEFAULT_DEBUG);
 		c.add("_" + CONFIGURATION_CYCLES + " = " + DEFAULT_CYCLES);
 		c.add("_" + CONFIGURATION_CONJOINT + " = " + DEFAULT_CONJOINT);
 		c.add("_" + CONFIGURATION_UPSTREAM + " = " + DEFAULT_UPSTREAM);
 		c.add("_" + CONFIGURATION_DOWNSTREAM + " = " + DEFAULT_DOWNSTREAM);
-		scenarios.list().forEach((s) -> {
-			c.add(StringUtils.removeStart(s.name(), x._root().concat(".")) + " = " + DEFAULT_WEIGHT);
+		this.scenarios.list().forEach(s -> {
+			c.add(StringUtils.removeStart(s.name(), this.x._root().concat(".")) + " = " + DEFAULT_WEIGHT);
 		});
 		return c;
 	}
 
+	/**
+	 * Execute configured cycles
+	 */
+	@SuppressWarnings("boxing")
+	public void execute() {
+		try {
+			if (this.cyclesToDo == 0)
+				this.x.l.logProblem(S2, "No test cycles were perfomed");
+			this.x.l.log(0, "Executing " + y(this.x._cycles()) + " cycle(s) of " + this.x.testDescription());
+			while (this.cyclesToDo > 0) {
+				this.scenarios.execute();
+				this.x.l.logln();
+				if (--this.cyclesToDo > 0)
+					this.x.l.log(0, "Cycles to do: " + y(this.cyclesToDo));
+			}
+			Output.writeDefConf(defConf());
+			if (this.x.propEmpty())
+				this.x.l.logProblem(S3,
+						"Test properties are absent. Wrong configuration? Template of Test Run Properties file '"
+								+ GENERATED_CONFIG_FILE + "' was updated");
+			if (this.x.service != null) {
+				this.x.l.log("Closing test service ...");
+				this.x.service.close();
+				this.x.l.log(" ... done.");
+			}
+		} catch (Exception e) {
+			this.x.exception = e;
+			this.x.l.logProblem(S1, "Uncaught exception during cycles execution: " + e.getMessage());
+			throw e;
+		}
+	}
+
 	protected Set<Scenario> scenariosList() {
-		return scenarios.list();
+		return this.scenarios.list();
 	}
 }
