@@ -25,6 +25,7 @@ public class Problem {
 		this.text = s;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		return "(" + this.time + ") " + this.text;

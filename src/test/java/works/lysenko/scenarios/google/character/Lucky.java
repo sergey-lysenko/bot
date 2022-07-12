@@ -1,5 +1,6 @@
 package works.lysenko.scenarios.google.character;
 
+import static works.lysenko.Constants.u002D;
 import static works.lysenko.bot.Constants.GOOGLE_LUCKY_BUTTON;
 import static works.lysenko.bot.Constants.quoteShortEnough;
 
@@ -12,11 +13,12 @@ public class Lucky extends AbstractLeafScenario {
 		super(x);
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public void action() {
 		section("Pressing 'Search' button");
 		findThenClick(GOOGLE_LUCKY_BUTTON);
-		makeScreenshot("cycle" + this.x.currentCycle() + "-" + name());
+		makeScreenshot("cycle" + this.x.currentCycle() + u002D + name());
 	}
 
 	@Override

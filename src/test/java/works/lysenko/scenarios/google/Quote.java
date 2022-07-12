@@ -17,7 +17,7 @@ public class Quote extends AbstractNodeScenario {
 		super(x, new Search(x), new Lucky(x), new Enter(x));
 	}
 
-	@SuppressWarnings("boxing")
+	@SuppressWarnings({ "boxing", "nls" })
 	@Override
 	public void action() {
 		section("Typing random Quote into search query input");

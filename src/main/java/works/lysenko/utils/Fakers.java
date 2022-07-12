@@ -1,5 +1,7 @@
 package works.lysenko.utils;
 
+import static works.lysenko.Constants.EMPTY;
+
 import com.github.javafaker.Faker;
 
 import works.lysenko.Common;
@@ -77,7 +79,7 @@ public class Fakers {
 			quote = new Faker().zelda().character();
 			break;
 		default:
-			quote = "";
+			quote = EMPTY;
 			break;
 		}
 		return quote;
@@ -155,7 +157,7 @@ public class Fakers {
 			quote = new Faker().yoda().quote();
 			break;
 		default:
-			quote = "";
+			quote = EMPTY;
 			break;
 		}
 		return quote;

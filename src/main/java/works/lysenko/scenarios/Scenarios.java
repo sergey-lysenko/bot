@@ -2,6 +2,11 @@ package works.lysenko.scenarios;
 
 import static works.lysenko.Constants.DEFAULT_SUFFICIENCY_RETRIES;
 import static works.lysenko.Constants.DEFAULT_WEIGHT;
+import static works.lysenko.Constants.EMPTY;
+import static works.lysenko.Constants.MASKED_DOT;
+import static works.lysenko.Constants.NaN;
+import static works.lysenko.Constants.u002D;
+import static works.lysenko.Constants.u002E;
 import static works.lysenko.enums.Severity.S2;
 import static works.lysenko.enums.Severity.S3;
 
@@ -42,10 +47,10 @@ public class Scenarios extends Common {
 	 */
 	@SuppressWarnings("boxing")
 	private static double weight(Scenario s, Execution x) {
-		String propName = StringUtils.removeStart(s.getClass().getName(), x._root().concat("."));
+		String propName = StringUtils.removeStart(s.getClass().getName(), x._root().concat(u002E));
 		String propValue = x.prop(propName, DEFAULT_WEIGHT);
-		if (propValue.equals("-"))
-			propValue = "NaN";
+		if (propValue.equals(u002D))
+			propValue = NaN;
 		Double d = Double.valueOf(propValue);
 		return d.equals(Double.POSITIVE_INFINITY) ? Double.MAX_VALUE : d;
 	}
@@ -92,7 +97,7 @@ public class Scenarios extends Common {
 	/**
 	 * Add single {@link works.lysenko.scenarios.Scenario} with defined weight
 	 *
-	 * @param s Scenario to be added
+	 * @param s  Scenario to be added
 	 * @param dw weight coefficient for this Scenario
 	 */
 	public void add(Scenario s, double dw) {
@@ -103,7 +108,7 @@ public class Scenarios extends Common {
 	 * Add single {@link works.lysenko.scenarios.Scenario} and read it's weight from
 	 * execution configuration file
 	 *
-	 * @param s Scenario to be added
+	 * @param s  Scenario to be added
 	 * @param ex reference to active {@link works.lysenko.Execution} instance
 	 */
 	public void add(Scenario s, Execution ex) {
@@ -114,7 +119,7 @@ public class Scenarios extends Common {
 	 * Add set of {@link works.lysenko.scenarios.Scenario} with same weight
 	 *
 	 * @param ss set of Scenarios to be added
-	 * @param dw  [same] weight of all Scenarios of this set
+	 * @param dw [same] weight of all Scenarios of this set
 	 */
 	public void add(Set<Scenario> ss, double dw) {
 		ss.forEach(s -> {
@@ -189,7 +194,7 @@ public class Scenarios extends Common {
 	 * (as long as its {@link works.lysenko.scenarios.Scenario#action()} had already
 	 * been executed before attempt of nested scenario selection)
 	 */
-	@SuppressWarnings("boxing")
+	@SuppressWarnings({ "boxing", "nls" })
 	public void execute() {
 		int ret = this.retries;
 		double downstreamWeight = 0.0;
@@ -294,18 +299,18 @@ public class Scenarios extends Common {
 	private static String list(Iterable<Pair<Scenario, Double>> list, boolean includeZeroWeight) {
 		try {
 			String qualifiedName = list.iterator().next().getKey().getClass().getName();
-			String[] nameParts = qualifiedName.split("\\."); // this is just twice escaped dot symbol
+			String[] nameParts = qualifiedName.split(MASKED_DOT); // this is just twice escaped dot symbol
 			String scenarioClassName = nameParts[nameParts.length - 1]; // last one
-			String packagePart = qualifiedName.replace(scenarioClassName, "");
+			String packagePart = qualifiedName.replace(scenarioClassName, EMPTY);
 			// Creating the set of Strings representing nested scenarios
 			Set<String> c = new TreeSet<>();
 			list.forEach(s -> {
 				if (s.getValue() > 0 || includeZeroWeight)
-					c.add(s.getKey().getClass().getName().toString().replace(packagePart, ""));
+					c.add(s.getKey().getClass().getName().toString().replace(packagePart, EMPTY));
 			});
 			return packagePart + c.toString();
 		} catch (@SuppressWarnings("unused") NoSuchElementException e) {
-			return "Ø";
+			return "Ø"; //$NON-NLS-1$
 		}
 	}
 

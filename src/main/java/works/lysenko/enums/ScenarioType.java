@@ -8,17 +8,17 @@ public enum ScenarioType {
 	/**
 	 * Leaf
 	 */
-	LEAF("◆"),
+	LEAF("◆"), //$NON-NLS-1$
 	
 	/**
 	 * Node
 	 */
-	NODE("▷"),
+	NODE("▷"), //$NON-NLS-1$
 	
 	/**
 	 * Mono
 	 */
-	MONO("◼");
+	MONO("◼"); //$NON-NLS-1$
 
 	private String tag;
 

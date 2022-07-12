@@ -17,6 +17,7 @@ public class Character extends AbstractNodeScenario {
 		super(x, new Search(x), new Lucky(x), new Enter(x));
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public void action() {
 		section("Typing random Character into search query input");

@@ -1,6 +1,7 @@
 package works.lysenko;
 
 import static works.lysenko.Constants.STORED_BROWSERS_FILE;
+import static works.lysenko.Constants.u002C;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class Platforms {
 	private static List<Platform> load() {
 		List<String> browserNames = null;
 		try {
-			browserNames = Arrays.asList(Files.readString(Paths.get(STORED_BROWSERS_FILE)).split(",", -1));
+			browserNames = Arrays.asList(Files.readString(Paths.get(STORED_BROWSERS_FILE)).split(u002C, -1));
 		} catch (@SuppressWarnings("unused") IOException e) {
 			browserNames = new LinkedList<>();
 		}
@@ -55,12 +56,13 @@ public class Platforms {
 			browserNames.add(b.title());
 		new File(STORED_BROWSERS_FILE).getParentFile().mkdirs(); // Create parent directory
 		try {
-			Files.write(Paths.get(STORED_BROWSERS_FILE), StringUtils.join(browserNames, ',').getBytes());
+			Files.write(Paths.get(STORED_BROWSERS_FILE), StringUtils.join(browserNames, u002C).getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+	@SuppressWarnings({ "resource", "nls" })
 	private static List<Platform> scan() {
 		List<Platform> platforms = new LinkedList<>();
 		WebDriver d = null;

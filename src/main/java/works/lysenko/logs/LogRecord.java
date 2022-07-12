@@ -1,5 +1,9 @@
 package works.lysenko.logs;
 
+import static works.lysenko.Constants.u0020;
+import static works.lysenko.Constants.u005B;
+import static works.lysenko.Constants.u005D;
+
 import java.text.DecimalFormat;
 
 /**
@@ -13,7 +17,7 @@ public class LogRecord {
 	 */
 	@SuppressWarnings("boxing")
 	public static String renderTime(Long t) {
-		return "[" + new DecimalFormat("0000000.000").format(Double.valueOf(t) / 1000) + "]";
+		return u005B + new DecimalFormat("0000000.000").format(Double.valueOf(t) / 1000) + u005D; //$NON-NLS-1$
 	}
 
 	long time;
@@ -82,7 +86,7 @@ public class LogRecord {
 	 */
 	@SuppressWarnings("boxing")
 	public String render() {
-		return renderTime(this.time) + " " + this.data.render();
+		return renderTime(this.time) + u0020 + this.data.render();
 	}
 
 	/**
@@ -100,6 +104,7 @@ public class LogRecord {
 		return this.time;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		return "LogRecord [data=" + this.data + "time=" + this.time + "]";

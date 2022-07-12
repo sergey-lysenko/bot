@@ -1,5 +1,7 @@
 package works.lysenko.logs;
 
+import static works.lysenko.Constants.EMPTY;
+
 /**
  * @author Sergii Lysenko
  */
@@ -10,7 +12,7 @@ public class LineFeed extends AbstractLogData {
 	 */
 	public LineFeed() {
 		super();
-		this.text = "";
+		this.text = EMPTY;
 	}
 
 	@Override
@@ -25,7 +27,7 @@ public class LineFeed extends AbstractLogData {
 
 	@Override
 	public String toString() {
-		return "LineFeed";
+		return "LineFeed"; //$NON-NLS-1$
 	}
 
 }

@@ -1,8 +1,16 @@
 package works.lysenko;
 
+import static works.lysenko.Constants.EMPTY;
 import static works.lysenko.Constants.FILENAME;
+import static works.lysenko.Constants.LATEST;
 import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.RUN_LOG_FILENAME;
+import static works.lysenko.Constants.TEST;
+import static works.lysenko.Constants.u0020;
+import static works.lysenko.Constants.u002F;
+import static works.lysenko.Constants.u005B;
+import static works.lysenko.Constants.u005D;
+import static works.lysenko.Constants.u0073;
 import static works.lysenko.enums.Platform.CHROME;
 
 import java.io.BufferedWriter;
@@ -62,6 +70,7 @@ public class Logger {
 	 * @param x
 	 * @param logsToRead
 	 */
+	@SuppressWarnings("nls")
 	public Logger(Execution x, Set<String> logsToRead) {
 		super();
 		this.x = x;
@@ -108,7 +117,7 @@ public class Logger {
 	 *          this method
 	 * @param x
 	 */
-	@SuppressWarnings("boxing")
+	@SuppressWarnings({ "boxing", "nls" })
 	public void log(int l, String s, Long t) {
 		LogEntries ls;
 		LogRecord lr;
@@ -121,7 +130,7 @@ public class Logger {
 				for (LogEntry e : ls) {
 					long timestamp = e.getTimestamp() - this.x.t.startedAt(); // since test start
 					long difference = time - timestamp; // since capturing
-					this.log.add(problem(timestamp, depth, "[" + difference + "]" + " [BROWSER] " + e.toString()));
+					this.log.add(problem(timestamp, depth, u005B + difference + u005D + " [BROWSER] " + e.toString()));
 				}
 			}
 			if (this.logsToRead.contains(LogType.CLIENT)) {
@@ -157,6 +166,7 @@ public class Logger {
 		log(1, s);
 	}
 
+	@SuppressWarnings("nls")
 	private void logFile(String s) {
 		try {
 			if (null == this.logWriter)
@@ -175,9 +185,10 @@ public class Logger {
 	 * @param n  name of log file
 	 * @param ex extension of log file
 	 */
+	@SuppressWarnings({ "resource", "nls" })
 	public void logFile(String s, String n, String ex) {
-		String location = RUNS + this.x.parameters.get("TEST") + "/" + this.x.t.startedAt() + "/";
-		@SuppressWarnings("boxing")
+		String location = RUNS + this.x.parameters.get(TEST.toUpperCase()) + u002F + this.x.t.startedAt() + u002F;
+		@SuppressWarnings({ "boxing" })
 		String timestamp = String.format("%013d", this.x.t.millis());
 		String name = Common.fill(FILENAME, timestamp, n, ex);
 		String filename = location + name;
@@ -200,7 +211,7 @@ public class Logger {
 			e.printStackTrace();
 		}
 		// Path target = Paths.get(".", name);
-		Path link = Paths.get(location, Common.fill(FILENAME, "latest", n, ex));
+		Path link = Paths.get(location, Common.fill(FILENAME, LATEST, n, ex));
 		try {
 			// if (Files.exists(link))
 			Files.delete(link);
@@ -237,9 +248,10 @@ public class Logger {
 	@SuppressWarnings("boxing")
 	public void logProblem(Severity se, String st) {
 		int depth = this.x.currentDepth();
-		this.log.add(problem(this.x.timer(), depth, se.tag() + " " + st));
+		this.log.add(problem(this.x.timer(), depth, se.tag() + u0020 + st));
 	}
 
+	@SuppressWarnings("nls")
 	private LogRecord problem(long t, int d, String p) {
 		LogRecord lr;
 		Set<String> ki = this.x.getKnownIssue(p);
@@ -268,7 +280,7 @@ public class Logger {
 	private void process() {
 		while (!this.log.isEmpty()) {
 			long since = 0;
-			String debug = "";
+			String debug = EMPTY;
 			LogRecord r = this.log.poll();
 			Long time = r.time();
 			String line = r.render();
@@ -277,7 +289,7 @@ public class Logger {
 				int thisLength = String.valueOf(since).length();
 				if (thisLength > this.length)
 					this.length = thisLength;
-				debug = "[" + String.format("%1$" + this.length + "s", time - this.prev) + "]";
+				debug = u005B + String.format("%1$" + this.length + u0073, time - this.prev) + u005D; //$NON-NLS-1$
 			}
 			logConsole(debug + line);
 			logFile(debug + line);

@@ -14,6 +14,10 @@ import static works.lysenko.Constants.DEFAULT_ROOT;
 import static works.lysenko.Constants.DEFAULT_UPSTREAM;
 import static works.lysenko.Constants.DEFAULT_WEIGHT;
 import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
+import static works.lysenko.Constants.u0020;
+import static works.lysenko.Constants.u002E;
+import static works.lysenko.Constants.u003D;
+import static works.lysenko.Constants.u005F;
 import static works.lysenko.enums.Ansi.y;
 import static works.lysenko.enums.Severity.S1;
 import static works.lysenko.enums.Severity.S2;
@@ -88,15 +92,16 @@ public class Cycles {
 	 * @return default configuration properties
 	 */
 	public Set<String> defConf() {
+		String e = u0020 + u003D + u0020;
 		Set<String> c = new SortedStringSet();
-		c.add("_" + CONFIGURATION_ROOT + " = " + this.root);
-		c.add("_" + CONFIGURATION_DEBUG + " = " + DEFAULT_DEBUG);
-		c.add("_" + CONFIGURATION_CYCLES + " = " + DEFAULT_CYCLES);
-		c.add("_" + CONFIGURATION_CONJOINT + " = " + DEFAULT_CONJOINT);
-		c.add("_" + CONFIGURATION_UPSTREAM + " = " + DEFAULT_UPSTREAM);
-		c.add("_" + CONFIGURATION_DOWNSTREAM + " = " + DEFAULT_DOWNSTREAM);
+		c.add(u005F + CONFIGURATION_ROOT + e + this.root);
+		c.add(u005F + CONFIGURATION_DEBUG + e + DEFAULT_DEBUG);
+		c.add(u005F + CONFIGURATION_CYCLES + e + DEFAULT_CYCLES);
+		c.add(u005F + CONFIGURATION_CONJOINT + e + DEFAULT_CONJOINT);
+		c.add(u005F + CONFIGURATION_UPSTREAM + e + DEFAULT_UPSTREAM);
+		c.add(u005F + CONFIGURATION_DOWNSTREAM + e + DEFAULT_DOWNSTREAM);
 		this.scenarios.list().forEach(s -> {
-			c.add(StringUtils.removeStart(s.name(), this.x._root().concat(".")) + " = " + DEFAULT_WEIGHT);
+			c.add(StringUtils.removeStart(s.name(), this.x._root().concat(u002E)) + e + DEFAULT_WEIGHT);
 		});
 		return c;
 	}
@@ -104,7 +109,7 @@ public class Cycles {
 	/**
 	 * Execute configured cycles
 	 */
-	@SuppressWarnings("boxing")
+	@SuppressWarnings({ "boxing", "nls" })
 	public void execute() {
 		try {
 			if (this.cyclesToDo == 0)

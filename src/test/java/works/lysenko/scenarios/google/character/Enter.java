@@ -1,5 +1,6 @@
 package works.lysenko.scenarios.google.character;
 
+import static works.lysenko.Constants.u002D;
 import static works.lysenko.bot.Constants.GOOGLE_INPUT;
 
 import org.openqa.selenium.Keys;
@@ -13,11 +14,12 @@ public class Enter extends AbstractLeafScenario {
 		super(x);
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public void action() {
 		section("Pressing 'Enter' button");
 		sendKeys(GOOGLE_INPUT, Keys.ENTER);
-		makeScreenshot("cycle" + this.x.currentCycle() + "-" + name());
+		makeScreenshot("cycle" + this.x.currentCycle() + u002D + name());
 	}
 
 	@Override

@@ -10,6 +10,7 @@ public class Google extends AbstractNodeScenario {
 		super(x);
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public void action() {
 		section("Opening Google");

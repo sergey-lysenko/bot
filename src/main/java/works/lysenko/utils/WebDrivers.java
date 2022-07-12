@@ -61,7 +61,7 @@ public class WebDrivers {
 			// d = WebDriverManager.chromedriver().browserInDockerAndroid().create();
 			break;
 		default:
-			System.out.println("Browser not defined, testing is not possible");
+			System.out.println("Browser not defined, testing is not possible"); //$NON-NLS-1$
 			System.exit(3);
 		}
 		if (maximize)
@@ -70,6 +70,7 @@ public class WebDrivers {
 		return d;
 	}
 
+	@SuppressWarnings("nls")
 	private static ChromeOptions getChromeOptions() {
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("window-size=1920,1080");
@@ -91,7 +92,7 @@ public class WebDrivers {
 
 	private static FirefoxOptions getFireFoxOptions() {
 		FirefoxOptions options = new FirefoxOptions();
-		options.setCapability("devtools.console.stdout.content", true);
+		options.setCapability("devtools.console.stdout.content", true); //$NON-NLS-1$
 		return options;
 	}
 

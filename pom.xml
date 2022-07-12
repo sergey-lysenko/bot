@@ -4,12 +4,12 @@
 
 	<groupId>works.lysenko</groupId>
 	<artifactId>bot</artifactId>
-	<version>0.22.27.01</version>
+	<version>0.22.28.01</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.10</maven.compiler.source>
-		<maven.compiler.target>1.10</maven.compiler.target>
+		<maven.compiler.source>1.17</maven.compiler.source>
+		<maven.compiler.target>1.17</maven.compiler.target>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 
 		<!-- Dependencies versions -->

@@ -7,21 +7,21 @@ package works.lysenko.utils;
  */
 @SuppressWarnings("javadoc")
 public enum Platform {
-	CHROME("Chrome"), FIREFOX("Firefox"), OPERA("Opera"), EDGE("Edge"), ANDROID("Android"), SAFARI("Safari");
+	CHROME("Chrome"), FIREFOX("Firefox"), OPERA("Opera"), EDGE("Edge"), ANDROID("Android"), SAFARI("Safari"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 	public static Platform get(String string) {
 		switch (string) {
-		case "Firefox":
+		case "Firefox": //$NON-NLS-1$
 			return FIREFOX;
-		case "Opera":
+		case "Opera": //$NON-NLS-1$
 			return OPERA;
-		case "Edge":
+		case "Edge": //$NON-NLS-1$
 			return EDGE;
-		case "Safari":
+		case "Safari": //$NON-NLS-1$
 			return SAFARI;
-		case "Chrome":
+		case "Chrome": //$NON-NLS-1$
 			return CHROME;
-		case "Android":
+		case "Android": //$NON-NLS-1$
 			return ANDROID;
 		default:
 			return CHROME;

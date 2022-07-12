@@ -1,5 +1,9 @@
 package works.lysenko.output;
 
+import static works.lysenko.Constants.EMPTY;
+import static works.lysenko.Constants.MASKED_DOT;
+import static works.lysenko.Constants.u002E;
+
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -19,8 +23,8 @@ public class Groups extends TreeMap<String, TreeMap<String, Result>> {
 	public static Groups flence(TreeMap<String, Result> source) {
 		Groups g = new Groups();
 		for (Map.Entry<String, Result> e : source.entrySet()) {
-			String groupId = e.getKey().split("\\.")[0];
-			String newKey = e.getKey().replace(groupId + ".", "");
+			String groupId = e.getKey().split(MASKED_DOT)[0];
+			String newKey = e.getKey().replace(groupId + u002E, EMPTY);
 			Result newValue = e.getValue();
 			TreeMap<String, Result> newMap = null == g.get(groupId) ? new TreeMap<>() : g.get(groupId);
 			newMap.put(newKey, newValue);

@@ -33,7 +33,7 @@ public class AbstractNodeScenario extends AbstractScenario {
 		this.scenarios = new Scenarios(x);
 		String name = this.getClass().getName();
 		{ // Strings are immutable, we need to create a new one
-			int i = name.lastIndexOf(".") + 1; // save the position of character in question
+			int i = name.lastIndexOf(".") + 1; // save the position of character in question //$NON-NLS-1$
 			char[] nameChars = name.toCharArray(); // create character array
 			nameChars[i] = Character.toLowerCase(nameChars[i]); // Lowercase single char
 			name = String.valueOf(nameChars);

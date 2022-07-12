@@ -11,9 +11,10 @@ public class Severe extends AbstractProblemLogData {
 	 */
     public Severe(int depth, String text) {
 		super(depth, text);
-		this.tag = "[SEVERE]";
+		this.tag = "[SEVERE]"; //$NON-NLS-1$
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		return "Severe [depth=" + this.depth + ", tag=" + this.tag + ", text=" + this.text + "]";

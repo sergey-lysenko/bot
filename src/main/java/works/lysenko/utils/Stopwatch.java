@@ -1,5 +1,7 @@
 package works.lysenko.utils;
 
+import static works.lysenko.Constants._MS;
+
 /**
  * @author Sergii Lysenko
  */
@@ -24,7 +26,7 @@ public class Stopwatch {
 	 * @return readable string of Stopwatch uptime
 	 */
 	public String read() {
-		return String.valueOf(millis()) + " ms";
+		return String.valueOf(millis()) + _MS;
 	}
 
 	/**

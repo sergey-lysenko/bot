@@ -10,22 +10,22 @@ public enum Severity {
 	/**
 	 * Severe
 	 */
-	S1("[SEVERE]", Ansi.RED),
+	S1("[SEVERE]", Ansi.RED), //$NON-NLS-1$
 
 	/**
 	 * Warning
 	 */
-	S2("[WARNING]", Ansi.YELLOW),
+	S2("[WARNING]", Ansi.YELLOW), //$NON-NLS-1$
 
 	/**
 	 * Notice
 	 */
-	S3("[NOTICE]", Ansi.CYAN),
+	S3("[NOTICE]", Ansi.CYAN), //$NON-NLS-1$
 
 	/**
 	 * Known Issue
 	 */
-	SK("[KNOWN-ISSUE]", Ansi.MAGENTA);
+	SK("[KNOWN-ISSUE]", Ansi.MAGENTA); //$NON-NLS-1$
 
 	/**
 	 * @param s Code of Severity

@@ -1,9 +1,14 @@
 package works.lysenko;
 
+import static works.lysenko.Constants.CYCLES;
 import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
 import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.RUN_JSON_FILENAME;
 import static works.lysenko.Constants.RUN_SVG_FILENAME;
+import static works.lysenko.Constants.TEST;
+import static works.lysenko.Constants.u0020;
+import static works.lysenko.Constants.u002F;
+import static works.lysenko.Constants.u003A;
 import static works.lysenko.enums.Ansi.BLACK;
 import static works.lysenko.enums.Ansi.GREEN;
 import static works.lysenko.enums.Ansi.GREEN_BACKGROUND;
@@ -42,7 +47,7 @@ import works.lysenko.scenarios.Scenario;
 public class Output {
 
 	static String name(Execution x, String t) {
-		String path = RUNS + x.parameters.get("TEST") + "/";
+		String path = RUNS + x.parameters.get(TEST.toUpperCase()) + u002F;
 		String name = path + Common.fill(t, String.valueOf(x.t.startedAt()));
 		new File(path).mkdirs();
 		return name;
@@ -62,7 +67,7 @@ public class Output {
 	}
 
 	private void drawGroup(SVGGraphics2D g, int col, int[] dy, TreeMap<String, Result> sorted) {
-		Groups t = new Groups("cycles", sorted);
+		Groups t = new Groups(CYCLES, sorted);
 		for (Entry<String, TreeMap<String, Result>> group : t.entrySet())
 			drawGroup(g, null, col, dy, group);
 	}
@@ -102,8 +107,8 @@ public class Output {
 			else
 				g.setColor(new Color(255, 128, 0));
 			int myDy = dy[col]++;
-			myDys.put(sgr.getKey().toLowerCase().split(" ")[0], myDy);
-			g.drawString(sgr.getKey() + " : " + sgr.getValue().toString(), col * cW + 15, myDy * rH);
+			myDys.put(sgr.getKey().toLowerCase().split(u0020)[0], myDy);
+			g.drawString(sgr.getKey() + u0020 + u003A + u0020 + sgr.getValue().toString(), col * cW + 15, myDy * rH);
 		}
 
 		// Body
@@ -122,7 +127,7 @@ public class Output {
 	 * then manageable. File location defined by DEFAULT_RUNS_LOCATION, file name
 	 * template defined by RUN_JSON_FILENAME
 	 */
-	@SuppressWarnings("boxing")
+	@SuppressWarnings({ "boxing", "resource", "nls" })
 	protected void jsonStats() {
 		// TODO: migrate to Gson (?)
 		TreeMap<Scenario, Result> sorted = this.x.r.getSorted();
@@ -202,12 +207,12 @@ public class Output {
 	}
 
 	private void plaque(String message, Ansi foreground, Ansi background) {
-		this.x.l.log(0, colorize(colorize(" ".repeat(message.length()), background), foreground));
+		this.x.l.log(0, colorize(colorize(u0020.repeat(message.length()), background), foreground));
 		this.x.l.log(0, colorize(colorize(message, background), foreground));
-		this.x.l.log(0, colorize(colorize(" ".repeat(message.length()), background), foreground));
+		this.x.l.log(0, colorize(colorize(u0020.repeat(message.length()), background), foreground));
 	}
 
-	@SuppressWarnings("boxing")
+	@SuppressWarnings({ "boxing", "nls" })
 	protected void stats() {
 		// If scenarios stack is not empty at that point, it means that normal execution
 		// was halted due to an error
@@ -216,7 +221,7 @@ public class Output {
 
 		int total = this.x.cycles.scenarios.combinations(false);
 		int active = this.x.cycles.scenarios.combinations(true);
-		String persentage = new DecimalFormat("####0.0").format(Double.valueOf(active) / Double.valueOf(total) * 100)
+		String persentage = new DecimalFormat("####0.0").format(Double.valueOf(active) / Double.valueOf(total) * 100) //$NON-NLS-1$
 				+ "%";
 
 		// It works, but this is kinda wrong. It is very non-elegant cross-reference.
@@ -267,7 +272,8 @@ public class Output {
 			this.x.l.log(0, colorize("[WARNING] No Test Execution Data available"));
 		else
 			for (Entry<Scenario, Result> e : sorted.entrySet())
-				this.x.l.log(0, e.getKey().type().tag() + " " + e.getKey().shortName() + " : " + e.getValue().toString());
+				this.x.l.log(0,
+						e.getKey().type().tag() + " " + e.getKey().shortName() + " : " + e.getValue().toString());
 		this.x.l.logln();
 
 		// Result marker

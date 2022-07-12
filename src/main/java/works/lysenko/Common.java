@@ -1,9 +1,72 @@
 package works.lysenko;
 
+import static works.lysenko.Constants.ALL_;
+import static works.lysenko.Constants.BODY;
+import static works.lysenko.Constants.CAUGHT_;
+import static works.lysenko.Constants.CHECKING_;
+import static works.lysenko.Constants.CLEARING_;
+import static works.lysenko.Constants.CLICKABILITY_OF_;
+import static works.lysenko.Constants.CLICKING_;
+import static works.lysenko.Constants.EMPTY;
 import static works.lysenko.Constants.EXCEPTION_RETRIES;
+import static works.lysenko.Constants.E_IS_NULL;
+import static works.lysenko.Constants.FINDING_;
+import static works.lysenko.Constants.FOR_;
+import static works.lysenko.Constants.FROM_;
+import static works.lysenko.Constants.HTML;
+import static works.lysenko.Constants.HTTP;
+import static works.lysenko.Constants.INVISIBILITY_OF_;
+import static works.lysenko.Constants.OPENING_;
+import static works.lysenko.Constants.PNG;
+import static works.lysenko.Constants.READING_;
 import static works.lysenko.Constants.RESOURCES;
 import static works.lysenko.Constants.SCREENSHOTS;
-import static works.lysenko.Constants.SILENT_SLEEPING_TRESHHOLD;
+import static works.lysenko.Constants.SILENT_SLEEPING_TRESHOLD;
+import static works.lysenko.Constants.SLEEPING_;
+import static works.lysenko.Constants.SWITCHING_;
+import static works.lysenko.Constants.THE_TEXT_OF_;
+import static works.lysenko.Constants.TO_;
+import static works.lysenko.Constants.TO_BE_SELECTED;
+import static works.lysenko.Constants.TYPING_;
+import static works.lysenko.Constants.UPLOADING_;
+import static works.lysenko.Constants.USER_DIR;
+import static works.lysenko.Constants.VALUE;
+import static works.lysenko.Constants.VISIBILITY_OF_;
+import static works.lysenko.Constants.WAITING_;
+import static works.lysenko.Constants.WHETHER_;
+import static works.lysenko.Constants.WHILE_;
+import static works.lysenko.Constants.XML;
+import static works.lysenko.Constants._AFTER_CLEARING_;
+import static works.lysenko.Constants._AND_CHILD_;
+import static works.lysenko.Constants._BEFORE_CLEARING_;
+import static works.lysenko.Constants._DISABLED;
+import static works.lysenko.Constants._ELEMENTS;
+import static works.lysenko.Constants._EMPTY;
+import static works.lysenko.Constants._ENABLED;
+import static works.lysenko.Constants._HAVE_VALUE_;
+import static works.lysenko.Constants._INTO_;
+import static works.lysenko.Constants._IS;
+import static works.lysenko.Constants._MS;
+import static works.lysenko.Constants._NOW_;
+import static works.lysenko.Constants._S;
+import static works.lysenko.Constants._STILL;
+import static works.lysenko.Constants._TEXT_IN_;
+import static works.lysenko.Constants._THROUGH_;
+import static works.lysenko.Constants._TO;
+import static works.lysenko.Constants.u0020;
+import static works.lysenko.Constants.u0027;
+import static works.lysenko.Constants.u0028;
+import static works.lysenko.Constants.u002E;
+import static works.lysenko.Constants.u002F;
+import static works.lysenko.Constants.u003A;
+import static works.lysenko.Constants.u003D;
+import static works.lysenko.Constants.u003E;
+import static works.lysenko.Constants.u0040;
+import static works.lysenko.Constants.u0061;
+import static works.lysenko.Constants.u0073;
+import static works.lysenko.Constants.u2022;
+import static works.lysenko.Constants.u2191;
+import static works.lysenko.Constants.u2193;
 import static works.lysenko.enums.Platform.ANDROID;
 import static works.lysenko.enums.Platform.CHROME;
 import static works.lysenko.enums.Platform.FIREFOX;
@@ -64,8 +127,10 @@ public class Common {
 	 * @return proper locator object based on contents of source string contents
 	 */
 	public static By by(String lc) {
-		if (lc.substring(0, 2).equals("//") || lc.substring(0, 2).equals("./") || lc.substring(0, 3).equals(".//")
-				|| lc.substring(0, 4).equals("(.//"))
+		if (lc.substring(0, 2).equals(u002F + u002F) //
+				|| lc.substring(0, 2).equals(u002E + u002F) //
+				|| lc.substring(0, 3).equals(u002E + u002F + u002F) //
+				|| lc.substring(0, 4).equals(u0028 + u002E + u002F + u002F)) //
 			return By.xpath(lc);
 		return By.cssSelector(lc);
 	}
@@ -137,7 +202,7 @@ public class Common {
 	 */
 	public static boolean isTrue(double d) {
 		if (d > 1.0 || d < 0.0)
-			throw new IllegalArgumentException("Given probability " + d + " is outside the valid range of [0.0 - 1.0]");
+			throw new IllegalArgumentException("Given probability " + d + " is outside the valid range of [0.0 - 1.0]"); //$NON-NLS-1$ //$NON-NLS-2$
 		return new Random().nextFloat() < d;
 	}
 
@@ -149,7 +214,7 @@ public class Common {
 	 * @return requested sequence
 	 */
 	public static String repeat(Keys k, int t) {
-		String sequence = "";
+		String sequence = EMPTY;
 		for (int i = 0; i < t; i++)
 			sequence = sequence + k;
 		return sequence;
@@ -211,8 +276,8 @@ public class Common {
 	public static String timeH(long t) {
 		String s = String.valueOf(t);
 		if (s.length() > 3)
-			return String.valueOf(ArrayUtils.insert(s.length() - 3, String.valueOf(t).toCharArray(), '.')) + " s";
-		return s + " ms";
+			return String.valueOf(ArrayUtils.insert(s.length() - 3, String.valueOf(t).toCharArray(), '.')) + _S;
+		return s + _MS;
 	}
 
 	/**
@@ -233,9 +298,9 @@ public class Common {
 	public static String visualize(Keys k) {
 		switch (k) {
 		case ARROW_DOWN:
-			return "↓";
+			return u2193;
 		case ARROW_UP:
-			return "↑";
+			return u2191;
 		default:
 			return k.toString();
 		}
@@ -248,6 +313,7 @@ public class Common {
 	 * @param ss set of lines to be stored in a file
 	 * @param fn name of the file to be written
 	 */
+	@SuppressWarnings("resource")
 	public static void writeToFile(String fl, Set<String> ss, String fn) {
 		BufferedWriter writer;
 		try {
@@ -338,16 +404,16 @@ public class Common {
 	 * @param e        element to clear
 	 */
 	public void clear(boolean sendKeys, WebElement e) {
-		this.l.log("Clearing " + describe(e));
+		this.l.log(CLEARING_ + describe(e));
 		if (this.x._debug())
-			this.l.log(" text in " + describe(e) + " before clearing: '" + e.getAttribute("value") + "'");
+			this.l.log(_TEXT_IN_ + describe(e) + _BEFORE_CLEARING_ + quote(e.getAttribute(VALUE)));
 		if (sendKeys) {
-			e.sendKeys(Keys.CONTROL, "a");
+			e.sendKeys(Keys.CONTROL, u0061);
 			e.sendKeys(Keys.BACK_SPACE);
 		} else
 			e.clear();
 		if (this.x._debug())
-			this.l.log(" text in " + describe(e) + " after clearing: '" + e.getAttribute("value") + "'");
+			this.l.log(_TEXT_IN_ + describe(e) + _AFTER_CLEARING_ + quote(e.getAttribute(VALUE)));
 	}
 
 	/**
@@ -387,6 +453,7 @@ public class Common {
 	 * @param y
 	 * @param lc string locator(s) of element to be clicked on
 	 */
+	@SuppressWarnings("nls")
 	public void click(@SuppressWarnings("hiding") double x, double y, String... lc) {
 		this.l.log("Clicking " + describe(lc) + " at (x" + x + ",y" + y + ")");
 		this.l.log(2, "Locating the element " + describe(lc) + " ...");
@@ -415,21 +482,21 @@ public class Common {
 			do
 				try {
 					WebElement e = find(false, true, lc);
-					this.l.log("Clicking " + describe(lc));
+					this.l.log(CLICKING_ + describe(lc));
 					if (e != null) {
 						e.click();
 						done = true;
 					} else {
-						this.l.logProblem(Severity.S2, "e is null");
+						this.l.logProblem(Severity.S2, E_IS_NULL);
 						return;
 					}
 				} catch (StaleElementReferenceException ex) {
-					this.l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
-							+ ", while trying to click(), during attempt " + ++attempt + " ...");
+					this.l.logProblem(Severity.S2, CAUGHT_ + ex.getClass().getName()
+							+ ", while trying to click(), during attempt " + ++attempt + " ..."); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			while (!done && attempt <= EXCEPTION_RETRIES);
 		} else
-			this.l.logProblem(Severity.S3, "Empty locators list in click()");
+			this.l.logProblem(Severity.S3, "Empty locators list in click()"); //$NON-NLS-1$
 	}
 
 	/**
@@ -444,17 +511,17 @@ public class Common {
 	 * @param geometry
 	 */
 	public void click(WebElement e, boolean geometry) {
-		this.l.log("Clicking " + describe(e, true));
+		this.l.log(CLICKING_ + describe(e, true));
 		e.click();
 	}
 
 	private static String describe(Rectangle r) {
-		return "h" + r.height + " w" + r.width + " @ " + "x" + r.x + " y" + r.y;
+		return "h" + r.height + " w" + r.width + " @ " + "x" + r.x + " y" + r.y; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$//$NON-NLS-5$
 	}
 
 	private static String describe(String[] lc) {
 		if (lc.length == 0)
-			return "";
+			return EMPTY;
 		if (lc.length == 1)
 			return lc[0];
 		if (lc.length > 1)
@@ -467,9 +534,9 @@ public class Common {
 	}
 
 	private String describe(WebElement e, boolean geometry) {
-		String an = this.x.in(CHROME) ? e.getAccessibleName() : "";
+		String an = this.x.in(CHROME) ? e.getAccessibleName() : EMPTY;
 		String tg = e.getTagName();
-		return tg + (an.isEmpty() ? "" : " '" + an + "'") + (geometry ? " @ " + describe(e.getRect()) : "");
+		return tg + (an.isEmpty() ? EMPTY : u0020 + quote(an)) + (geometry ? u0040 + describe(e.getRect()) : EMPTY);
 	}
 
 	/**
@@ -499,27 +566,27 @@ public class Common {
 		do
 			try {
 				if (!silent && lc.length > 0)
-					this.l.log("Finding " + lc[0]);
+					this.l.log(FINDING_ + lc[0]);
 				if (lc.length == 0)
-					e = this.d.findElement(by("//body"));
+					e = this.d.findElement(by(BODY));
 				if (lc.length > 0)
 					e = this.d.findElement(by(lc[0]));
 				if (lc.length > 1)
 					for (int i = 1; i < lc.length; i++) {
 						if (!silent)
-							this.l.log(" ... and child " + lc[i]);
+							this.l.log(_AND_CHILD_ + lc[i]);
 						if (null != e)
 							e = e.findElement(by(lc[i]));
 					}
 				done = true;
 			} catch (TimeoutException | NoSuchElementException | StaleElementReferenceException ex) {
-				this.l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
-						+ ", while trying to find(), during attempt " + ++attempt + " ...");
+				this.l.logProblem(Severity.S2, CAUGHT_ + ex.getClass().getName()
+						+ ", while trying to find(), during attempt " + ++attempt + " ..."); //$NON-NLS-1$//$NON-NLS-2$
 				sleep(333);
 			}
 		while (!done && attempt < EXCEPTION_RETRIES);
 		if (attempt >= EXCEPTION_RETRIES) {
-			logProblem(Severity.S1, "Maximum retries amount reached, find() returns null, test failure imminent");
+			logProblem(Severity.S1, "Maximum retries amount reached, find() returns null, test failure imminent"); //$NON-NLS-1$
 			return null;
 		}
 		return scrollTo ? find(e) : e;
@@ -545,7 +612,7 @@ public class Common {
 	public WebElement find(WebElement e) {
 
 		if (in(FIREFOX))
-			((JavascriptExecutor) this.x.d).executeScript("arguments[0].scrollIntoView(true);", e);
+			((JavascriptExecutor) this.x.d).executeScript("arguments[0].scrollIntoView(true);", e); //$NON-NLS-1$
 		else {
 			Actions actions = new Actions(this.d);
 			actions.moveToElement(e);
@@ -571,7 +638,7 @@ public class Common {
 	 */
 	public List<WebElement> findAll(String lc) {
 		List<WebElement> e = this.d.findElements(by(lc));
-		this.l.log("Finding all " + lc + " > " + e.size() + " elements");
+		this.l.log(FINDING_ + ALL_ + lc + u003E + e.size() + _ELEMENTS);
 		return e;
 	}
 
@@ -592,8 +659,8 @@ public class Common {
 						target = e;
 				done = true;
 			} catch (TimeoutException ex) {
-				this.l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
-						+ ", while trying to findThenClick(), during attempt " + ++attempt + " ...");
+				this.l.logProblem(Severity.S2, CAUGHT_ + ex.getClass().getName()
+						+ ", while trying to findThenClick(), during attempt " + ++attempt + " ..."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		while (!done || attempt > EXCEPTION_RETRIES);
 		if (null != target)
@@ -649,7 +716,7 @@ public class Common {
 	 * @return true is this Web Element is disabled
 	 */
 	public boolean isDisabled(String lc) {
-		this.l.log("Checking whether " + lc + " is disabled");
+		this.l.log(CHECKING_ + WHETHER_ + lc + _IS + _DISABLED);
 		return !this.d.findElement(by(lc)).isEnabled();
 	}
 
@@ -658,7 +725,7 @@ public class Common {
 	 * @return true is this Web Element is disabled
 	 */
 	public boolean isEnabled(String lc) {
-		this.l.log("Checking whether " + lc + " is enabled");
+		this.l.log(CHECKING_ + WHETHER_ + lc + _IS + _ENABLED);
 		return this.d.findElement(by(lc)).isEnabled();
 	}
 
@@ -667,7 +734,7 @@ public class Common {
 	 * @return true is this Web Element is present in DOM
 	 */
 	public boolean isPresent(String lc) {
-		this.l.log("Checking visibility of " + lc);
+		this.l.log(CHECKING_ + VISIBILITY_OF_ + lc);
 		return !this.d.findElements(by(lc)).isEmpty();
 	}
 
@@ -701,7 +768,7 @@ public class Common {
 	}
 
 	private void makeCodeshot(String p, String f) {
-		String ext = this.x.in(ANDROID) ? ".xml" : ".html";
+		String ext = u002E + (this.x.in(ANDROID) ? XML : HTML);
 		try {
 			Files.writeString(Path.of(p, f + ext), this.d.getPageSource());
 		} catch (IOException e) {
@@ -738,7 +805,7 @@ public class Common {
 		else
 			src = ((TakesScreenshot) element).getScreenshotAs(OutputType.FILE);
 		try {
-			FileUtils.copyFile(src, new File(path + name + ".png"));
+			FileUtils.copyFile(src, new File(path + name + u002E + PNG));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -767,17 +834,17 @@ public class Common {
 			url = new URL(u);
 		} catch (@SuppressWarnings("unused") MalformedURLException e) {
 			try {
-				url = new URL("https://" + u);
+				url = new URL(HTTP + u0073 + u003A + u002F + u002F + u);
 			} catch (@SuppressWarnings("unused") MalformedURLException f1) {
 				try {
-					url = new URL("http://" + u);
+					url = new URL(HTTP + u003A + u002F + u002F + u);
 				} catch (MalformedURLException f2) {
 					f2.printStackTrace();
 				}
 			}
 		}
 		if (null != url) {
-			this.l.log("Opening " + url.toString());
+			this.l.log(OPENING_ + url.toString());
 			this.d.get(url.toString());
 		}
 	}
@@ -795,13 +862,13 @@ public class Common {
 			url = new URL(u);
 		} catch (@SuppressWarnings("unused") MalformedURLException e) {
 			try {
-				url = new URL(p + "://" + u);
+				url = new URL(p + u003A + u002F + u002F + u);
 			} catch (MalformedURLException f) {
 				f.printStackTrace();
 			}
 		}
 		if (null != url) {
-			this.l.log("Opening " + url.toString());
+			this.l.log(OPENING_ + url.toString());
 			this.d.get(url.toString());
 		}
 	}
@@ -817,6 +884,10 @@ public class Common {
 		this.w = this.x.w;
 	}
 
+	private static String quote(String s) {
+		return u0027 + s + u0027;
+	}
+
 	/**
 	 * Read contents of the element defined by string locator
 	 *
@@ -824,7 +895,7 @@ public class Common {
 	 * @return result of .getText() for this element
 	 */
 	public String read(String lc) {
-		this.l.log("Reading from " + lc);
+		this.l.log(READING_ + FROM_ + lc);
 		return this.d.findElement(by(lc)).getText();
 	}
 
@@ -847,7 +918,7 @@ public class Common {
 	 * @return result of .getText() for this element
 	 */
 	public String read(WebElement e, boolean geometry) {
-		this.l.log("Reading from " + describe(e, geometry));
+		this.l.log(READING_ + FROM_ + describe(e, geometry));
 		return e.getText();
 	}
 
@@ -871,8 +942,8 @@ public class Common {
 	 * @return contents of value attribute of the element
 	 */
 	public String readInput(String lc) {
-		this.l.log("Reading from " + lc);
-		return this.d.findElement(by(lc)).getAttribute("value");
+		this.l.log(READING_ + FROM_ + lc);
+		return this.d.findElement(by(lc)).getAttribute(VALUE);
 	}
 
 	/**
@@ -882,8 +953,8 @@ public class Common {
 	 * @return contents of value attribute of the element
 	 */
 	public String readInput(WebElement e) {
-		this.l.log("Reading from " + describe(e));
-		return e.getAttribute("value");
+		this.l.log(READING_ + FROM_ + describe(e));
+		return e.getAttribute(VALUE);
 	}
 
 	/**
@@ -903,7 +974,7 @@ public class Common {
 	 */
 	public void section(String s) {
 		this.l.logln();
-		this.l.log(0, Ansi.colorize("= " + s + " =", Ansi.BLUE_BOLD_BRIGHT));
+		this.l.log(0, Ansi.colorize(u003D + s + u003D, Ansi.BLUE_BOLD_BRIGHT));
 	}
 
 	/**
@@ -939,7 +1010,7 @@ public class Common {
 	}
 
 	private String shotLocation() {
-		return SCREENSHOTS + this.x.t.startedAt() + "/";
+		return SCREENSHOTS + this.x.t.startedAt() + u002F;
 	}
 
 	/**
@@ -968,9 +1039,10 @@ public class Common {
 	 * @param ms amount of milliseconds to pause for
 	 * @param s
 	 */
+	@SuppressWarnings("nls")
 	public void sleep(long ms, String s) {
-		if (ms < SILENT_SLEEPING_TRESHHOLD)
-			this.l.log(0, Ansi.colorize("[WARNING]: " + "Sleeping for less then " + SILENT_SLEEPING_TRESHHOLD
+		if (ms < SILENT_SLEEPING_TRESHOLD)
+			this.l.log(0, Ansi.colorize("[WARNING]: " + "Sleeping for less then " + SILENT_SLEEPING_TRESHOLD
 					+ " ms is better to be perfomed in silent mode"));
 		sleep(ms, s, false);
 	}
@@ -987,7 +1059,7 @@ public class Common {
 	public void sleep(long ms, String s, boolean silent) {
 		try {
 			if (!silent)
-				this.l.log(null == s ? "Sleeping " + ms + " ms" : s);
+				this.l.log(null == s ? SLEEPING_ + ms + _MS : s);
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -1000,7 +1072,7 @@ public class Common {
 	 * @param window handle to switch to
 	 */
 	public void switchTo(String window) {
-		this.l.log("Switching to " + window);
+		this.l.log(SWITCHING_ + TO_ + window);
 		this.d.switchTo().window(window);
 	}
 
@@ -1126,9 +1198,10 @@ public class Common {
 	 *               passwords)
 	 * @return true of direct copy was used, false otherwise
 	 */
+	@SuppressWarnings("nls")
 	public boolean typeInto(WebElement e, Object c, double pp, boolean secret) {
 		CharSequence symbols = String.valueOf(c);
-		this.l.log("Typing '" + (secret ? "•".repeat(symbols.length()) : c) + "' into " + describe(e));
+		this.l.log(TYPING_ + quote((String) (secret ? u2022.repeat(symbols.length()) : c)) + _INTO_ + describe(e));
 		try {
 			if (isTrue(pp)) {
 				// simulation of pasting from clipboard by instant addition of all content
@@ -1143,8 +1216,8 @@ public class Common {
 			return false;
 		} catch (Exception ex) {
 			logProblem(Severity.S2,
-					"Exception " + ex.getClass().getName() + " caught while trying to type '"
-							+ (secret ? "•".repeat(symbols.length()) : c) + "' into " + describe(e)
+					"Exception " + ex.getClass().getName() + " caught while trying to type "
+							+ quote((String) (secret ? u2022.repeat(symbols.length()) : c)) + _INTO_ + describe(e)
 							+ ", attempting workaround ...");
 			Actions action = new Actions(this.x.d);
 			action.moveToElement(e).click().sendKeys(String.valueOf(c)).build().perform();
@@ -1157,8 +1230,8 @@ public class Common {
 	 * @param name     filename of file to upload
 	 */
 	public void upload(String uploader, String name) {
-		this.l.log("Uploading '" + name + "' through " + uploader);
-		find(false, false, uploader).sendKeys(System.getProperty("user.dir") + "/" + RESOURCES + name);
+		this.l.log(UPLOADING_ + quote(name) + _THROUGH_ + uploader);
+		find(false, false, uploader).sendKeys(System.getProperty(USER_DIR) + u002F + RESOURCES + name);
 	}
 
 	/**
@@ -1196,7 +1269,7 @@ public class Common {
 	 * @param lc string locator of an element expected to be clickable
 	 */
 	public void waitClickable(String lc) {
-		this.l.log("Waiting for clickability of " + lc);
+		this.l.log(WAITING_ + FOR_ + CLICKABILITY_OF_ + lc);
 		this.w.until(ExpectedConditions.elementToBeClickable(by(lc)));
 	}
 
@@ -1206,7 +1279,7 @@ public class Common {
 	 * @param lc string locator of an element expected to be invisible
 	 */
 	public void waitInvisibility(String lc) {
-		this.l.log("Waiting for invisibility of " + lc);
+		this.l.log(WAITING_ + FOR_ + INVISIBILITY_OF_ + lc);
 		this.w.until(ExpectedConditions.invisibilityOfElementLocated(by(lc)));
 	}
 
@@ -1216,7 +1289,7 @@ public class Common {
 	 * @param lc string locator of an element expected to be selected
 	 */
 	public void waitSeleted(String lc) {
-		this.l.log("Waiting for " + lc + "to be selected");
+		this.l.log(WAITING_ + FOR_ + lc + TO_BE_SELECTED);
 		this.w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
 	}
 
@@ -1224,12 +1297,12 @@ public class Common {
 	 * Wait for appearance of the defined element and the click on it
 	 *
 	 * @param lc string locator of an element to be waited for
-	 * @param x
-	 * @param y
+	 * @param X
+	 * @param Y
 	 */
-	public void waitThenClick(double x, double y, String lc) {
+	public void waitThenClick(double X, double Y, String lc) {
 		wait(lc);
-		click(x, y, lc);
+		click(X, Y, lc);
 	}
 
 	/**
@@ -1281,7 +1354,7 @@ public class Common {
 	 * @param s  expected value
 	 */
 	public void waitValue(String lc, String s) {
-		this.l.log("Waiting for " + lc + " to have value '" + s + "'");
+		this.l.log(WAITING_ + FOR_ + lc + _TO + _HAVE_VALUE_ + quote(s));
 		this.w.until(ExpectedConditions.textToBe(by(lc), s));
 	}
 
@@ -1293,7 +1366,7 @@ public class Common {
 	 * @return value after the detected change
 	 */
 	public String waitValueNot(String lc, String s) {
-		this.l.log("Waiting while " + lc + " still have value '" + s + "'");
+		this.l.log(WAITING_ + WHILE_ + lc + _STILL + _HAVE_VALUE_ + quote(s));
 		this.w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), s)));
 		return read(lc);
 	}
@@ -1306,11 +1379,11 @@ public class Common {
 	 */
 	public String waitValueNotEmpty(String lc) {
 		// TODO: this routine seems to be working not as expected
-		this.l.log("Waiting while " + lc + " is still empty");
-		this.w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), "")));
+		this.l.log(WAITING_ + WHILE_ + lc + _IS + _STILL + _EMPTY);
+		this.w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), EMPTY)));
 		sleep(333);
 		String t = read(lc);
-		this.l.log("The text of " + lc + " is now '" + t + "'");
+		this.l.log(THE_TEXT_OF_ + lc + _IS + _NOW_ + quote(t));
 		return t;
 	}
 
@@ -1320,7 +1393,7 @@ public class Common {
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void waitVisibility(String lc) {
-		this.l.log("Waiting for visibility of " + lc);
+		this.l.log(WAITING_ + FOR_ + VISIBILITY_OF_ + lc);
 		this.w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
 	}
 
@@ -1330,7 +1403,7 @@ public class Common {
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void waitVisibility(String[] lc) {
-		this.l.log("Waiting for visibility of " + Arrays.toString(lc));
+		this.l.log(WAITING_ + FOR_ + VISIBILITY_OF_ + Arrays.toString(lc));
 		this.w.until(ExpectedConditions.visibilityOfElementLocated(by(lc)));
 	}
 

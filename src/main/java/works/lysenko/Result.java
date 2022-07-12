@@ -1,5 +1,14 @@
 package works.lysenko;
 
+import static works.lysenko.Constants.EMPTY;
+import static works.lysenko.Constants._PROBLEM;
+import static works.lysenko.Constants.u0020;
+import static works.lysenko.Constants.u0028;
+import static works.lysenko.Constants.u0029;
+import static works.lysenko.Constants.u0073;
+import static works.lysenko.Constants.u2190;
+import static works.lysenko.Constants.u2192;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,11 +64,11 @@ public class Result {
 
 	@Override
 	public String toString() {
-		String weight = (this.dWeight > 0.0 ? "(" + this.dWeight + ")" + "\u2192" : "") + "(" + this.cWeight + ")"
-				+ (this.uWeight > 0.0 ? "\u2190" + "(" + this.uWeight + ")" : "");
+		String weight = (this.dWeight > 0.0 ? u0028 + this.dWeight + u0029 + u2192 : EMPTY) + u0028 + this.cWeight
+				+ u0029 + (this.uWeight > 0.0 ? u2190 + u0028 + this.uWeight + u0029 : EMPTY);
 		String strProblems = this.problems != null && this.problems.size() > 0
-				? " (" + this.problems.size() + (this.problems.size() == 1 ? " problem)" : " problems)")
-				: "";
-		return weight + " " + this.executions + strProblems;
+				? u0020 + u0028 + this.problems.size() + _PROBLEM + (this.problems.size() == 1 ? EMPTY : u0073) + u0029
+				: EMPTY;
+		return weight + u0020 + this.executions + strProblems;
 	}
 }

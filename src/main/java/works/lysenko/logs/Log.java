@@ -44,6 +44,7 @@ public class Log extends AbstractLogData {
 		return this.text;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString() {
 		return "Log [depth=" + this.depth + ", level=" + this.level + ", text=" + this.text + "]";

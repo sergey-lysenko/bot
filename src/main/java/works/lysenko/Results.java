@@ -1,5 +1,7 @@
 package works.lysenko;
 
+import static works.lysenko.Constants.u0020;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -88,6 +90,6 @@ public class Results {
 	}
 
 	private static String tagged(Scenario s) {
-		return s.shortName() + " " + s.type().tag();
+		return s.shortName() + u0020 + s.type().tag();
 	}
 }

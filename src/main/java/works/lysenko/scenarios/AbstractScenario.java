@@ -1,6 +1,23 @@
 package works.lysenko.scenarios;
 
+import static works.lysenko.Constants.DATA;
 import static works.lysenko.Constants.DEFAULT_WEIGHT;
+import static works.lysenko.Constants.DONE_IN;
+import static works.lysenko.Constants.JSON;
+import static works.lysenko.Constants.MASKED_DOT;
+import static works.lysenko.Constants.STANDALONE;
+import static works.lysenko.Constants.u0020;
+import static works.lysenko.Constants.u0027;
+import static works.lysenko.Constants.u0028;
+import static works.lysenko.Constants.u0029;
+import static works.lysenko.Constants.u002D;
+import static works.lysenko.Constants.u002E;
+import static works.lysenko.Constants.u003A;
+import static works.lysenko.Constants.u005B;
+import static works.lysenko.Constants.u005D;
+import static works.lysenko.Constants.u2192;
+import static works.lysenko.Constants.u21D0;
+import static works.lysenko.Constants.u21D2;
 import static works.lysenko.enums.Ansi.BLUE_BOLD_BRIGHT;
 import static works.lysenko.enums.Ansi.colorize;
 
@@ -67,7 +84,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	public boolean contains(Object field) {
 		boolean b = this.x.data.containsKey(field);
 		if (this.x._debug())
-			log(3, "contains(" + field + ")" + "\u2192" + b);
+			log(3, Thread.currentThread().getStackTrace()[1].getMethodName() + u0028 + field + u0029 + u2192 + b);
 		return b;
 	}
 
@@ -81,7 +98,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	public boolean containsKey(Object field) {
 		boolean b = this.x.data.containsKey(field);
 		if (this.x._debug())
-			log(3, "containsKey(" + field + ")" + "\u2192" + b);
+			log(3, Thread.currentThread().getStackTrace()[1].getMethodName() + u0028 + field + u0029 + u2192 + b);
 		return b;
 	}
 
@@ -98,7 +115,8 @@ public abstract class AbstractScenario extends Common implements Scenario {
 			if (!this.x.data.containsKey(f))
 				b = false;
 		if (this.x._debug())
-			log(3, "containsKeys(" + Arrays.toString(fields) + ")" + "\u0336" + b);
+			log(3, Thread.currentThread().getStackTrace()[1].getMethodName() + u0028 + Arrays.toString(fields) + u0029
+					+ u2192 + b);
 		return b;
 	}
 
@@ -123,11 +141,12 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	protected void done() {
 		@SuppressWarnings("boxing")
 		long r1 = this.x.timer() - this.startAt;
+		String s1 = u0027 + shortName() + u0027 + u0020 + DONE_IN + u0020 + timeH(r1);
 		if (standalone()) {
-			this.l.log(0, "Standalone " + shortName() + " done in " + timeH(r1));
+			this.l.log(0, STANDALONE + u0020 + s1);
 			this.l.logln();
 		} else
-			this.l.log(0, "'" + shortName() + "' done in " + timeH(r1));
+			this.l.log(0, s1);
 		this.x.current.pop();
 	}
 
@@ -151,7 +170,8 @@ public abstract class AbstractScenario extends Common implements Scenario {
 		this.startAt = this.x.timer();
 		this.x.current.push(this);
 		this.l.logln();
-		this.l.log(0, colorize(type().tag() + " " + shortName(), BLUE_BOLD_BRIGHT) + " : " + this.x.r.count(this));
+		this.l.log(0, colorize(type().tag() + u0020 + shortName(), BLUE_BOLD_BRIGHT) + u0020 + u003A + u0020
+				+ this.x.r.count(this));
 	}
 
 	@Override
@@ -161,7 +181,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 
 	@SuppressWarnings("boxing")
 	private int gauge() {
-		int g = name().split("\\.").length;
+		int g = name().split(MASKED_DOT).length;
 		if (null == this.x.minDepth)
 			this.x.minDepth = g;
 		return g;
@@ -196,7 +216,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	}
 
 	private void getLog(Object field, Object obj) {
-		log(3, "get(" + field + ")" + "\u21D2" + obj + " ");
+		log(3, Thread.currentThread().getStackTrace()[2].getMethodName() + u0028 + field + u0029 + u21D2 + obj + u0020);
 	}
 
 	@Override
@@ -221,8 +241,9 @@ public abstract class AbstractScenario extends Common implements Scenario {
 		Object obj = this.x.data.put(field, value);
 		if (this.x._debug()) {
 			JSONObject j = new JSONObject(this.x.data);
-			log(3, "put(" + field + ")" + "\u21D0" + "[" + value + "\u2192" + obj + "]");
-			this.l.logFile(j.toString(), "data", "json");
+			log(3, Thread.currentThread().getStackTrace()[1].getMethodName() + u0028 + field + u0029 + u21D0 + u005B
+					+ value + u2192 + obj + u005D);
+			this.l.logFile(j.toString(), DATA, JSON);
 		}
 	}
 
@@ -240,11 +261,11 @@ public abstract class AbstractScenario extends Common implements Scenario {
 		String[] a;
 		if (null == this.x.minDepth)
 			gauge();
-		a = this.getClass().getName().split("\\.");
+		a = this.getClass().getName().split(MASKED_DOT);
 		@SuppressWarnings("boxing")
 		int b = this.x.minDepth - 1;
 		int c = a.length;
-		return String.join(".", Arrays.copyOfRange(a, b, c));
+		return String.join(u002E, Arrays.copyOfRange(a, b, c));
 	}
 
 	/**
@@ -278,8 +299,9 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	@SuppressWarnings("boxing")
 	@Override
 	public Double weight() {
-		String wh = this.x.prop(StringUtils.removeStart(this.getClass().getName(), this.x._root().concat(".")), DEFAULT_WEIGHT);
-		if (wh.equals("-"))
+		String wh = this.x.prop(StringUtils.removeStart(this.getClass().getName(), this.x._root().concat(u002E)),
+				DEFAULT_WEIGHT);
+		if (wh.equals(u002D))
 			return Double.NaN;
 		return Double.valueOf(wh);
 	}

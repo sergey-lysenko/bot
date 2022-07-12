@@ -1,5 +1,7 @@
 package works.lysenko.scenarios;
 
+import static works.lysenko.Constants.u002E;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
@@ -15,6 +17,7 @@ import works.lysenko.Execution;
  */
 public class ScenarioLoader {
 
+	@SuppressWarnings({ "resource", "nls" })
 	private static Set<Class<?>> findAll(String s) {
 		Set<Class<?>> a = null;
 		try {
@@ -29,7 +32,7 @@ public class ScenarioLoader {
 
 	private static Class<?> getClass(String className, String packageName) {
 		try {
-			return Class.forName(packageName + "." + className.substring(0, className.lastIndexOf('.')));
+			return Class.forName(packageName + u002E + className.substring(0, className.lastIndexOf('.')));
 		} catch (@SuppressWarnings("unused") ClassNotFoundException e) {
 			// NOP
 		}

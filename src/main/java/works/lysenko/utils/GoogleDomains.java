@@ -11,7 +11,7 @@ import org.apache.commons.math3.util.Pair;
  *
  * @author Sergii Lysenko
  */
-@SuppressWarnings("boxing")
+@SuppressWarnings({ "boxing", "nls" })
 public class GoogleDomains {
 
 	private static final List<Pair<String, Double>> d = new LinkedList<>();
