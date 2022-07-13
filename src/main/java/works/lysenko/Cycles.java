@@ -1,5 +1,6 @@
 package works.lysenko;
 
+import static works.lysenko.Common.s;
 import static works.lysenko.Constants.CONFIGURATION_CONJOINT;
 import static works.lysenko.Constants.CONFIGURATION_CYCLES;
 import static works.lysenko.Constants.CONFIGURATION_DEBUG;
@@ -14,6 +15,8 @@ import static works.lysenko.Constants.DEFAULT_ROOT;
 import static works.lysenko.Constants.DEFAULT_UPSTREAM;
 import static works.lysenko.Constants.DEFAULT_WEIGHT;
 import static works.lysenko.Constants.GENERATED_CONFIG_FILE;
+import static works.lysenko.Constants._CYCLE;
+import static works.lysenko.Constants._OF_;
 import static works.lysenko.Constants.u0020;
 import static works.lysenko.Constants.u002E;
 import static works.lysenko.Constants.u003D;
@@ -114,7 +117,8 @@ public class Cycles {
 		try {
 			if (this.cyclesToDo == 0)
 				this.x.l.logProblem(S2, "No test cycles were perfomed");
-			this.x.l.log(0, "Executing " + y(this.x._cycles()) + " cycle(s) of " + this.x.testDescription());
+			int i = (this.x._cycles());
+			this.x.l.log(0, "Executing " + y(i) + _CYCLE + s(i) + _OF_ + this.x.testDescription());
 			while (this.cyclesToDo > 0) {
 				this.scenarios.execute();
 				this.x.l.logln();

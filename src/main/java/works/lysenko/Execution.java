@@ -30,6 +30,7 @@ import static works.lysenko.Constants.DEFAULT_IWAIT;
 import static works.lysenko.Constants.DEFAULT_ROOT;
 import static works.lysenko.Constants.DEFAULT_UPSTREAM;
 import static works.lysenko.Constants.DOMAIN;
+import static works.lysenko.Constants.EMPTY;
 import static works.lysenko.Constants.KNOWN_ISSUES;
 import static works.lysenko.Constants.PLATFORM;
 import static works.lysenko.Constants.TEST;
@@ -122,9 +123,9 @@ public class Execution extends Common {
 	protected Stopwatch t;
 
 	@SuppressWarnings("javadoc")
-	public Parameters parameters;
-	private Properties know;
-	private Properties prop;
+	public Parameters pa;
+	private Properties kn;
+	private Properties pr;
 	protected Set<String> newIssues = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	protected Set<String> knownIssues = new HashSet<>();
 	protected Set<String> notReproduced;
@@ -189,7 +190,7 @@ public class Execution extends Common {
 		Set<String> logsToRead = Set.of(BROWSER, CLIENT, DRIVER, PERFORMANCE, PROFILER, SERVER);
 
 		// Parameters
-		this.parameters = new Parameters(parametersList);
+		this.pa = new Parameters(parametersList);
 
 		// Bot components
 		this.t = new Stopwatch();
@@ -199,11 +200,11 @@ public class Execution extends Common {
 
 		// Test properties
 		this.data = new Properties();
-		this.know = readProperties(KNOWN_ISSUES);
-		this.prop = readProperties(TESTS + (String) this.parameters.get(TEST.toUpperCase()) + u002E + TEST);
+		this.kn = readProperties(KNOWN_ISSUES);
+		this.pr = readProperties(TESTS + (String) this.pa.get(TEST.toUpperCase()) + u002E + TEST);
 
 		// Web driver components
-		String platform = this.parameters.string(PLATFORM);
+		String platform = this.pa.string(PLATFORM);
 		if (Platform.get(platform).equals(Platform.ANDROID)) {
 
 			if (_adebug())
@@ -228,7 +229,7 @@ public class Execution extends Common {
 			this.d = new AndroidDriver(this.service.getUrl(), capabilities);
 
 		} else {
-			this.d = WebDrivers.get(Platform.get(this.parameters.string(PLATFORM)), false);
+			this.d = WebDrivers.get(Platform.get(this.pa.string(PLATFORM)), false);
 			this.d.manage().window().setPosition(new Point(0, 0));
 			this.d.manage().window().maximize();
 		}
@@ -238,7 +239,7 @@ public class Execution extends Common {
 		this.w = new WebDriverWait(this.d, Duration.ofSeconds(_ewait()));
 
 		// That's one dirty trick :)
-		this.notReproduced = new HashSet<>((Set<String>) (Set<?>) this.know.keySet());
+		this.notReproduced = new HashSet<>((Set<String>) (Set<?>) this.kn.keySet());
 	}
 
 	/**
@@ -246,21 +247,21 @@ public class Execution extends Common {
 	 */
 	@SuppressWarnings("boxing")
 	public boolean _adebug() {
-		return Boolean.valueOf(this.prop.getProperty(u005F + CONFIGURATION_ADEBUG, DEFAULT_ADEBUG).trim());
+		return Boolean.valueOf(this.pr.getProperty(u005F + CONFIGURATION_ADEBUG, DEFAULT_ADEBUG).trim());
 	}
 
 	/**
 	 * @return app parameter
 	 */
 	public String _app() {
-		return String.valueOf(this.prop.getProperty(u005F + CONFIGURATION_APP, DEFAULT_APP).trim());
+		return String.valueOf(this.pr.getProperty(u005F + CONFIGURATION_APP, DEFAULT_APP).trim());
 	}
 
 	/**
 	 * @return whether current test execution have "conjoint" mode active
 	 */
 	public Boolean _conjoint() {
-		return Boolean.valueOf(this.prop.getProperty(u005F + CONFIGURATION_CONJOINT, DEFAULT_CONJOINT).trim());
+		return Boolean.valueOf(this.pr.getProperty(u005F + CONFIGURATION_CONJOINT, DEFAULT_CONJOINT).trim());
 	}
 
 	/**
@@ -268,7 +269,7 @@ public class Execution extends Common {
 	 */
 	@SuppressWarnings("boxing")
 	public int _cycles() {
-		return Integer.valueOf(this.prop.getProperty(u005F + CONFIGURATION_CYCLES, DEFAULT_CYCLES).trim());
+		return Integer.valueOf(this.pr.getProperty(u005F + CONFIGURATION_CYCLES, DEFAULT_CYCLES).trim());
 	}
 
 	/**
@@ -276,14 +277,14 @@ public class Execution extends Common {
 	 */
 	@SuppressWarnings("boxing")
 	public boolean _debug() {
-		return Boolean.valueOf(this.prop.getProperty(u005F + CONFIGURATION_DEBUG, DEFAULT_DEBUG).trim());
+		return Boolean.valueOf(this.pr.getProperty(u005F + CONFIGURATION_DEBUG, DEFAULT_DEBUG).trim());
 	}
 
 	/**
 	 * @return dir parameter
 	 */
 	public String _dir() {
-		return String.valueOf(this.prop.getProperty(u005F + CONFIGURATION_DIR, DEFAULT_DIR).trim());
+		return String.valueOf(this.pr.getProperty(u005F + CONFIGURATION_DIR, DEFAULT_DIR).trim());
 	}
 
 	/**
@@ -291,7 +292,7 @@ public class Execution extends Common {
 	 */
 	@SuppressWarnings("boxing")
 	public boolean _downstream() {
-		return Boolean.valueOf(this.prop.getProperty(u005F + CONFIGURATION_DOWNSTREAM, DEFAULT_DOWNSTREAM).trim());
+		return Boolean.valueOf(this.pr.getProperty(u005F + CONFIGURATION_DOWNSTREAM, DEFAULT_DOWNSTREAM).trim());
 	}
 
 	/**
@@ -299,7 +300,7 @@ public class Execution extends Common {
 	 */
 	@SuppressWarnings("boxing")
 	private int _ewait() {
-		return Integer.valueOf(this.prop.getProperty(u005F + CONFIGURATION_EWAIT, DEFAULT_EWAIT).trim());
+		return Integer.valueOf(this.pr.getProperty(u005F + CONFIGURATION_EWAIT, DEFAULT_EWAIT).trim());
 	}
 
 	/**
@@ -307,14 +308,14 @@ public class Execution extends Common {
 	 */
 	@SuppressWarnings("boxing")
 	private int _iwait() {
-		return Integer.valueOf(this.prop.getProperty(u005F + CONFIGURATION_IWAIT, DEFAULT_IWAIT).trim());
+		return Integer.valueOf(this.pr.getProperty(u005F + CONFIGURATION_IWAIT, DEFAULT_IWAIT).trim());
 	}
 
 	/**
 	 * @return configured root of scenarios
 	 */
 	public String _root() {
-		return this.prop.getProperty(u005F + CONFIGURATION_ROOT, DEFAULT_ROOT).trim();
+		return this.pr.getProperty(u005F + CONFIGURATION_ROOT, DEFAULT_ROOT).trim();
 	}
 
 	/**
@@ -322,7 +323,7 @@ public class Execution extends Common {
 	 */
 	@SuppressWarnings("boxing")
 	public boolean _upstream() {
-		return Boolean.valueOf(this.prop.getProperty(u005F + CONFIGURATION_UPSTREAM, DEFAULT_UPSTREAM).trim());
+		return Boolean.valueOf(this.pr.getProperty(u005F + CONFIGURATION_UPSTREAM, DEFAULT_UPSTREAM).trim());
 	}
 
 	/**
@@ -388,7 +389,7 @@ public class Execution extends Common {
 	public double downstream(Scenario s) {
 		// TODO: move this to Scenario class(es) ?
 		double v = 0.0;
-		for (Entry<Object, Object> p : this.prop.entrySet()) {
+		for (Entry<Object, Object> p : this.pr.entrySet()) {
 			String k = (String) p.getKey();
 			if (!(k.charAt(0) == '_')) {
 				String a = s.getClass().getName().toLowerCase();
@@ -408,8 +409,8 @@ public class Execution extends Common {
 	 */
 	public Set<String> getKnownIssue(String p) {
 		HashSet<String> ki = new HashSet<>();
-		if (null != this.know)
-			this.know.forEach((k, v) -> {
+		if (null != this.kn)
+			this.kn.forEach((k, v) -> {
 				if (p.contains((String) v)) {
 					ki.add((String) k);
 					if (this.notReproduced.contains(k)) {
@@ -426,7 +427,7 @@ public class Execution extends Common {
 	 */
 	@Override
 	public Platform in() {
-		return Platform.get(this.x.parameters.string(PLATFORM));
+		return Platform.get(this.x.pa.string(PLATFORM));
 	}
 
 	/**
@@ -435,7 +436,7 @@ public class Execution extends Common {
 	 */
 	@Override
 	public boolean in(Platform b) {
-		return this.x.parameters.string(PLATFORM).equals(b.title());
+		return this.x.pa.string(PLATFORM).equals(b.title());
 	}
 
 	/**
@@ -444,14 +445,14 @@ public class Execution extends Common {
 	 * @return value of requested property
 	 */
 	public String prop(String n, String def) {
-		return this.prop.getProperty(n, def);
+		return this.pr.getProperty(n, def);
 	}
 
 	/**
 	 * @return true is properties is empty
 	 */
 	public boolean propEmpty() {
-		return this.prop.isEmpty();
+		return this.pr.isEmpty();
 	}
 
 	@SuppressWarnings({ "resource", "nls" })
@@ -480,7 +481,8 @@ public class Execution extends Common {
 	 * @return test description
 	 */
 	public String testDescription() {
-		return y(this.x.parameters.get(TEST.toUpperCase()) + _ON_ + y(this.x.parameters.get(DOMAIN)));
+		return y(this.x.pa.get(TEST.toUpperCase())
+				+ (this.x.pa.get(DOMAIN).equals(EMPTY) ? EMPTY : (_ON_ + y(this.x.pa.get(DOMAIN)))));
 	}
 
 	/**

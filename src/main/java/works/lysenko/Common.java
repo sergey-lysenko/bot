@@ -220,6 +220,11 @@ public class Common {
 		return sequence;
 	}
 
+	@SuppressWarnings("javadoc")
+	public static String s(int c) {
+		return ((c > 1) ? u0073 : EMPTY);
+	}
+
 	/**
 	 * Get random object from a list of objects
 	 *
@@ -974,7 +979,7 @@ public class Common {
 	 */
 	public void section(String s) {
 		this.l.logln();
-		this.l.log(0, Ansi.colorize(u003D + s + u003D, Ansi.BLUE_BOLD_BRIGHT));
+		this.l.log(0, Ansi.colorize(u003D + u0020 + s + u0020 + u003D, Ansi.BLUE_BOLD_BRIGHT));
 	}
 
 	/**

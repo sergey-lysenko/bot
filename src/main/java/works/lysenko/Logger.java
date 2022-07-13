@@ -187,7 +187,7 @@ public class Logger {
 	 */
 	@SuppressWarnings({ "resource", "nls" })
 	public void logFile(String s, String n, String ex) {
-		String location = RUNS + this.x.parameters.get(TEST.toUpperCase()) + u002F + this.x.t.startedAt() + u002F;
+		String location = RUNS + this.x.pa.get(TEST.toUpperCase()) + u002F + this.x.t.startedAt() + u002F;
 		@SuppressWarnings({ "boxing" })
 		String timestamp = String.format("%013d", this.x.t.millis());
 		String name = Common.fill(FILENAME, timestamp, n, ex);

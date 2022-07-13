@@ -6,6 +6,8 @@ import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.RUN_JSON_FILENAME;
 import static works.lysenko.Constants.RUN_SVG_FILENAME;
 import static works.lysenko.Constants.TEST;
+import static works.lysenko.Constants._CYCLE;
+import static works.lysenko.Constants._OF_;
 import static works.lysenko.Constants.u0020;
 import static works.lysenko.Constants.u002F;
 import static works.lysenko.Constants.u003A;
@@ -19,6 +21,9 @@ import static works.lysenko.enums.Ansi.WHITE_BOLD_BRIGHT;
 import static works.lysenko.enums.Ansi.YELLOW;
 import static works.lysenko.enums.Ansi.colorize;
 import static works.lysenko.enums.Ansi.y;
+import static works.lysenko.Common.s;
+import static works.lysenko.Common.fill;
+import static works.lysenko.Common.writeToFile;
 
 import java.awt.Color;
 import java.io.BufferedWriter;
@@ -47,8 +52,8 @@ import works.lysenko.scenarios.Scenario;
 public class Output {
 
 	static String name(Execution x, String t) {
-		String path = RUNS + x.parameters.get(TEST.toUpperCase()) + u002F;
-		String name = path + Common.fill(t, String.valueOf(x.t.startedAt()));
+		String path = RUNS + x.pa.get(TEST.toUpperCase()) + u002F;
+		String name = path + fill(t, String.valueOf(x.t.startedAt()));
 		new File(path).mkdirs();
 		return name;
 	}
@@ -230,6 +235,8 @@ public class Output {
 			failed = this.x.current.peek().shortName();
 			this.x.current.removeAllElements();
 		}
+
+		int i = this.x.currentCycle();
 		this.x.l.log(0, y(this.x.currentCycle()) + " cycle(s) of " + this.x.testDescription() + " done");
 
 		// New issues output
@@ -294,7 +301,7 @@ public class Output {
 
 		drawGroup(g, 0, dy, sorted);
 		try {
-			SVGUtils.writeToSVG(new File(Common.fill(name(this.x, RUN_SVG_FILENAME))), g.getSVGElement());
+			SVGUtils.writeToSVG(new File(fill(name(this.x, RUN_SVG_FILENAME))), g.getSVGElement());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -307,6 +314,6 @@ public class Output {
 	 * @param fileName
 	 */
 	public static void writeDefConf(Set<String> defConf) {
-		Common.writeToFile(null, defConf, GENERATED_CONFIG_FILE);
+		writeToFile(null, defConf, GENERATED_CONFIG_FILE);
 	}
 }

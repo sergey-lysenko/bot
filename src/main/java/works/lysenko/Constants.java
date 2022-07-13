@@ -54,6 +54,7 @@ public class Constants {
 	public static final String CLEARING_ = "Clearing "; //$NON-NLS-1$
 	public static final String CLICKING_ = "Clicking "; //$NON-NLS-1$
 	public static final String CLICKABILITY_OF_ = "clickability of "; //$NON-NLS-1$
+	public static final String _CYCLE = " cycle"; //$NON-NLS-1$
 	public static final String CYCLES = "cycles"; //$NON-NLS-1$
 
 	public static final String DATA = "data"; //$NON-NLS-1$
@@ -90,6 +91,7 @@ public class Constants {
 	public static final String NaN = "NaN"; //$NON-NLS-1$
 
 	public static final String OPENING_ = "Opening "; //$NON-NLS-1$
+	public static final String _OF_ = " of "; //$NON-NLS-1$
 	public static final String _ON_ = " on "; //$NON-NLS-1$
 
 	public static final String PNG = "png"; //$NON-NLS-1$

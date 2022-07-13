@@ -141,12 +141,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	protected void done() {
 		@SuppressWarnings("boxing")
 		long r1 = this.x.timer() - this.startAt;
-		String s1 = u0027 + shortName() + u0027 + u0020 + DONE_IN + u0020 + timeH(r1);
-		if (standalone()) {
-			this.l.log(0, STANDALONE + u0020 + s1);
-			this.l.logln();
-		} else
-			this.l.log(0, s1);
+		this.l.log(0, u0027 + shortName() + u0027 + u0020 + DONE_IN + u0020 + timeH(r1));
 		this.x.current.pop();
 	}
 
@@ -266,13 +261,6 @@ public abstract class AbstractScenario extends Common implements Scenario {
 		int b = this.x.minDepth - 1;
 		int c = a.length;
 		return String.join(u002E, Arrays.copyOfRange(a, b, c));
-	}
-
-	/**
-	 * @return whether current scenario is a stand alone one
-	 */
-	public boolean standalone() {
-		return this.x.currentCycle() == 0;
 	}
 
 	@Override
