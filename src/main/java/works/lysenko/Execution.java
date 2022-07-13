@@ -466,7 +466,7 @@ public class Execution extends Common {
 			}
 			try {
 				if (null != fis)
-					this.prop.load(fis);
+					properties.load(fis);
 				else
 					this.l.logProblem(Severity.S2, "Unable to read properties from '" + name + "'");
 			} catch (@SuppressWarnings("unused") IOException e) {

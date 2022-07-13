@@ -1201,7 +1201,7 @@ public class Common {
 	@SuppressWarnings("nls")
 	public boolean typeInto(WebElement e, Object c, double pp, boolean secret) {
 		CharSequence symbols = String.valueOf(c);
-		this.l.log(TYPING_ + quote((String) (secret ? u2022.repeat(symbols.length()) : c)) + _INTO_ + describe(e));
+		this.l.log(TYPING_ + quote(secret ? u2022.repeat(symbols.length()) : String.valueOf(c)) + _INTO_ + describe(e));
 		try {
 			if (isTrue(pp)) {
 				// simulation of pasting from clipboard by instant addition of all content
@@ -1217,7 +1217,7 @@ public class Common {
 		} catch (Exception ex) {
 			logProblem(Severity.S2,
 					"Exception " + ex.getClass().getName() + " caught while trying to type "
-							+ quote((String) (secret ? u2022.repeat(symbols.length()) : c)) + _INTO_ + describe(e)
+							+ quote(secret ? u2022.repeat(symbols.length()) : String.valueOf(c)) + _INTO_ + describe(e)
 							+ ", attempting workaround ...");
 			Actions action = new Actions(this.x.d);
 			action.moveToElement(e).click().sendKeys(String.valueOf(c)).build().perform();

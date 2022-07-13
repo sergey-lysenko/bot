@@ -24,8 +24,9 @@ public class BotTest {
 		x.complete();
 	}
 
+	@SuppressWarnings("static-method")
 	@Test
-	public static void test() {
+	public void test() {
 		cycles.execute();
 	}
 }
