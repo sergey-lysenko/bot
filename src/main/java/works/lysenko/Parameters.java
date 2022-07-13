@@ -36,7 +36,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jdt.annotation.Nullable;
 
 import works.lysenko.enums.Platform;
 
@@ -169,7 +168,7 @@ public class Parameters extends Properties {
 		this.reset = new JButton(RESET);
 		this.reset.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(@Nullable ActionEvent e) {
+			public void actionPerformed(ActionEvent e) {
 				Platforms.reset();
 				System.exit(2);
 			}
@@ -247,7 +246,7 @@ public class Parameters extends Properties {
 		File directory = new File(TESTS);
 		File[] files = directory.listFiles(new FilenameFilter() {
 			@Override
-			public boolean accept(@Nullable File dir, @Nullable String name) {
+			public boolean accept(File dir, String name) {
 				return name.endsWith(u002E + TEST);
 			}
 		});
