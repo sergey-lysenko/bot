@@ -5,7 +5,7 @@ package works.lysenko.enums;
  */
 @SuppressWarnings("javadoc")
 public enum Platform {
-	CHROME("Chrome"), FIREFOX("Firefox"), OPERA("Opera"), EDGE("Edge"), ANDROID("Android"), SAFARI("Safari");
+	CHROME("Chrome"), FIREFOX("Firefox"), EDGE("Edge"), ANDROID("Android"), SAFARI("Safari");
 
 	private String title;
 
@@ -17,8 +17,6 @@ public enum Platform {
 		switch (string) {
 		case "Firefox":
 			return FIREFOX;
-		case "Opera":
-			return OPERA;
 		case "Edge":
 			return EDGE;
 		case "Safari":
