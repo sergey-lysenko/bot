@@ -53,8 +53,8 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+// import com.google.gson.Gson;
+// import com.google.gson.GsonBuilder;
 
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
@@ -67,7 +67,7 @@ import works.lysenko.utils.WebDrivers;
 
 /**
  * This class represent single bot execution information
- * 
+ *
  * @author Sergii Lysenko
  *
  */
@@ -100,7 +100,7 @@ public class Execution extends Common {
 	/**
 	 * Stack of currently executed scenarios
 	 */
-	public Stack<AbstractScenario> current = new Stack<AbstractScenario>();
+	public Stack<AbstractScenario> current = new Stack<>();
 	/**
 	 * Linked Cycles object
 	 */
@@ -113,16 +113,12 @@ public class Execution extends Common {
 									// field from single external code location
 	protected Stopwatch t;
 
-	/**
-	 * Cached GsonBuilder object to share between calls
-	 */
-	public GsonBuilder gsonBuilder = new GsonBuilder();
 	@SuppressWarnings("javadoc")
 	public Parameters parameters;
 	private Properties know;
 	private Properties prop;
 	protected Set<String> newIssues = Collections.newSetFromMap(new ConcurrentHashMap<>());
-	protected Set<String> knownIssues = new HashSet<String>();
+	protected Set<String> knownIssues = new HashSet<>();
 	protected Set<String> notReproduced;
 	/**
 	 * Shared data storage (for prerequisites management)
@@ -135,7 +131,7 @@ public class Execution extends Common {
 	public Exception exception;
 
 	/**
-	 * 
+	 *
 	 */
 	public Execution() {
 		this(null);
@@ -143,17 +139,18 @@ public class Execution extends Common {
 
 	/**
 	 * Start legacy-compatible execution with defined Implicit and Explicit waits
-	 * @param iwait 
-	 * @param ewait 
-	 * 
+	 *
+	 * @param iwait
+	 * @param ewait
+	 *
 	 * @param browser
-	 * 
+	 *
 	 * @param parametersList
 	 */
 
 	public Execution(int iwait, int ewait, String browser) {
 		super();
-		this.x = this;
+		x = this;
 		Set<String> logsToRead = Set.of(BROWSER, CLIENT, DRIVER, PERFORMANCE, PROFILER, SERVER);
 
 		// Bot components
@@ -172,15 +169,15 @@ public class Execution extends Common {
 	}
 
 	/**
-	 * 
+	 *
 	 * Start bot-compatible execution
-	 * 
+	 *
 	 * @param parametersList
 	 */
 	@SuppressWarnings("unchecked")
 	public Execution(String parametersList) {
 		super();
-		this.x = this;
+		x = this;
 		Set<String> logsToRead = Set.of(BROWSER, CLIENT, DRIVER, PERFORMANCE, PROFILER, SERVER);
 
 		// Parameters
@@ -232,11 +229,11 @@ public class Execution extends Common {
 		w = new WebDriverWait(d, Duration.ofSeconds(_ewait()));
 
 		// That's one dirty trick :)
-		notReproduced = new HashSet<String>((Set<String>) (Set<?>) know.keySet());
+		notReproduced = new HashSet<>((Set<String>) (Set<?>) know.keySet());
 	}
 
 	/**
-	 * @return _adebug parameter 
+	 * @return _adebug parameter
 	 */
 	public boolean _adebug() {
 		return Boolean.valueOf(prop.getProperty("_" + CONFIGURATION_ADEBUG, DEFAULT_ADEBUG).trim());
@@ -336,7 +333,11 @@ public class Execution extends Common {
 			e.printStackTrace();
 		}
 		if (insideDocker() || insideCI())
-			d.quit();
+			try {
+				d.quit();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 	}
 
 	/**
@@ -350,7 +351,7 @@ public class Execution extends Common {
 	 * @return logical depth of current scenario
 	 */
 	public int currentDepth() {
-		return (null == x.currentScenario()) ? 0 : x.currentScenario().depth();
+		return null == x.currentScenario() ? 0 : x.currentScenario().depth();
 	}
 
 	/**
@@ -363,7 +364,7 @@ public class Execution extends Common {
 	/**
 	 * Calculate downstream weights of given scenario from current execution
 	 * parameters
-	 * 
+	 *
 	 * @param s Scenario to calculate downstream weights
 	 * @return cumulative downstream weight
 	 */
@@ -375,10 +376,9 @@ public class Execution extends Common {
 			if (!(k.charAt(0) == '_')) {
 				String a = s.getClass().getName().toLowerCase();
 				String b = k.toLowerCase();
-				if (a.contains(b)) {
-					if (!(p.getValue().equals("-")))
+				if (a.contains(b))
+					if (!p.getValue().equals("-"))
 						v = v + Double.valueOf((String) p.getValue());
-				}
 			}
 		}
 		s.downstream(v);
@@ -390,7 +390,7 @@ public class Execution extends Common {
 	 * @return Set of KnownIssues for given query
 	 */
 	public Set<String> getKnownIssue(String p) {
-		HashSet<String> ki = new HashSet<String>();
+		HashSet<String> ki = new HashSet<>();
 		if (null != know)
 			know.forEach((k, v) -> {
 				if (p.contains((String) v)) {
@@ -405,15 +405,9 @@ public class Execution extends Common {
 	}
 
 	/**
-	 * @return Gson object built by cached GsonBuilder
-	 */
-	public Gson gson() {
-		return gsonBuilder.create();
-	}
-
-	/**
 	 * @return browser in which current execution takes place
 	 */
+	@Override
 	public Platform in() {
 		return Platform.get(x.parameters.string("PLATFORM"));
 	}
@@ -422,8 +416,9 @@ public class Execution extends Common {
 	 * @param b
 	 * @return true if current is in defined browser
 	 */
+	@Override
 	public boolean in(Platform b) {
-		return (x.parameters.string("PLATFORM").equals(b.title()));
+		return x.parameters.string("PLATFORM").equals(b.title());
 	}
 
 	/**
@@ -464,16 +459,17 @@ public class Execution extends Common {
 	}
 
 	/**
+	 * @return test description
+	 */
+	public String testDescription() {
+		return y(x.parameters.get("TEST")
+				+ ((x.parameters.get("DOMAIN").toString().isBlank()) ? "" : " on " + y(x.parameters.get("DOMAIN"))));
+	}
+
+	/**
 	 * @return amount of milliseconds since start of test execution
 	 */
 	public Long timer() {
 		return t.millis();
-	}
-
-	/**
-	 * @return test description
-	 */
-	public String testDescription() {
-		return (y(x.parameters.get("TEST") + " on " + y(x.parameters.get("DOMAIN"))));
 	}
 }

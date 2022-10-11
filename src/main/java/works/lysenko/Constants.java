@@ -3,7 +3,7 @@ package works.lysenko;
 @SuppressWarnings("javadoc")
 public class Constants {
 
-	public static final int EXCEPTION_RETRIES = 15;
+	public static final int EXCEPTION_RETRIES = 9;
 	public static final String DEFAULT_TEST = "bot";
 	public static final String DEFAULT_DOMAIN = "";
 
@@ -64,8 +64,13 @@ public class Constants {
 	public final static String _FIRST_SPAN = "(.//span)[1]";
 	public static final String _SECOND_DIV = "(.//div)[2]";
 	public static final String _FIRST_DIV = "(.//div)[1]";
+	public static final String _BUTTON_TEXT = "//button[text()='%1$s']";
+	public static final String _LABEL_TEXT = "//label[text()='%1$s']";
 	public static final String _SPAN_TEXT = "//span[text()='%1$s']";
 	public static final String _DIV_TEXT = "//div[text()='%1$s']";
+	public static final String _H1_TEXT = "//h1[text()='%1$s']";
+	public static final String _H2_TEXT = "//h2[text()='%1$s']";
+	public static final String _LI_TEXT = "//li[text()='%1$s']";
 	public static final String _A_TEXT = "//a[text()='%1$s']";
 	public static final String _P_TEXT = "//p[text()='%1$s']";
 	public static final String CHECKED = "checked";

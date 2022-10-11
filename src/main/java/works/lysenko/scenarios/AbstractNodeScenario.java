@@ -12,7 +12,7 @@ import works.lysenko.Execution;
  * This is abstract implementation of Node Scenario, which have defined both
  * actions to be performed as well as the set of child scenarios to be executed
  * randomly based on their weight coefficients
- * 
+ *
  * @author Sergii Lysenko
  *
  */
@@ -22,38 +22,9 @@ public class AbstractNodeScenario extends AbstractScenario {
 	private boolean halted = false;
 
 	/**
-	 * Create an instance of Node Scenario with defined set of sub-scenarios
-	 * 
-	 * @param ss array of child scenarios with weight coefficient defined within ..
-	 * @param x  instance of Run object
-	 */
-	public AbstractNodeScenario(Execution x, Scenario... ss) {
-		super(x);
-		scenarios = new Scenarios(x);
-		if (null != ss)
-			scenarios.add(new HashSet<Scenario>(Arrays.asList(ss)), x);
-		uWeight = scenarios.upstream();
-	}
-
-	/**
-	 * Create a Node Scenario and add all scenarios from defined package as
-	 * sub-scenarios to this one
-	 * 
-	 * @param s name of package to load child scenarios from with weight coefficient
-	 *          defined within ..
-	 * @param x instance of Run object
-	 */
-	public AbstractNodeScenario(Execution x, String s) {
-		super(x);
-		scenarios = new Scenarios(x);
-		scenarios.add((Set<Scenario>) ScenarioLoader.read(s, x), x);
-		uWeight = scenarios.upstream();
-	}
-
-	/**
 	 * Default constructor adds all scenarios from properly named package as
 	 * sub-scenarios of one being created
-	 * 
+	 *
 	 * @param x instance of Run object
 	 */
 	public AbstractNodeScenario(Execution x) {
@@ -66,7 +37,36 @@ public class AbstractNodeScenario extends AbstractScenario {
 			nameChars[i] = Character.toLowerCase(nameChars[i]); // Lowercase single char
 			name = String.valueOf(nameChars);
 		}
-		scenarios.add((Set<Scenario>) ScenarioLoader.read(name, x), x);
+		scenarios.add(ScenarioLoader.read(name, x), x);
+		uWeight = scenarios.upstream();
+	}
+
+	/**
+	 * Create an instance of Node Scenario with defined set of sub-scenarios
+	 *
+	 * @param ss array of child scenarios with weight coefficient defined within ..
+	 * @param x  instance of Run object
+	 */
+	public AbstractNodeScenario(Execution x, Scenario... ss) {
+		super(x);
+		scenarios = new Scenarios(x);
+		if (null != ss)
+			scenarios.add(new HashSet<>(Arrays.asList(ss)), x);
+		uWeight = scenarios.upstream();
+	}
+
+	/**
+	 * Create a Node Scenario and add all scenarios from defined package as
+	 * sub-scenarios to this one
+	 *
+	 * @param s name of package to load child scenarios from with weight coefficient
+	 *          defined within ..
+	 * @param x instance of Run object
+	 */
+	public AbstractNodeScenario(Execution x, String s) {
+		super(x);
+		scenarios = new Scenarios(x);
+		scenarios.add(ScenarioLoader.read(s, x), x);
 		uWeight = scenarios.upstream();
 	}
 
@@ -75,25 +75,26 @@ public class AbstractNodeScenario extends AbstractScenario {
 	 *                       currently configured for execution
 	 * @return calculated amount of possible execution paths of underlying scenarios
 	 */
+	@Override
 	public int combinations(boolean onlyConfigured) {
 		int c = 0;
-		for (Pair<Scenario, Double> s : scenarios.get()) {
+		for (Pair<Scenario, Double> s : scenarios.get())
 			c = c + s.getKey().combinations(onlyConfigured);
-		}
 		return c;
 	}
 
 	/**
 	 * For a Node Scenario, execution consist of
-	 * 
+	 *
 	 * 1) default execution code defined in super class
-	 * 
+	 *
 	 * 2) logic defined in action()
-	 * 
+	 *
 	 * 3) random execution of one of nested scenarios
-	 * 
+	 *
 	 * 4) final steps defined in finals() of this scenario
 	 */
+	@Override
 	public void execute() {
 		super.execute();
 		action();
@@ -111,12 +112,13 @@ public class AbstractNodeScenario extends AbstractScenario {
 	public void halt() {
 		halted = true;
 	}
-	
+
 	/**
 	 * Returns the set with names of all underlying scenarios
-	 * 
+	 *
 	 * @return set of scenarios
 	 */
+	@Override
 	public Set<Scenario> list() {
 		Set<Scenario> c = super.list();
 		c.addAll(scenarios.list());
@@ -124,16 +126,18 @@ public class AbstractNodeScenario extends AbstractScenario {
 	}
 
 	/**
-	 * @return calculated pervasive weight of this scenario
+	 * @return whether this scenario meets it's prerequisites
 	 */
-	public double upstream() {
-		return uWeight;
+	@Override
+	public boolean sufficed() {
+		return false;
 	}
 
 	/**
-	 * @return whether this scenario meets it's prerequisites
+	 * @return calculated pervasive weight of this scenario
 	 */
-	public boolean sufficed() {
-		return false;
+	@Override
+	public double upstream() {
+		return uWeight;
 	}
 }

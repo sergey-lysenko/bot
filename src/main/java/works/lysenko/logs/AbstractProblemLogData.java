@@ -24,6 +24,7 @@ public abstract class AbstractProblemLogData extends AbstractLogData {
 	/**
 	 * @return default text representation of abstract Log Data
 	 */
+	@Override
 	public String render() {
 		return LogData.renderLog(depth, 0, Ansi.colorize(text, Severity.byCode(tag).color()));
 	}

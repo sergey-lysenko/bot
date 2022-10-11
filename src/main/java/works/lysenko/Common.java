@@ -31,6 +31,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
@@ -46,9 +47,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import io.appium.java_client.service.local.AppiumDriverLocalService;
-
-import org.openqa.selenium.JavascriptExecutor;
-
 import works.lysenko.enums.Ansi;
 import works.lysenko.enums.Platform;
 import works.lysenko.enums.Severity;
@@ -61,7 +59,7 @@ public class Common {
 	/**
 	 * Generate {@link org.openqa.selenium.By} object corresponding to given string
 	 * locator
-	 * 
+	 *
 	 * @param lc string with either xpath or css locator
 	 * @return proper locator object based on contents of source string contents
 	 */
@@ -76,7 +74,7 @@ public class Common {
 	/**
 	 * Generate {@link org.openqa.selenium.By} object corresponding to given string
 	 * locator
-	 * 
+	 *
 	 * @param lc array of strings with either xpath or css locator
 	 * @return proper locator object based on contents of source string contents
 	 */
@@ -86,7 +84,7 @@ public class Common {
 
 	/**
 	 * Shortcut for {@link java.lang.String#format(t, v)}
-	 * 
+	 *
 	 * @param t template
 	 * @param v value
 	 * @return filled in string template
@@ -97,7 +95,7 @@ public class Common {
 
 	/**
 	 * Generate random integer in the defined range
-	 * 
+	 *
 	 * @param l minimum value
 	 * @param u maximum value
 	 * @return random integer
@@ -108,7 +106,7 @@ public class Common {
 
 	/**
 	 * Generate random integer in the defined range with list of values to exclude
-	 * 
+	 *
 	 * @param l minimum value
 	 * @param u maximum value
 	 * @param x list of values to exclude
@@ -124,7 +122,7 @@ public class Common {
 
 	/**
 	 * Return 'true' of 'false' with equal probability
-	 * 
+	 *
 	 * @return random boolean value
 	 */
 	public static boolean isTrue() {
@@ -133,19 +131,19 @@ public class Common {
 
 	/**
 	 * Return 'true' with defined probability, or 'false' otherwise
-	 * 
+	 *
 	 * @param d probability of 'true' selection
 	 * @return random boolean value
 	 */
 	public static boolean isTrue(double d) {
-		if ((d > 1.0) || (d < 0.0))
+		if (d > 1.0 || d < 0.0)
 			throw new IllegalArgumentException("Given probability " + d + " is outside the valid range of [0.0 - 1.0]");
 		return new Random().nextFloat() < d;
 	}
 
 	/**
 	 * Repeat defined key given number of times
-	 * 
+	 *
 	 * @param k key to be repeated
 	 * @param t times to repeat
 	 * @return requested sequence
@@ -159,7 +157,7 @@ public class Common {
 
 	/**
 	 * Get random object from a list of objects
-	 * 
+	 *
 	 * @param <T> type of objects in a list
 	 * @param l   list of objects
 	 * @return random object from a list of objects
@@ -170,7 +168,7 @@ public class Common {
 
 	/**
 	 * Get random object from an array of objects
-	 * 
+	 *
 	 * @param a array of objects
 	 * @return random element from an array of objects
 	 */
@@ -180,7 +178,7 @@ public class Common {
 
 	/**
 	 * Get random object from a set of objects
-	 * 
+	 *
 	 * @param <T> type of objects in a set
 	 * @param s   set of objects
 	 * @return random object from a set of objects
@@ -194,7 +192,7 @@ public class Common {
 	 * Get an element from a list of strings different from defined one. There is no
 	 * check that a list contains defined string, only the exclusion of defined
 	 * value is performed.
-	 * 
+	 *
 	 * @param e string to be excluded from selection
 	 * @param l list of string to select from
 	 * @return an element from a list of strings which differs from specified one
@@ -220,7 +218,7 @@ public class Common {
 
 	/**
 	 * Generate equally probable true or false value
-	 * 
+	 *
 	 * @return 'true' or 'false' with equal probability
 	 */
 	public static boolean trueOrFalse() {
@@ -229,7 +227,7 @@ public class Common {
 
 	/**
 	 * Supply visual representation for non-printable character
-	 * 
+	 *
 	 * @param k key to be screened
 	 * @return visual representation for non-printable character
 	 */
@@ -246,7 +244,7 @@ public class Common {
 
 	/**
 	 * Write lines of the provided set to a file
-	 * 
+	 *
 	 * @param fl optional first line of the text to be added to a file (title)
 	 * @param ss set of lines to be stored in a file
 	 * @param fn name of the file to be written
@@ -258,9 +256,8 @@ public class Common {
 			writer = new BufferedWriter(new FileWriter(fn));
 			if (null != fl)
 				writer.write(fl + System.lineSeparator());
-			for (String s : ss) {
+			for (String s : ss)
 				writer.write(s + System.lineSeparator());
-			}
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -268,42 +265,42 @@ public class Common {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public Output o;
 
 	/**
-	 * 
+	 *
 	 */
 	public Logger l;
 
 	/**
-	 * 
+	 *
 	 */
 	public Results r;
 
 	/**
-	 * 
+	 *
 	 */
 	public Execution x;
 
 	/**
-	 * 
+	 *
 	 */
 	public WebDriver d;
 
 	/**
-	 * 
+	 *
 	 */
 	public WebDriverWait w;
 
 	/**
-	 * 
+	 *
 	 */
 	AppiumDriverLocalService service = null;
 
 	/**
-	 * 
+	 *
 	 */
 	public Common() {
 		super();
@@ -319,22 +316,64 @@ public class Common {
 	}
 
 	/**
-	 * 
-	 * @param lc
+	 * Clear an input by either executing
+	 * {@link org.openqa.selenium.WebElement#clear()} method or by simulating the
+	 * <strong>Ctrl+A</strong> and <strong>Backspace</strong> keystrokes
+	 *
+	 * @param sendKeys <strong>Ctrl+A*</strong> and <strong>Backspace</strong> if
+	 *                 true
+	 * @param lc       locator(s) of elements to clear
 	 */
-	public void clear(String... lc) {
-		l.log("Clearing " + describe(lc));
-		find(true, true, lc).clear();
-		; // Silent find during clear
+	public void clear(boolean sendKeys, String... lc) {
+		WebElement e = find(false, true, lc);
+		clear(sendKeys, e);
 	}
 
 	/**
-	 * 
-	 * @param e
+	 * Clear an input by either executing
+	 * {@link org.openqa.selenium.WebElement#clear()} method or by simulating the
+	 * <strong>Ctrl+A</strong> and <strong>Backspace</strong> keystrokes
+	 *
+	 * @param sendKeys <strong>Ctrl+A*</strong> and <strong>Backspace</strong> if
+	 *                 true
+	 * @param e        element to clear
+	 */
+	public void clear(boolean sendKeys, WebElement e) {
+		l.log("Clearing " + describe(e));
+		if (x._debug())
+			l.log(" text in " + describe(e) + " before clearing: '" + e.getAttribute("value") + "'");
+		if (sendKeys) {
+			e.sendKeys(Keys.CONTROL, "a");
+			e.sendKeys(Keys.BACK_SPACE);
+		} else
+			e.clear();
+		if (x._debug())
+			l.log(" text in " + describe(e) + " after clearing: '" + e.getAttribute("value") + "'");
+	}
+
+	/**
+	 * Clear an input by executing {@link org.openqa.selenium.WebElement#clear()}
+	 * method
+	 *
+	 * @param sendKeys <strong>Ctrl+A*</strong> and <strong>Backspace</strong> if
+	 *                 true
+	 * @param lc       locator(s) of elements to clear
+	 */
+	public void clear(String... lc) {
+		WebElement e = find(false, true, lc);
+		clear(e);
+	}
+
+	/**
+	 * Clear an input by executing {@link org.openqa.selenium.WebElement#clear()}
+	 * method
+	 *
+	 * @param sendKeys <strong>Ctrl+A*</strong> and <strong>Backspace</strong> if
+	 *                 true
+	 * @param e        element to clear
 	 */
 	public void clear(WebElement e) {
-		l.log("Clearing " + describe(e));
-		e.clear();
+		clear(false, e);
 	}
 
 	/**
@@ -342,9 +381,9 @@ public class Common {
 	 * by two double typed relative x and y coordinates, where value 0.0 corresponds
 	 * to leftmost or upmost part of the element, as 1.0 is for rightmost of lowest
 	 * part of an object.
-	 * 
+	 *
 	 * Consequently, coordinates (0.5, 0.5) defining a center of the object
-	 * 
+	 *
 	 * @param x  requested x coordinate offset
 	 * @param y
 	 * @param lc string locator(s) of element to be clicked on
@@ -374,7 +413,7 @@ public class Common {
 		if (lc.length > 0) {
 			boolean done = false;
 			int attempt = 0;
-			do {
+			do
 				try {
 					WebElement e = find(false, true, lc);
 					l.log("Clicking " + describe(lc));
@@ -389,7 +428,7 @@ public class Common {
 					l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
 							+ ", while trying to click(), during attempt " + ++attempt + " ...");
 				}
-			} while ((!done) && (attempt <= EXCEPTION_RETRIES));
+			while (!done && attempt <= EXCEPTION_RETRIES);
 		} else
 			l.logProblem(Severity.S3, "Empty locators list in click()");
 	}
@@ -429,9 +468,9 @@ public class Common {
 	}
 
 	private String describe(WebElement e, boolean geometry) {
-		String an = (x.in(CHROME)) ? e.getAccessibleName() : "";
+		String an = x.in(CHROME) ? e.getAccessibleName() : "";
 		String tg = e.getTagName();
-		return tg + ((an.isEmpty()) ? "" : " '" + an + "'") + ((geometry) ? (" @ " + describe(e.getRect())) : "");
+		return tg + (an.isEmpty() ? "" : " '" + an + "'") + (geometry ? " @ " + describe(e.getRect()) : "");
 	}
 
 	/**
@@ -440,13 +479,12 @@ public class Common {
 	 */
 	public boolean exists(String lc) {
 		int oc = findAll(lc).size();
-		log("... found " + oc + " occurence(s)");
 		return oc > 0;
 	}
 
 	/**
 	 * Find an element defined by one or several nested String locators
-	 * 
+	 *
 	 * @param silent   if true, no output will be added to log
 	 * @param scrollTo if true, window will be scrolled to make this element visible
 	 *                 on screen
@@ -459,7 +497,7 @@ public class Common {
 		WebElement e = null;
 		boolean done = false;
 		int attempt = 0;
-		do {
+		do
 			try {
 				if (!silent && lc.length > 0)
 					l.log("Finding " + lc[0]);
@@ -479,18 +517,17 @@ public class Common {
 						+ ", while trying to find(), during attempt " + ++attempt + " ...");
 				sleep(333);
 			}
-		} while ((!done) && (attempt < EXCEPTION_RETRIES));
+		while (!done && attempt < EXCEPTION_RETRIES);
 		if (attempt >= EXCEPTION_RETRIES) {
 			logProblem(Severity.S1, "Maximum retries amount reached, find() returns null, test failure imminent");
 			return null;
-		} else {
-			return (scrollTo) ? find(e) : e;
-		}
+		} else
+			return scrollTo ? find(e) : e;
 	}
 
 	/**
 	 * Find an element defined by one or several nested String locators
-	 * 
+	 *
 	 * @param lc one or several nested String locators
 	 * @return WebElement object
 	 */
@@ -501,7 +538,7 @@ public class Common {
 	/**
 	 * "Find" an element which could be located outside of current view by
 	 * performing moveToElement() call
-	 * 
+	 *
 	 * @param e WebElement to scroll to
 	 * @return same web element
 	 */
@@ -528,18 +565,19 @@ public class Common {
 
 	/**
 	 * Find all elements defined by string locator
-	 * 
+	 *
 	 * @param lc locator of 1-n elements to be found
 	 * @return list of located element references
 	 */
 	public List<WebElement> findAll(String lc) {
-		l.log("Finding all " + lc + " elements");
-		return d.findElements(by(lc));
+		List<WebElement> e = d.findElements(by(lc));
+		l.log("Finding all " + lc + " > " + e.size() + " elements");
+		return e;
 	}
 
 	/**
 	 * Find visible instance of the defined element and the click on it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void findThenClick(String lc) {
@@ -547,24 +585,23 @@ public class Common {
 		WebElement target = null;
 		boolean done = false;
 		int attempt = 0;
-		do {
+		do
 			try {
-				for (WebElement e : list) {
+				for (WebElement e : list)
 					if (e.isDisplayed())
 						target = e;
-				}
 				done = true;
 			} catch (TimeoutException ex) {
 				l.logProblem(Severity.S2, "Caught " + ex.getClass().getName()
 						+ ", while trying to findThenClick(), during attempt " + ++attempt + " ...");
 			}
-		} while ((!done) || (attempt > EXCEPTION_RETRIES));
+		while (!done || attempt > EXCEPTION_RETRIES);
 		target.click();
 	}
 
 	/**
 	 * Calculate a point placed in a center of a rectangle
-	 * 
+	 *
 	 * @param r Rectangle
 	 * @return Point located in a center of the given Rectangle
 	 */
@@ -576,7 +613,7 @@ public class Common {
 	 * Calculate a point based on a rectangle and relative coefficients of x and y
 	 * coordinates. Coordinate 0.0 corresponds to leftmost or upper part of the
 	 * rectangle, and 1.0 is for rightmost of lowest part of an object.
-	 * 
+	 *
 	 * @param x horizontal location of the requested point relative to the given
 	 *          rectangle
 	 * @param y vertical location of the requested point relative to the given
@@ -634,7 +671,7 @@ public class Common {
 
 	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.log(ll, s)}
-	 * 
+	 *
 	 * @param ll
 	 * @param s
 	 */
@@ -644,7 +681,7 @@ public class Common {
 
 	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.log(s)}
-	 * 
+	 *
 	 * @param s
 	 */
 	public void log(String s) {
@@ -653,7 +690,7 @@ public class Common {
 
 	/**
 	 * Shortcut for {@link works.lysenko.Logger#l.logProblem(s)}
-	 * 
+	 *
 	 * @param se
 	 * @param st
 	 */
@@ -662,7 +699,7 @@ public class Common {
 	}
 
 	private void makeCodeshot(String p, String f) {
-		String ext = (x.in(ANDROID)) ? ".xml" : ".html";
+		String ext = x.in(ANDROID) ? ".xml" : ".html";
 		try {
 			Files.writeString(Path.of(p, f + ext), d.getPageSource());
 		} catch (IOException e) {
@@ -673,7 +710,7 @@ public class Common {
 	/**
 	 * Produce a full-screen PNG Screenshot and save it in a location defined by
 	 * DEFAULT_SHOTS_LOCATION
-	 * 
+	 *
 	 * @param n of the screenshot
 	 */
 	public void makeScreenshot(String n) {
@@ -683,7 +720,7 @@ public class Common {
 	/**
 	 * Produce a framed PNG Screenshot of defined element and save it in a location
 	 * defined by DEFAULT_SHOTS_LOCATION
-	 * 
+	 *
 	 * @param element to be used for local framed screenshot
 	 * @param name    of the screenshot
 	 * @param x
@@ -708,7 +745,7 @@ public class Common {
 	/**
 	 * Simultaneously make a full-screen screenshot and a copy of page html code and
 	 * save in a location defined by DEFAULT_SHOTS_LOCATION
-	 * 
+	 *
 	 * @param f name of snapshot
 	 * @param x
 	 */
@@ -719,7 +756,7 @@ public class Common {
 
 	/**
 	 * Open a page defined by url or domain.
-	 * 
+	 *
 	 * @param u domain or full url
 	 */
 	public void open(String u) {
@@ -740,11 +777,11 @@ public class Common {
 		l.log("Opening " + url.toString());
 		d.get(url.toString());
 	}
-	
+
 	/**
 	 * Open a page defined by protocol and domain. Protocol parameter could be
 	 * overridden by directly specifying protocol in the domain parameter value
-	 * 
+	 *
 	 * @param p default protocol
 	 * @param u domain or full url
 	 */
@@ -767,16 +804,16 @@ public class Common {
 	 * Populate links to sub-objects from Execution
 	 */
 	public void populateShortcuts() {
-		this.d = x.d;
-		this.l = x.l;
-		this.o = x.o;
-		this.r = x.r;
-		this.w = x.w;
+		d = x.d;
+		l = x.l;
+		o = x.o;
+		r = x.r;
+		w = x.w;
 	}
 
 	/**
 	 * Read contents of the element defined by string locator
-	 * 
+	 *
 	 * @param lc string locator of an element
 	 * @return result of .getText() for this element
 	 */
@@ -787,7 +824,7 @@ public class Common {
 
 	/**
 	 * Read contents of the WebElement
-	 * 
+	 *
 	 * @param e WebElement to read text from
 	 * @return text
 	 */
@@ -798,7 +835,7 @@ public class Common {
 	/**
 	 * Read contents of given WebElement with optional logging of geometry
 	 * information
-	 * 
+	 *
 	 * @param e
 	 * @param geometry
 	 * @return result of .getText() for this element
@@ -823,7 +860,7 @@ public class Common {
 
 	/**
 	 * Read value attribute of the element defined by String locator
-	 * 
+	 *
 	 * @param lc string locator of an element
 	 * @return contents of value attribute of the element
 	 */
@@ -834,7 +871,7 @@ public class Common {
 
 	/**
 	 * Read value attribute of the element
-	 * 
+	 *
 	 * @param e an element
 	 * @return contents of value attribute of the element
 	 */
@@ -845,7 +882,7 @@ public class Common {
 
 	/**
 	 * Produce BASE64 encoded string screenshot of an element
-	 * 
+	 *
 	 * @param lc string locator of requested element
 	 * @return BASE64 encoded string screenshot
 	 */
@@ -855,7 +892,7 @@ public class Common {
 
 	/**
 	 * Add a section title to the test log
-	 * 
+	 *
 	 * @param s string to be added as section title
 	 */
 	public void section(String s) {
@@ -865,7 +902,7 @@ public class Common {
 
 	/**
 	 * Send keys as Action
-	 * 
+	 *
 	 * @param s CharSequence to send
 	 */
 	public void sendKeys(CharSequence s) {
@@ -874,7 +911,7 @@ public class Common {
 
 	/**
 	 * Send keys as Action defined number of times
-	 * 
+	 *
 	 * @param s CharSequence to send
 	 * @param i times to repeat
 	 */
@@ -886,7 +923,7 @@ public class Common {
 
 	/**
 	 * Send keys to the element defined by string locator
-	 * 
+	 *
 	 * @param lc string locator of target input element
 	 * @param s  CharSequence to send
 	 */
@@ -900,7 +937,7 @@ public class Common {
 
 	/**
 	 * Sleep during defined amount of milliseconds
-	 * 
+	 *
 	 * @param ms
 	 */
 	public void sleep(long ms) {
@@ -910,7 +947,7 @@ public class Common {
 	/**
 	 * Sleep during defined amount of milliseconds with optional bypassing of
 	 * logging
-	 * 
+	 *
 	 * @param ms
 	 * @param silent
 	 */
@@ -920,7 +957,7 @@ public class Common {
 
 	/**
 	 * Sleep during defined amount of milliseconds with optional custom message
-	 * 
+	 *
 	 * @param ms amount of milliseconds to pause for
 	 * @param s
 	 */
@@ -934,7 +971,7 @@ public class Common {
 	/**
 	 * Sleep during defined amount of milliseconds with optional custom message and
 	 * optional bypassing of logging
-	 * 
+	 *
 	 * @param ms     amount of milliseconds to pause for
 	 * @param s      text to displey in log, can be set to null for default
 	 *               "Sleeping X ms" message
@@ -943,7 +980,7 @@ public class Common {
 	public void sleep(long ms, String s, boolean silent) {
 		try {
 			if (!silent)
-				l.log((null == s) ? "Sleeping " + ms + " ms" : s);
+				l.log(null == s ? "Sleeping " + ms + " ms" : s);
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -952,7 +989,7 @@ public class Common {
 
 	/**
 	 * Switch to other WebDriver window
-	 * 
+	 *
 	 * @param w window handle to switch to
 	 */
 	public void switchTo(String w) {
@@ -964,7 +1001,7 @@ public class Common {
 	 * Call {@link Common#typeInto(String, Object, double, boolean)} with
 	 * {@code pasteProbability} set to {@value 0} and {@code secret} set to
 	 * {@value false}
-	 * 
+	 *
 	 * @param lc single String locator. To facilitate multilevel search, use
 	 *           {@code typeInto(find(str1, str2, ...), ...);}
 	 * @param c  Content to type, Object.toString() in used to get string
@@ -978,7 +1015,7 @@ public class Common {
 	/**
 	 * Call {@link Common#typeInto(String, Object, double, boolean)} with
 	 * {@code pasteProbability} set to {@value 0}
-	 * 
+	 *
 	 * @param lc     single String locator. To facilitate multilevel search, use
 	 *               {@code typeInto(find(str1, str2, ...), ...);}
 	 * @param c      Content to type, Object.toString() in used to get string
@@ -994,7 +1031,7 @@ public class Common {
 	/**
 	 * Call {@link Common#typeInto(String, Object, double, boolean)} with
 	 * {@code secret} set to {@value false}
-	 * 
+	 *
 	 * @param lc single String locator. To facilitate multilevel search, use
 	 *           {@code typeInto(find(str1, str2, ...), ...);}
 	 * @param c  Content to type, Object.toString() in used to get string
@@ -1010,7 +1047,7 @@ public class Common {
 	/**
 	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
 	 * WebElement defined by String locator
-	 * 
+	 *
 	 * @param lc     single String locator. To facilitate multilevel search, use
 	 *               {@code typeInto(find(str1, str2, ...), ...);}
 	 * @param c      Content to type, Object.toString() in used to get string
@@ -1030,7 +1067,7 @@ public class Common {
 	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
 	 * {@code pasteProbability} set to {@value 0} and {@code secret} set to
 	 * {@value false}
-	 * 
+	 *
 	 * @param e WebElement to type into
 	 * @param c Content to type, Object.toString() in used to get string
 	 *          representation
@@ -1043,7 +1080,7 @@ public class Common {
 	/**
 	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
 	 * {@code pasteProbability} set to {@value 0}
-	 * 
+	 *
 	 * @param e      WebElement to type into
 	 * @param c      Content to type, Object.toString() in used to get string
 	 *               representation
@@ -1058,7 +1095,7 @@ public class Common {
 	/**
 	 * Call {@link Common#typeInto(WebElement, Object, double, boolean)} with
 	 * {@code secret} set to {@value false}
-	 * 
+	 *
 	 * @param e  WebElement to type into
 	 * @param c  Content to type, Object.toString() in used to get string
 	 *           representation
@@ -1072,7 +1109,7 @@ public class Common {
 
 	/**
 	 * Simulate typing the value into the WebElement
-	 * 
+	 *
 	 * @param e      WebElement to type into
 	 * @param c      Content to type, Object.toString() in used to get string
 	 *               representation
@@ -1084,7 +1121,7 @@ public class Common {
 	 */
 	public boolean typeInto(WebElement e, Object c, double pp, boolean secret) {
 		CharSequence symbols = String.valueOf(c);
-		l.log("Typing '" + ((secret) ? "•".repeat(symbols.length()) : c) + "' into " + describe(e));
+		l.log("Typing '" + (secret ? "•".repeat(symbols.length()) : c) + "' into " + describe(e));
 		try {
 			if (isTrue(pp)) {
 				// simulation of pasting from clipboard by instant addition of all content
@@ -1101,7 +1138,7 @@ public class Common {
 		} catch (Exception ex) {
 			logProblem(Severity.S2,
 					"Exception " + ex.getClass().getName() + " caught while trying to type '"
-							+ ((secret) ? "•".repeat(symbols.length()) : c) + "' into " + describe(e)
+							+ (secret ? "•".repeat(symbols.length()) : c) + "' into " + describe(e)
 							+ ", attempting workaround ...");
 			Actions action = new Actions(x.d);
 			action.moveToElement(e).click().sendKeys(String.valueOf(c)).build().perform();
@@ -1120,7 +1157,7 @@ public class Common {
 
 	/**
 	 * Verify that defined element is enabled and then click on it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void verifyThenClick(String lc) {
@@ -1131,7 +1168,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void wait(String lc) {
@@ -1140,7 +1177,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void wait(String[] lc) {
@@ -1149,7 +1186,7 @@ public class Common {
 
 	/**
 	 * Wait for an element to be clickable
-	 * 
+	 *
 	 * @param lc string locator of an element expected to be clickable
 	 */
 	public void waitClickable(String lc) {
@@ -1159,7 +1196,7 @@ public class Common {
 
 	/**
 	 * Wait for an element to be not visible
-	 * 
+	 *
 	 * @param lc string locator of an element expected to be invisible
 	 */
 	public void waitInvisibility(String lc) {
@@ -1169,7 +1206,7 @@ public class Common {
 
 	/**
 	 * Wait for an element to be selected
-	 * 
+	 *
 	 * @param lc string locator of an element expected to be selected
 	 */
 	public void waitSeleted(String lc) {
@@ -1179,7 +1216,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element and the click on it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 * @param x
 	 * @param y
@@ -1191,7 +1228,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element and the click on it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void waitThenClick(String lc) {
@@ -1201,7 +1238,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element and the click on it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void waitThenClick(String[] lc) {
@@ -1211,7 +1248,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element and return reference to it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 * @return element
 	 */
@@ -1222,7 +1259,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element and return reference to it
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 * @return element
 	 */
@@ -1233,7 +1270,7 @@ public class Common {
 
 	/**
 	 * Wait for a text value of an element to be as defined
-	 * 
+	 *
 	 * @param lc string locator of an element
 	 * @param s  expected value
 	 */
@@ -1244,7 +1281,7 @@ public class Common {
 
 	/**
 	 * Wait for a text value of an element to change from defined one
-	 * 
+	 *
 	 * @param lc string locator of an element
 	 * @param s  the value to change from
 	 * @return value after the detected change
@@ -1257,11 +1294,12 @@ public class Common {
 
 	/**
 	 * Wait for a text value to be not empty
-	 * 
+	 *
 	 * @param lc string locator of an element
 	 * @return value after the detected change
 	 */
 	public String waitValueNotEmpty(String lc) {
+		// TODO: this routine seems to be working not as expected
 		l.log("Waiting while " + lc + " is still empty");
 		w.until(ExpectedConditions.not(ExpectedConditions.textToBe(by(lc), "")));
 		sleep(333);
@@ -1272,7 +1310,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void waitVisibility(String lc) {
@@ -1282,7 +1320,7 @@ public class Common {
 
 	/**
 	 * Wait for appearance of the defined element
-	 * 
+	 *
 	 * @param lc string locator of an element to be waited for
 	 */
 	public void waitVisibility(String[] lc) {

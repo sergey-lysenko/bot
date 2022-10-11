@@ -62,9 +62,8 @@ public class Parameters extends Properties {
 			String[] data = list.split(";");
 			params = data[0].split(":");
 			types = data[1].split(":");
-			for (String param : params) {
+			for (String param : params)
 				read(param);
-			}
 		}
 
 		if (!(Execution.insideDocker() || Execution.insideCI())) {
@@ -83,9 +82,9 @@ public class Parameters extends Properties {
 
 		// Additional parameters
 		if (null != params) {
-			aparams = new LinkedList<JTextField>();
+			aparams = new LinkedList<>();
 			int i = 0;
-			for (String param : params) {
+			for (String param : params)
 				switch (types[i++]) {
 				case "t":
 					aparams.add(new JTextField((String) get(param), WIDTH));
@@ -95,33 +94,7 @@ public class Parameters extends Properties {
 					break;
 				default:
 				}
-			}
 		}
-	}
-
-	private void platforms() {
-
-		List<String> platformNames = platformNames();
-
-		// Creating Browsers ComboBox
-		platform = new JComboBox<Object>(platformNames.toArray());
-		platform.setSelectedItem((String) get("PLATFORM"));
-
-		reset = new JButton("reset");
-		reset.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Platforms.reset();
-				System.exit(2);
-			}
-		});
-	}
-
-	private List<String> platformNames() {
-		List<String> platformNames = new LinkedList<String>();
-		for (Platform b : Platforms.available())
-			platformNames.add(b.title());
-		platformNames.sort(null);
-		return platformNames;
 	}
 
 	private JPanel dialogueBox() {
@@ -168,12 +141,38 @@ public class Parameters extends Properties {
 		}
 	}
 
+	private List<String> platformNames() {
+		List<String> platformNames = new LinkedList<>();
+		for (Platform b : Platforms.available())
+			platformNames.add(b.title());
+		platformNames.sort(null);
+		return platformNames;
+	}
+
+	private void platforms() {
+
+		List<String> platformNames = platformNames();
+
+		// Creating Browsers ComboBox
+		platform = new JComboBox<>(platformNames.toArray());
+		platform.setSelectedItem(get("PLATFORM"));
+
+		reset = new JButton("reset");
+		reset.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Platforms.reset();
+				System.exit(2);
+			}
+		});
+	}
+
 	private void propagate() {
 
 		// Propagation of the user input
 		put("DOMAIN", domain.getText());
-		put("PLATFORM", (platform.getSelectedItem() == null) ? "" : platform.getSelectedItem().toString());
-		put("TEST", (test.getSelectedItem() == null) ? "" : test.getSelectedItem().toString());
+		put("PLATFORM", platform.getSelectedItem() == null ? "" : platform.getSelectedItem().toString());
+		put("TEST", test.getSelectedItem() == null ? "" : test.getSelectedItem().toString());
 
 		// Additional parameters
 		if (null != aparams) {
@@ -231,12 +230,13 @@ public class Parameters extends Properties {
 	private void tests() {
 
 		// Tests
-		List<String> tests = new LinkedList<String>();
+		List<String> tests = new LinkedList<>();
 		tests.add((String) get("TEST"));
 
 		// Retrieving possible test names
 		File dir = new File(TESTS);
 		File[] files = dir.listFiles(new FilenameFilter() {
+			@Override
 			public boolean accept(File dir, String name) {
 				return name.endsWith(TEST);
 			}
@@ -253,7 +253,7 @@ public class Parameters extends Properties {
 		}
 
 		// Creating Tests ComboBox
-		test = new JComboBox<Object>(tests.toArray());
-		test.setSelectedItem((String) get("TEST"));
+		test = new JComboBox<>(tests.toArray());
+		test.setSelectedItem(get("TEST"));
 	}
 }

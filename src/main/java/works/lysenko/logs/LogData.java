@@ -1,19 +1,13 @@
 package works.lysenko.logs;
 
 /**
- * @author Sergii Checkbox
+ * @author Sergii Lysenko
  */
 public interface LogData {
 
-	// TODO: why not .toString();?
-	/**
-	 * @return text representation of Log Data
-	 */
-	public String render();
-
 	/**
 	 * Render log data
-	 * 
+	 *
 	 * @param d depth of log (number of added spaces)
 	 * @param l level of log (number of dots)
 	 * @param s message
@@ -23,9 +17,15 @@ public interface LogData {
 		StringBuilder sb = new StringBuilder();
 		sb.append(" ".repeat(Math.abs(d))); // logical scenario level
 		sb.append("•".repeat(Math.abs(l))); // logical message level
-		sb.append(((0 == l) ? "" : " ")); // optional space
+		sb.append(0 == l ? "" : " "); // optional space
 		sb.append(s); // message
 		return sb.toString();
 	}
+
+	// TODO: why not .toString();?
+	/**
+	 * @return text representation of Log Data
+	 */
+	public String render();
 
 }

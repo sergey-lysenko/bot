@@ -8,59 +8,71 @@ Universal Bot for Exploratory testing based on Selenium WebDriver
 * Maven 3.x
 * Eclipse or other IDE by your preference
 
-## Required Configuration for local executions ##
+## Test Execution ##
 
-* On linux, make a copy of ./env.bash (preferably named ./_env.bash as it is already included in the .gitignore file) and fill in CI, TEST and other variables with proper values
-* On windows, same environment variables should be added in order to have ability to execute tests from command line
+Use  *./bot.sh* or *./bot.cmd* scripts to start local test execution. 
+These scripts are one-liners for staring of the Maven build with required parameters.
 
-## Environment variables ##
+## Test Parameters ##
+
+There are several parameters to be defined before execution of a test.
+It is possible to define exact values of these parameters by either setting up Environment Variables, or by typing them into the Test Parameters dialogue box shown before test execution.
+It is intended to use only Enviroment Variables for defining test parameters during execution within CI pipeline.
+Values of parameters are persisted between consequent executions in */target/parameters* file.
+Parameter value defined as Environment Variable has greater priority then the one persisted in the */target/parameters* cache.
+However, it is still possible to change all values before actual test execution in the Test Parameters dialogue.
 
 Name|Meaning|Default value
 ---|---|---
 CI|CI environment?|true
-TEST|Name of test configuration|bot
+IWAIT|Implicit wait in seconds. This is a period of time spent by WebDriver implicitly during page navigation.|1
+EWAIT|Explicit wait in seconds. This is effectively a Timeout configuration for long waits. For example, default value of 30 seconds is not enough to have Lendfast test passed|30
+TEST|Name of test configuration to be executed|**no default value**
+DOMAIN|Target deployment address|**no default value**
+EMAIL|login for primary test account|**no default value**
+PASSWORD|password for primary test account|**no default value**
 
-CI environment variable should be defined (to any value) to trigger the logic of automatic closing of browser after tests execution.
+**CI** environment variable should be defined (to any value) to simulate behavior in CI/pipelines. There will be no GUI for parameters input. Browser will be automatically closed after tests execution. 
 
-"Name of test configuration" corresponds to the property file name in the */src/test/resources* directory
+**Name of test configuration** corresponds to the file name (without *.test* extension) in the */qa/src/test/resources/tests* directory
 
 ## Test configurations ##
 
-Files in */src/test/resources* directory are test configurations. These are standard Java property files with two types of records:
+Files in */qa/src/test/resources/tests* directory are various test configurations. These are standard Java property files with two types of records:
 
 * **_parameter = value** are several test parameters explained below
 * **scenario.name = x.x** where double **x.x** defines the chance of particular scenario to be executed.
 
-Omitted scenarios considered to have 0 chance of being selected for execution, initially. However, it is not required to have each and every scenario mentioned in this configuration file in order for them to be executed.
+Omitted scenarios considered to have 0.0 chance of being selected for execution. However, it is not required to have each and every scenario mentioned in this configuration file in order for them to be executed.
 
-## _include_upstream and _include_downstream parameters ##
+Name|Meaning|Default value
+---|---|---
+_root|package to start execution from. This is the single required parameter|**no default value**
+_cycles|Number of test repetitions|1
+_include_upstream|Whether to propagate weights of defined scenarios to their ancestors|false
+_include_downstream|Whether to propagate weights of defined scenarios to their descendants|false
+_debug|Include additional debug information into log output|false
+*fully.qualified.class.Name*|Weight coefficient for a scenario|0.0
+
+### _include_upstream and _include_downstream parameters ###
 
 To execute a single scenario,
 
-1. add this scenario to the configuration, for example *works.lysenko.scenarios.google.character.Enter = 1.0*
+1. add this scenario to the configuration, for example *works.lysenko.scenarios.Character = 0.01*
 2. add *_include_upstream = true* parameter in order to automatically add the same weight coefficient to all parent scenarios
 
 To execute a subset of scenarios,
 
-1. add the scenario which is the root of the group to be executed, for example *works.lysenko.scenarios.Google = 1.0*
+1. add the scenario which is the root of the group to be executed, for example *works.lysenko.scenarios.Quote = 0.01*
 2. add *_include_downstream = true* parameter in order to automatically add the same weight coefficient to all subsequent scenarios
 
-See examples in the */src/test/resources* directory
+## Sourcecode overview ##
 
-## _cycles parameter ##
-
-This parameter used by works.lysenko.Cycles class as a number of times to repeat test cycle. General idea is that by using different number of executions it is possible to have minimal acceptance tests in case of low number of executions, regression tests in case of middle number of cycles, and stability tests in case of high cycles count. While exactly the same code base user for all types of testing, therefore less maintenance and tooling variance.
-
-## _conjoint and _debug parameters ##
-
-These are two boolean parameters.
-
-First one is not used by framework part, and is for use within tests only, to distinguish two different modes of test execution, which will be described later. 
-
-Setting the _debug parameter to 'true' adds more diagnostic information to console:
-
-1. Each line in console log prepended by time in milliseconds passed since previous log record.
-2. Each interaction with shared data storage dumps snapshot of that data into the console log and as a file into /target/runs directory.
+Location|Description
+---|---
+src/test/java/works/lysenko/bot|Location of the main Bot test java class
+src/test/java/works/lysenko/scenarios|Generic Bot test scenarios
+src/main/java/works/lysenko/*|Wrapper library which provides additional functionality to standard WebDriver API
 
 ## Used Software components overview ##
 
@@ -78,30 +90,32 @@ Several **Apache Commons** libraries are used, namely **commons-math3**, **commo
 
 ## Testing process overview ##
 
-Each test "physically" is an execution of Bot.java by means of JUnit5 and Selenium WebDriver. To execute a test, put up required values into modified local copy *./_env.bash* file and execute the following command: `. ./_env.bash; mvn clean install`
+Each test "physically" is an execution of BotTest.java by means of JUnit5 and Selenium WebDriver. To execute a test, put up required values into modified local copy *./_env.bash* file and execute the following command: `. ./_env.bash; mvn clean install`
 
-Bot.java itself consists of four simple parts:
+BotTest.java itself consists of four simple steps:
 
 1. setupTest() - create the shared test execution context and root set of Leaf Scenarios
 2. init() - perform logging into the application
 3. cycles.execute() - perform requested amount of testing cycles
 4. quit() - write updated default configuration, write execution stats to the console, write json file for ELK import, and finally close the test Browser (or do not close, depending on the configuration)
 
-It is possible to have **_cycles = 0**. In this case, only init() will be executed.
+It is possible to have **cycles = 0**. In this case, only init() will be executed.
 
 Each test cycle (Step 3) consists of several stages:
 
-* defining the root set of scenario for execution (done by *Cycles.execute()*)
+* defining the root set of scenario for execution (done by *Cycles.execute()*) 
 * performing the selection (based on the weight coefficients defined in the configuration file) of one of scenarios from this group
 
 In turn, selection of a scenario from a set (done by Scenarios.execute()) is a sequence of:
 
 1. Creating the list of execution candidates
 2. Algorithmical selection of a candidate (based on weight coefficient) 
-3. Verification of prerequisites for preselected candidate. If prerequisites are not met, preselected candidate is rejected, removed from list of candidates, and mathematical selection (step 2) performed again. If prerequisites are satisfied, selected scenario is executed.
-4. Steps 2 and 3 repeated until one of three happens: 1) Mathematically selected scenario meets prerequisites, 2) maximum amount of retries done (defined by works.lysenko.Constants.DEFAULT_SUFFICIENCY_RETRIES), or 3) list of candidates become empty. By design, all mentioned problems are not exceptional. Warnings and Notices are posted to console and saved in json result file.
+3. Verification of prerequisites for preselected candidate. If prerequisites are not met, preselected candidate is rejected, removed from list of candidated, and mathematical selection (step 2) performed again. If prerequisites are satisfied, selected scenario is executed.
+4. Steps 2 and 3 repeated until one of three happens: 1) Mathematically selected scenario meets prerequisites, 2) maximum amount of retries done (currently - 5, defined as constant in the source code), or 3) list of candidates become empty
 
-Now, there are three possibilities:
+By design, all mentioned problems are not exceptional. Warnings and Notices are posted to console and saved in json result file.
+
+Now, there are two possibilities:
 
 1. Selected scenario is Node Scenario (Node have nested scenarios, one of which will be selected for further execution)
 2. Selected scenario is Leaf Scenario (Leaf scenario have no nested ones, and the execution of a cycle is complete after it's selection and execution)
@@ -115,18 +129,17 @@ Execution of Node Scenario (see AbstractNodeScenario.java) is:
 4. finals() - final actions for a scenario
 5. done() - technical finalization of scenario
 
-Execution of Leaf scenario (see AbstractLeafScenario.java) is:
+Execution of Leaf scenario (see AbstractNodeScenario.java) is:
 
 1. super.execute() - execution AbstractScenario.execute() (see above)
 2. action() - performing Scenario Actions (for example - deletion of a Solution)
 3. finals() - final actions for a scenario
-4. done() - technical finalization of scenario
 
 ## Scenarios graph ##
 
-Scenarios are structured as a common graph. This graph have a set of level-1 Elements which used by Cycles class for initiation of each consequenr test execution. All elements could be of any type, but only Node scenarios are used for linking with next-level scenarios. In the current implementation, test examples, and result visualization, assumes that scenarios are organized as tree. However, it is already possible to create graph-like interlinking. Later implementations of framework will support graph scenarios in more fully.
+Scenarios are structured as a graph, which starts from the set of root Node elements and ends by one-level layer of Leaf elements.
 
-Each test cycle is a random weighted and prerequisited selection of several Node scenarios and single ending Leaf Scenario, for example:
+Each test cycle is a random weighted and requisited selection of sequence of several Node scenarios and single ending Leaf Scenario, for example:
 
 Node 'Elements' >> Node 'Edit' >> Leaf 'Delete'
 
@@ -134,6 +147,11 @@ Each scenario, either of Node, Leaf or Mono type, can have or not have any Actio
 
 ## Scenario Prerequisites ##
 
-Each scenario class could have Boolean sufficed() method redefined in order to indicate readiness of the Scenario to be executed. All scenarios are not sufficed by default.
+Each scenario class could have Boolean sufficed() method redefined in order to indicate readiness of the Scenario to be executed. Node scenarios are sufficed by default, while Leaf scenarios are not sufficed by default. This is done to 'enforce' definition of sufficed() method for Leaf scenarios.
 
-Recommended way to manage the state of the system is by sharing the data through Properties Run.data object.
+Recommended way to manage the state of the system is by sharing the data through Properties Run.data object (see scenarios/solutions/create/Create.java for an example)
+
+## Branches and contributions ##
+
+* Make you ongoing commits either to **dev** branch or to a **feature_branch**, upon your judgement
+* Contents of **main** branch treated as a release which is ready to be used for tests

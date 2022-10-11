@@ -1,7 +1,7 @@
 package works.lysenko;
 
-import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.FILENAME;
+import static works.lysenko.Constants.RUNS;
 import static works.lysenko.Constants.RUN_LOG_FILENAME;
 import static works.lysenko.enums.Platform.CHROME;
 
@@ -70,24 +70,25 @@ public class Logger {
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to open log file for writting");
 		}
-		this.logsToRead = (null == logsToRead) ? new HashSet<String>() : logsToRead;
-		this.log = new PriorityQueue<LogRecord>((new Comparator<LogRecord>() {
+		this.logsToRead = null == logsToRead ? new HashSet<>() : logsToRead;
+		log = new PriorityQueue<>(new Comparator<LogRecord>() {
+			@Override
 			public int compare(LogRecord o1, LogRecord o2) {
 				return o1.time().compareTo(o2.time());
 			}
-		}));
+		});
 	}
 
 	/**
 	 * Write a string of text to test execution log with defined logical level as
 	 * visual queues, for example:
-	 * 
+	 *
 	 * This is the level 0 record
-	 * 
+	 *
 	 * • This is the level 1 record
-	 * 
+	 *
 	 * •• This is the level 2 record
-	 * 
+	 *
 	 * @param l log level, 0 is for no markers, 1-n is for number of '•' markers
 	 *          before a string
 	 * @param s string of text to be written to log
@@ -99,7 +100,7 @@ public class Logger {
 	/**
 	 * Write a string of text to test execution log with preceding check of browser
 	 * console for present errors and eventual output of found browser console logs
-	 * 
+	 *
 	 * @param l log level, 0 is for no markers, 1-n is for number of '•' markers
 	 *          before a string
 	 * @param s string of text to be written to log
@@ -115,7 +116,7 @@ public class Logger {
 		if (x.in(CHROME)) {
 			if (logsToRead.contains(LogType.BROWSER)) {
 				ls = x.d.manage().logs().get(LogType.BROWSER);
-				long time = ((null == t) ? x.timer() : t);
+				long time = null == t ? x.timer() : t;
 				for (LogEntry e : ls) {
 					long timestamp = e.getTimestamp() - x.t.startedAt(); // since test start
 					long difference = time - timestamp; // since capturing
@@ -124,22 +125,20 @@ public class Logger {
 			}
 			if (logsToRead.contains(LogType.CLIENT)) {
 				ls = x.d.manage().logs().get(LogType.CLIENT);
-				long time = ((null == t) ? x.timer() : t);
-				for (LogEntry e : ls) {
+				long time = null == t ? x.timer() : t;
+				for (LogEntry e : ls)
 					log.add(problem(time, depth, "[CLIENT] " + e.toString()));
-				}
 			}
 			if (logsToRead.contains(LogType.DRIVER)) {
 				ls = x.d.manage().logs().get(LogType.DRIVER);
-				long time = ((null == t) ? x.timer() : t);
-				for (LogEntry e : ls) {
+				long time = null == t ? x.timer() : t;
+				for (LogEntry e : ls)
 					log.add(problem(time, depth, "[DRIVER] " + e.toString()));
-				}
 			}
 		}
 
 		AbstractLogData ld = new Log(x.currentDepth(), l, s);
-		long time = ((null == t) ? x.timer() : t);
+		long time = null == t ? x.timer() : t;
 		lr = new LogRecord(time, ld);
 		log.add(lr);
 		process();
@@ -148,9 +147,9 @@ public class Logger {
 	/**
 	 * Write a string of text into the test execution log with logical level 1, for
 	 * example:
-	 * 
+	 *
 	 * • This is the level 1 record
-	 * 
+	 *
 	 * @param s string of text to be written to log
 	 */
 	public void log(String s) {
@@ -170,7 +169,7 @@ public class Logger {
 
 	/**
 	 * Write a string to a named log file
-	 * 
+	 *
 	 * @param s  text to write
 	 * @param n  name of log file
 	 * @param ex extension of log file
@@ -206,17 +205,11 @@ public class Logger {
 		} catch (IOException e1) {
 			// NOP
 		}
-		/*try {
-			Files.createSymbolicLink(link, target);
-			TODO: fix for windows   
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
 	}
 
 	/**
 	 * Log a problem as Known Issue
-	 * 
+	 *
 	 * @param s description of known issue
 	 */
 	public void logKnownIssue(String s) {
@@ -234,7 +227,7 @@ public class Logger {
 
 	/**
 	 * Log a problem
-	 * 
+	 *
 	 * @param se severity of the problem
 	 * @param st description of the problem
 	 */
@@ -246,9 +239,9 @@ public class Logger {
 	private LogRecord problem(long t, int d, String p) {
 		LogRecord lr;
 		Set<String> ki = x.getKnownIssue(p);
-		if (ki.size() > 0) {
+		if (ki.size() > 0)
 			lr = new LogRecord(t, new KnownIssue(d, "[KNOWN-ISSUE]:" + ki.toString() + ":" + p));
-		} else if (p.contains("[SEVERE]")) {
+		else if (p.contains("[SEVERE]")) {
 			lr = new LogRecord(t, new Severe(d, p));
 			x.newIssues.add(p);
 		} else if (p.contains("[WARNING]")) {
@@ -256,11 +249,12 @@ public class Logger {
 			x.newIssues.add(p);
 		} else if (p.contains("[NOTICE]")) {
 			lr = new LogRecord(t, new Notice(d, p));
-		} else if (p.contains("[KNOWN-ISSUE]")) {
+			if (x._debug())
+				x.newIssues.add(p);
+		} else if (p.contains("[KNOWN-ISSUE]"))
 			lr = new LogRecord(t, new KnownIssue(d, p));
-		} else {
+		else
 			lr = new LogRecord(t, new Notice(d, p));
-		}
 
 		x.r.problem(lr);
 		return lr;

@@ -1,21 +1,29 @@
 package works.lysenko.logs;
 
-@SuppressWarnings("javadoc")
+/**
+ * @author Sergii Lysenko
+ */
 public class LineFeed extends AbstractLogData {
 
+	/**
+	 * Line Feed
+	 */
 	public LineFeed() {
 		super();
-		this.text = "";
+		text = "";
 	}
 
-	public String text() {
-		return text;
-	}
-
+	@Override
 	public String render() {
 		return text;
 	}
 
+	@Override
+	public String text() {
+		return text;
+	}
+
+	@Override
 	public String toString() {
 		return "LineFeed";
 	}

@@ -1,13 +1,20 @@
 package works.lysenko.logs;
 
-@SuppressWarnings("javadoc")
+/**
+ * @author Sergii Lysenko
+ */
 public class KnownIssue extends AbstractProblemLogData {
 
+	/**
+	 * @param depth in the output log
+	 * @param text  describing the problem
+	 */
 	public KnownIssue(int depth, String text) {
 		super(depth, text);
-		this.tag = "[KNOWN-ISSUE]";
+		tag = "[KNOWN-ISSUE]";
 	}
 
+	@Override
 	public String toString() {
 		return "Known Issue [depth=" + depth + ", tag=" + tag + ", text=" + text + "]";
 	}

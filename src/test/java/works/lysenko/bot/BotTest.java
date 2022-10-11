@@ -2,12 +2,14 @@ package works.lysenko.bot;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import works.lysenko.Cycles;
 import works.lysenko.Execution;
 
 @SuppressWarnings("javadoc")
+@Tag("Bot")
 public class BotTest {
 
 	private static Execution x;

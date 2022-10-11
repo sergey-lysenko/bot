@@ -45,6 +45,20 @@ public class Cycles {
 	private String root = DEFAULT_ROOT;
 
 	/**
+	 * @param s
+	 * @param x
+	 */
+	public Cycles(Execution x) {
+		super();
+		this.x = x;
+		root = x._root();
+		scenarios = new Scenarios(x);
+		scenarios.add(ScenarioLoader.read(root, x), x);
+		cyclesToDo = x._cycles();
+		x.cycles = this;
+	}
+
+	/**
 	 * @param ss
 	 * @param x
 	 */
@@ -71,17 +85,20 @@ public class Cycles {
 	}
 
 	/**
-	 * @param s
-	 * @param x
+	 * @return default configuration properties
 	 */
-	public Cycles(Execution x) {
-		super();
-		this.x = x;
-		root = x._root();
-		scenarios = new Scenarios(x);
-		scenarios.add(ScenarioLoader.read(root, x), x);
-		cyclesToDo = x._cycles();
-		x.cycles = this;
+	public Set<String> defConf() {
+		Set<String> c = new SortedStringSet();
+		c.add("_" + CONFIGURATION_ROOT + " = " + root);
+		c.add("_" + CONFIGURATION_DEBUG + " = " + DEFAULT_DEBUG);
+		c.add("_" + CONFIGURATION_CYCLES + " = " + DEFAULT_CYCLES);
+		c.add("_" + CONFIGURATION_CONJOINT + " = " + DEFAULT_CONJOINT);
+		c.add("_" + CONFIGURATION_UPSTREAM + " = " + DEFAULT_UPSTREAM);
+		c.add("_" + CONFIGURATION_DOWNSTREAM + " = " + DEFAULT_DOWNSTREAM);
+		scenarios.list().forEach(s -> {
+			c.add(StringUtils.removeStart(s.name(), x._root().concat(".")) + " = " + DEFAULT_WEIGHT);
+		});
+		return c;
 	}
 
 	/**
@@ -91,13 +108,15 @@ public class Cycles {
 		try {
 			if (cyclesToDo == 0)
 				x.l.logProblem(S2, "No test cycles were perfomed");
-			x.l.log(0, "Executing " + y(x._cycles()) + " cycle(s) of " + x.testDescription());
+			x.l.log(0, "Executing " + y(x._cycles()) + " cycle" + (x._cycles() > 1 ? "s" : "") + " of "
+					+ x.testDescription());
 			while (cyclesToDo > 0) {
 				scenarios.execute();
 				x.l.logln();
 				if (--cyclesToDo > 0)
 					x.l.log(0, "Cycles to do: " + y(cyclesToDo));
 			}
+			x.l.log(0, y(x.currentCycle()) + " cycle" + (x.currentCycle() > 1 ? "s" : "") + " of " + x.testDescription() + " done");
 			x.o.writeDefConf(defConf());
 			if (x.propEmpty())
 				x.l.logProblem(S3,
@@ -113,23 +132,6 @@ public class Cycles {
 			x.l.logProblem(S1, "Uncaught exception during cycles execution: " + e.getMessage());
 			throw e;
 		}
-	}
-
-	/**
-	 * @return default configuration properties
-	 */
-	public Set<String> defConf() {
-		Set<String> c = new SortedStringSet();
-		c.add("_" + CONFIGURATION_ROOT + " = " + root);
-		c.add("_" + CONFIGURATION_DEBUG + " = " + DEFAULT_DEBUG);
-		c.add("_" + CONFIGURATION_CYCLES + " = " + DEFAULT_CYCLES);
-		c.add("_" + CONFIGURATION_CONJOINT + " = " + DEFAULT_CONJOINT);
-		c.add("_" + CONFIGURATION_UPSTREAM + " = " + DEFAULT_UPSTREAM);
-		c.add("_" + CONFIGURATION_DOWNSTREAM + " = " + DEFAULT_DOWNSTREAM);
-		scenarios.list().forEach((s) -> {
-			c.add(StringUtils.removeStart(s.name(), x._root().concat(".")) + " = " + DEFAULT_WEIGHT);
-		});
-		return c;
 	}
 
 	protected Set<Scenario> scenariosList() {

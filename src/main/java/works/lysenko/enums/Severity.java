@@ -1,18 +1,47 @@
 package works.lysenko.enums;
 
-@SuppressWarnings("javadoc")
+/**
+ * Severity of indicated problems
+ * 
+ * @author Sergii Lysenko
+ */
 public enum Severity {
 
-	S1("[SEVERE]", Ansi.RED), S2("[WARNING]", Ansi.YELLOW), S3("[NOTICE]", Ansi.CYAN), SK("[KNOWN-ISSUE]", Ansi.MAGENTA);
+	/**
+	 * Severe
+	 */
+	S1("[SEVERE]", Ansi.RED),
 
-	private final String tag;
-	private final Ansi color;
+	/**
+	 * Warning
+	 */
+	S2("[WARNING]", Ansi.YELLOW),
 
-	Severity(String tag, Ansi color) {
-		this.tag = tag;
-		this.color = color;
+	/**
+	 * Notice
+	 */
+	S3("[NOTICE]", Ansi.CYAN),
+
+	/**
+	 * Known Issue
+	 */
+	SK("[KNOWN-ISSUE]", Ansi.MAGENTA);
+
+	/**
+	 * @param s Code of Severity
+	 * @return Severity for this Code
+	 */
+	public static Severity byCode(String s) {
+		for (Severity e : Severity.values())
+			if (e.tag().equals(s))
+				return e;
+		return null;
 	}
 
+	/**
+	 * @param c Color of Severity
+	 * @return Severity for this Color
+	 */
 	public static Severity byColor(Ansi c) {
 		for (Severity e : Severity.values())
 			if (e.color().equals(c))
@@ -20,18 +49,26 @@ public enum Severity {
 		return null;
 	}
 
-	public static Severity byCode(String v) {
-		for (Severity e : Severity.values())
-			if (e.tag().equals(v))
-				return e;
-		return null;
+	private final String tag;
+
+	private final Ansi color;
+
+	Severity(String tag, Ansi color) {
+		this.tag = tag;
+		this.color = color;
 	}
 
-	public String tag() {
-		return tag;
-	}
-
+	/**
+	 * @return Color of this Severity
+	 */
 	public Ansi color() {
 		return color;
+	}
+
+	/**
+	 * @return Tag of this Severity
+	 */
+	public String tag() {
+		return tag;
 	}
 }

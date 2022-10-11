@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 
 import works.lysenko.Common;
 import works.lysenko.Execution;
@@ -15,59 +16,50 @@ import works.lysenko.enums.ScenarioType;
 import works.lysenko.utils.SortedScenarioSet;
 
 /**
- * This is basic implementation of Scenario interface
- * 
+ * This is basic implementation of {@link works.lysenko.scenarios.Scenario}
+ * interface
+ *
  * @author Sergii Lysenko
  *
  */
 public abstract class AbstractScenario extends Common implements Scenario {
 
-	/**
-	 * 
-	 */
 	private long startAt = 0;
 
 	/**
-	 * 
+	 * current upstream weight
 	 */
-
 	public double uWeight = 0.0;
+
 	/**
-	 * 
+	 * current downstream weight
 	 */
 	public double dWeight = 0.0;
 
 	/**
-	 * @param x instance of Run object associated with this scenario
+	 * @param x instance of {#link works.lysenko.Execution} object associated with
+	 *          this scenario
 	 */
 	public AbstractScenario(Execution x) {
 		super(x);
 	}
 
-	/**
-	 * container for actual logic of a scenario
-	 */
+	@Override
 	public void action() {
 
 	}
 
-	/**
-	 * This routine reports an amount of possible variants of executions for
-	 * underlying scenarios
-	 * 
-	 * @param onlyConfigured or all possible scenarios from code base
-	 * @return number of possible combinations for underlying scenarios
-	 */
+	@Override
 	public int combinations(boolean onlyConfigured) {
 		if (onlyConfigured)
-			return ((this.dWeight > 0.0) || (this.uWeight > 0.0) || (this.weight() > 0.0)) ? 1 : 0;
+			return dWeight > 0.0 || uWeight > 0.0 || weight() > 0.0 ? 1 : 0;
 		return 1;
 	}
 
 	/**
 	 * Shortcut for checking the presence of a data in the common test data
 	 * container
-	 * 
+	 *
 	 * @param field of test data to be verified
 	 * @return true if data is present
 	 */
@@ -81,7 +73,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	/**
 	 * Shortcut for checking the presence of a data in the common test data
 	 * container
-	 * 
+	 *
 	 * @param field of test data to be verified
 	 * @return true if data is present
 	 */
@@ -95,7 +87,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	/**
 	 * Shortcut for checking the presence of a data in the common test data
 	 * container
-	 * 
+	 *
 	 * @param fields of test data to be verified
 	 * @return true if all data is present
 	 */
@@ -106,14 +98,13 @@ public abstract class AbstractScenario extends Common implements Scenario {
 				b = false;
 		if (x._debug())
 			log(3, "containsKeys(" + Arrays.toString(fields) + ")" + "\u0336" + b);
-		// + " " + LF + x.gson().toJson(x.data));
 		return b;
 	}
 
 	/**
 	 * This is a stub of the defConf() function which is to be redefined in
 	 * descending abstract scenarios implementations
-	 * 
+	 *
 	 * @return null
 	 */
 	public Set<String> defConf() {
@@ -130,47 +121,42 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	protected void done() {
 		long r = x.timer() - startAt;
 		if (standalone()) {
-			l.log(0, "Standalone " + this.shortName() + " done in " + timeH(r));
+			l.log(0, "Standalone " + shortName() + " done in " + timeH(r));
 			l.logln();
-		} else {
-			l.log(0, "'" + this.shortName() + "' done in " + timeH(r));
-		}
+		} else
+			l.log(0, "'" + shortName() + "' done in " + timeH(r));
 		x.current.pop();
 	}
 
-	/**
-	 * @return current downstream weight
-	 */
+	@Override
 	public double downstream() {
 		return dWeight;
 	}
 
-	/**
-	 * @param d downstream weight to set
-	 */
+	@Override
 	public void downstream(double d) {
-		this.dWeight = d;
+		dWeight = d;
 	}
 
-	/**
-	 * @return whether this scenario is able to be executed
-	 */
+	@Override
 	public boolean executable() {
-		return !(weight().isNaN());
+		return !weight().isNaN();
 	}
 
-	/**
-	 * Default common code for a scenario execution
-	 */
-	public void execute() {
+	protected void execute() {
 		startAt = x.timer();
 		x.current.push(this);
 		l.logln();
 		l.log(0, colorize(type().tag() + " " + shortName(), BLUE_BOLD_BRIGHT) + " : " + x.r.count(this));
 	}
 
+	@Override
+	public void finals() {
+
+	}
+
 	private int gauge() {
-		int g = this.name().split("\\.").length;
+		int g = name().split("\\.").length;
 		if (null == x.minDepth)
 			x.minDepth = g;
 		return g;
@@ -178,7 +164,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 
 	/**
 	 * Shortcut for getting a data from the common test data container
-	 * 
+	 *
 	 * @param field of test data to be retrieved
 	 * @return copy of test data
 	 */
@@ -192,7 +178,7 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	/**
 	 * Shortcut for getting a data from the common test data container, with
 	 * optional default
-	 * 
+	 *
 	 * @param field of test data to be retrieved
 	 * @param def   default value
 	 * @return copy of test data
@@ -208,60 +194,43 @@ public abstract class AbstractScenario extends Common implements Scenario {
 		log(3, "get(" + field + ")" + "\u21D2" + o + " ");
 	}
 
-	/**
-	 * This is a stub implementation of empty finals() routine which is to be
-	 * redefined in scenarios as needed
-	 */
 	@Override
-	public void finals() {
-
-	}
-
-	/**
-	 * @return list of underlying scenarios
-	 *
-	 */
 	public Set<Scenario> list() {
 		Set<Scenario> c = new SortedScenarioSet();
 		c.add(this);
 		return c;
 	}
 
-	/**
-	 * @return unique name of this scenario
-	 */
+	@Override
 	public String name() {
 		return this.getClass().getName();
 	}
 
 	/**
 	 * Shortcut for putting a data into the common test data container
-	 * 
+	 *
 	 * @param field of test data to be updated
 	 * @param value of this field
 	 */
 	public void put(Object field, Object value) {
 		Object o = x.data.put(field, value);
 		if (x._debug()) {
-			String j = x.gson().toJson(x.data);
+			JSONObject j = new JSONObject(x.data);
 			log(3, "put(" + field + ")" + "\u21D0" + "[" + value + "\u2192" + o + "]");
-			l.logFile(j, "data", "json");
+			l.logFile(j.toString(), "data", "json");
 		}
 	}
 
 	/**
 	 * Shortcut for removing a data from the common test data container
-	 * 
+	 *
 	 * @param field of test data to be updated
 	 */
 	public void remove(Object field) {
 		x.data.remove(field);
 	}
 
-	/**
-	 * @return shortened scenario name
-	 */
-
+	@Override
 	public String shortName() {
 		String[] a;
 		if (null == x.minDepth)
@@ -273,22 +242,18 @@ public abstract class AbstractScenario extends Common implements Scenario {
 	}
 
 	/**
-	 * @return whether current scenario is a standalone one
+	 * @return whether current scenario is a stand alone one
 	 */
 	public boolean standalone() {
 		return x.currentCycle() == 0;
 	}
 
-	/**
-	 * @return whether this scenario meets it's prerequisites
-	 */
+	@Override
 	public boolean sufficed() {
 		return false;
 	}
 
-	/**
-	 * @return Type of Scenario
-	 */
+	@Override
 	public ScenarioType type() {
 		if (this instanceof AbstractLeafScenario)
 			return ScenarioType.LEAF;
@@ -299,23 +264,16 @@ public abstract class AbstractScenario extends Common implements Scenario {
 		return null;
 	}
 
-	/**
-	 * @return current upstream weight
-	 */
+	@Override
 	public double upstream() {
 		return uWeight;
 	}
 
-	/**
-	 * @return current weight coefficient of this scenario acquired from run
-	 *         properties
-	 */
+	@Override
 	public Double weight() {
-		String w = x.prop(StringUtils.removeStart(this.getClass().getName(), x._root().concat(".")),
-				DEFAULT_WEIGHT);
+		String w = x.prop(StringUtils.removeStart(this.getClass().getName(), x._root().concat(".")), DEFAULT_WEIGHT);
 		if (w.equals("-"))
 			return Double.NaN;
 		return Double.valueOf(w);
 	}
-
 }
