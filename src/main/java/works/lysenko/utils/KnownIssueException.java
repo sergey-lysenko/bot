@@ -3,15 +3,17 @@ package works.lysenko.utils;
 /**
  * @author Sergii Lysenko
  */
+@SuppressWarnings({"SerializableHasSerializationMethods", "ClassIndependentOfModule", "ClassWithoutNoArgConstructor", "UncheckedExceptionClass", "WeakerAccess"})
 public class KnownIssueException extends RuntimeException {
 
-	private static final long serialVersionUID = 4203658749164177761L;
+    private static final long serialVersionUID = 4203658749164177761L;
 
-	/**
-	 * @param string message to identify the known issue
-	 */
-	public KnownIssueException(String string) {
-		super(string);
-	}
+    /**
+     * @param message message to identify the known issue
+     */
+    @SuppressWarnings({"unused", "PublicConstructor"})
+    public KnownIssueException(String message) {
+        super(message);
+    }
 
 }

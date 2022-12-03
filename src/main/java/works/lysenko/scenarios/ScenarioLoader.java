@@ -1,64 +1,77 @@
 package works.lysenko.scenarios;
 
+import works.lysenko.Execution;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import works.lysenko.Execution;
+import static works.lysenko.Common.c;
+import static works.lysenko.enums.Severity.S1;
 
 /**
  * @author Sergii Lysenko
  */
-public class ScenarioLoader {
+@SuppressWarnings({"UtilityClass", "UtilityClassCanBeEnum", "PublicConstructor", "UtilityClassWithoutPrivateConstructor", "ReturnOfNull", "ClassWithoutLogger", "PublicMethodWithoutLogging", "ClassWithoutConstructor", "ClassWithTooManyTransitiveDependencies", "ClassWithTooManyTransitiveDependents", "CyclicClassDependency"})
+public final class ScenarioLoader {
 
-	private static Set<Class<?>> findAll(String s) {
-		Set<Class<?>> a = null;
-		try {
-			a = new BufferedReader(new InputStreamReader(
-					ClassLoader.getSystemClassLoader().getResourceAsStream(s.replaceAll("[.]", "/")))).lines()
-					.filter(l -> l.endsWith(".class")).map(l -> getClass(l, s)).collect(Collectors.toSet());
-		} catch (Exception e) {
-			System.out.println("There are no '" + s + "' package of nested scenarios");
-		}
-		return a;
-	}
+    @SuppressWarnings({"UseOfConcreteClass", "ChainedMethodCall", "DynamicRegexReplaceableByCompiledPattern", "StandardVariableNames", "DuplicateStringLiteralInspection", "ImplicitDefaultCharsetUsage", "OverlyBroadCatchBlock"})
+    private static Set<Class<?>> findAll(Execution x, String s, boolean silent) {
+        Set<Class<?>> a = null;
+        try {
+            a = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(ClassLoader.getSystemClassLoader().getResourceAsStream(s.replaceAll("[.]", "/"))))).lines()
+                    .filter(l -> l.endsWith(".class")).map(l -> getClass(l, s)).collect(Collectors.toSet());
+        } catch (Exception e) {
+            if (!silent)
+                x.log(3, c("To test this page logic, add scenarios to '", s, "' package"));
+        }
+        return a;
+    }
 
-	private static Class<?> getClass(String className, String packageName) {
-		try {
-			return Class.forName(packageName + "." + className.substring(0, className.lastIndexOf('.')));
-		} catch (ClassNotFoundException e) {
-		}
-		return null;
-	}
+    @SuppressWarnings({"ReturnOfNull", "ImplicitNumericConversion", "MethodWithMultipleReturnPoints", "MagicCharacter"})
+    private static Class<?> getClass(String className, String packageName) {
+        try {
+            return Class.forName(packageName + "." + className.substring(0, className.lastIndexOf('.')));
+        } catch (ClassNotFoundException e) {
+            //
+        }
+        return null;
+    }
 
-	/**
-	 * Read classes from package into a set. It is assumed that package contains
-	 * only valid classes. This allows to define relations between scenarios by just
-	 * placing them in properly arranged packages tree
-	 *
-	 * @param s name of the package to load scenarios from
-	 * @param x reference to test execution object
-	 * @return set of scenarios
-	 */
-	public static Set<Scenario> read(String s, Execution x) {
-		Set<Class<?>> zz = findAll(s);
-		Set<Scenario> ss = new HashSet<>();
-		for (Class<?> z : zz)
-			try {
-				Class<?>[] t = { Execution.class };
-				Constructor<?> c = z.getConstructor(t);
-				Object[] o = { x };
-				Object i = c.newInstance(o);
-				ss.add((Scenario) i);
-			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				e.printStackTrace();
-			}
-		return ss;
-	}
+    /**
+     * Read classes from package into a set. It is assumed that package contains
+     * only valid classes. This allows to define relations between scenarios by just
+     * placing them in properly arranged packages tree
+     *
+     * @param s      name of the package to load scenarios from
+     * @param x      reference to test execution object
+     * @param silent to hide text output or not
+     * @return set of scenarios
+     */
+    @SuppressWarnings({"BooleanParameter", "UseOfConcreteClass", "ChainedMethodCall", "ObjectAllocationInLoop", "CollectionWithoutInitialCapacity", "LawOfDemeter"})
+    public static Set<Scenario> read(String s, Execution x, boolean silent) {
+        Set<Class<?>> zz = findAll(x, s, silent);
+        Set<Scenario> ss = new HashSet<>();
+        if (null != zz)
+            for (Class<?> z : zz)
+                try {
+                    Class<?>[] t = {Execution.class};
+                    Constructor<?> constructor = z.getConstructor(t);
+                    Object[] objects = {x};
+                    Object instance = constructor.newInstance(objects);
+                    ss.add((Scenario) instance);
+                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                         | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                    if (!silent)
+                        x.l.logProblem(S1, c(e.getClass().getName() + " caught: ", e.toString()));
+                }
+        return ss;
+    }
 
 }

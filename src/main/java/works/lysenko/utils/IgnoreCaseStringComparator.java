@@ -5,18 +5,12 @@ import java.util.Comparator;
 /**
  * @author Sergii Lysenko
  */
+@SuppressWarnings({"ComparatorNotSerializable", "PublicConstructor", "ClassWithoutLogger", "PublicMethodWithoutLogging", "ClassWithoutConstructor", "ClassWithTooManyTransitiveDependents", "WeakerAccess"})
 public class IgnoreCaseStringComparator implements Comparator<String> {
 
-	/**
-	 * {@link java.util.Comparator} for sorting of Strings ignoring the character
-	 * case
-	 */
-	public IgnoreCaseStringComparator() {
-		super();
-	}
-
-	@Override
-	public int compare(String s1, String s2) {
-		return s1.compareToIgnoreCase(s2);
-	}
+    @SuppressWarnings("CallToSuspiciousStringMethod")
+    @Override
+    public int compare(String o1, String o2) {
+        return o1.compareToIgnoreCase(o2);
+    }
 }

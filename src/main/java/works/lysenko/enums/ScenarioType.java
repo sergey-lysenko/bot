@@ -3,33 +3,34 @@ package works.lysenko.enums;
 /**
  * @author Sergii Lysenko
  */
+@SuppressWarnings({"PublicMethodNotExposedInInterface", "ClassHasNoToStringMethod", "ParameterHidesMemberVariable", "PublicMethodWithoutLogging", "ClassWithTooManyTransitiveDependents"})
 public enum ScenarioType {
 
-	/**
-	 * Leaf
-	 */
-	LEAF("◆"),
-	
-	/**
-	 * Node
-	 */
-	NODE("▷"),
-	
-	/**
-	 * Mono
-	 */
-	MONO("◼");
+    /**
+     * Leaf
+     */
+    LEAF("◆"),
 
-	private String tag;
+    /**
+     * Node
+     */
+    NODE("▷"),
 
-	ScenarioType(String tag) {
-		this.tag = tag;
-	}
+    /**
+     * Mono
+     */
+    MONO("◼");
 
-	/**
-	 * @return tag of this Type
-	 */
-	public String tag() {
-		return tag;
-	}
+    private final String tag;
+
+    ScenarioType(String tag) {
+        this.tag = tag;
+    }
+
+    /**
+     * @return tag of this Type
+     */
+    public String tag() {
+        return tag;
+    }
 }

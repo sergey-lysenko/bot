@@ -17,7 +17,7 @@ public class Google extends AbstractNodeScenario {
 	}
 
 	@Override
-	public boolean sufficed() {
+	public boolean isSufficed() {
 		return true;
 	}
 }

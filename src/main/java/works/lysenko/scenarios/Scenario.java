@@ -1,88 +1,111 @@
 package works.lysenko.scenarios;
 
-import java.util.Set;
-
 import works.lysenko.enums.ScenarioType;
+
+import java.util.Set;
 
 /**
  * @author Sergii Lysenko
  */
+@SuppressWarnings({"InterfaceWithOnlyOneDirectInheritor", "ClassWithTooManyDependents", "ClassWithTooManyTransitiveDependents"})
 public interface Scenario {
 
-	/**
-	 * Container for logic of a scenario. This code executed before selecting one of
-	 * nested scenarios, if there are any.
-	 */
-	public abstract void action();
+    /**
+     * Container for logic of a scenario. This code executed before selecting one of
+     * nested scenarios, if there are any.
+     */
+    void action();
 
-	/**
-	 * This routine reports an amount of possible variants of executions for
-	 * underlying scenarios
-	 *
-	 * @param onlyConfigured or all possible scenarios from code base
-	 * @return number of possible combinations for underlying scenarios
-	 */
-	public abstract int combinations(boolean onlyConfigured);
+    /**
+     * This routine reports an amount of possible variants of executions for
+     * underlying scenarios
+     *
+     * @param onlyConfigured or all possible scenarios from code base
+     * @return number of possible combinations for underlying scenarios
+     */
+    @SuppressWarnings("BooleanParameter")
+    int combinations(boolean onlyConfigured);
 
-	/**
-	 * @return Current downstream weight of this Scenario
-	 */
-	public abstract double downstream();
+    @SuppressWarnings({"SameReturnValue", "unused"})
+    Set<String> defConf();
 
-	/**
-	 * Redefine downstream weight of this Scenario
-	 * 
-	 * @param w downstream weight to set
-	 */
-	public abstract void downstream(double w);
+    @SuppressWarnings("unused")
+    int depth();
 
-	/**
-	 * @return whether this scenario is able to be executed
-	 */
-	public abstract boolean executable();
+    /**
+     * @return Current downstream weight of this Scenario
+     */
+    double downstream();
 
-	/**
-	 * Container for logic of a scenario, which is to be executed AFTER nested
-	 * scenarios execution.
-	 */
-	public abstract void finals();
+    /**
+     * Redefine downstream weight of this Scenario
+     *
+     * @param w downstream weight to set
+     */
+    void downstream(double w);
 
-	/**
-	 * @return list of nested scenarios
-	 */
-	public abstract Set<Scenario> list();
+    /**
+     * @return whether this scenario is executable
+     */
+    @SuppressWarnings("BooleanMethodNameMustStartWithQuestion")
+    boolean executable();
 
-	/**
-	 * @return unique name of this Scenario
-	 */
-	public abstract String name();
+    /**
+     * Execute this scenario
+     */
+    @SuppressWarnings("unused")
+    void execute();
 
-	/**
-	 * @return shortened name of this Scenario
-	 */
-	public abstract String shortName();
+    /**
+     * Avoid starting of sub-scenarios.
+     */
+    @SuppressWarnings("unused")
+    void halt();
 
-	/**
-	 * This should be redefined and contain the code to indicate readiness of a
-	 * Scenario to be executed
-	 * 
-	 * @return whether this scenario meets it's prerequisites
-	 */
-	public abstract boolean sufficed();
+    /**
+     * Container for logic of a scenario, which is to be executed AFTER nested
+     * scenarios execution.
+     */
+    @SuppressWarnings("unused")
+    void finals();
 
-	/**
-	 * @return {@link works.lysenko.enums.ScenarioType} of Scenario
-	 */
-	public abstract ScenarioType type();
+    /**
+     * @return list of nested scenarios
+     */
+    Set<Scenario> list();
 
-	/**
-	 * @return current upstream weight of this Scenario
-	 */
-	public abstract double upstream();
+    /**
+     * @return unique name of this Scenario
+     */
+    String name();
 
-	/**
-	 * @return own weight of this Scenario
-	 */
-	public abstract Double weight();
+    /**
+     * @return shortened name of this Scenario
+     */
+    String shortName();
+
+    /**
+     * This should be redefined and contain the code to indicate readiness of a
+     * Scenario to be executed
+     *
+     * @return whether this scenario meets it's prerequisites
+     */
+    @SuppressWarnings("unused")
+    boolean isSufficed();
+
+    /**
+     * @return {@link works.lysenko.enums.ScenarioType} of Scenario
+     */
+    ScenarioType type();
+
+    /**
+     * @return current upstream weight of this Scenario
+     */
+    double upstream();
+
+    /**
+     * @return own weight of this Scenario
+     */
+    Double weight();
 
 }

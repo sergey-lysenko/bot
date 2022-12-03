@@ -1,16 +1,17 @@
 package works.lysenko.utils;
 
-import java.util.TreeMap;
-
 import works.lysenko.Result;
 import works.lysenko.scenarios.Scenario;
 
-@SuppressWarnings("javadoc")
+import java.util.TreeMap;
+
+@SuppressWarnings({"SerializableHasSerializationMethods", "CloneableClassInSecureContext", "ClassWithoutLogger", "ClassWithTooManyTransitiveDependents", "ClassExtendsConcreteCollection", "ClassWithTooManyTransitiveDependencies", "CyclicClassDependency"})
 public class SortedResultMap extends TreeMap<Scenario, Result> {
 
-	private static final long serialVersionUID = -8268293097575167966L;
+    private static final long serialVersionUID = -8268293097575167966L;
 
-	public SortedResultMap() {
-		super((new ScenarioComparator()));
-	}
+    @SuppressWarnings("PublicConstructor")
+    public SortedResultMap() {
+        super((new ScenarioComparator()));
+    }
 }

@@ -1,0 +1,5 @@
+# Format of this file is
+# Human readable description==Xpath locator or Css selector
+Query==//input[@class='gLFyf']
+Search button==//form/div/div/div/center/input[1]
+Lucky button==//form/div/div/div/center/input[2]

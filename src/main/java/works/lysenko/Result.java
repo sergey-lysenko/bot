@@ -1,65 +1,64 @@
 package works.lysenko;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import works.lysenko.enums.ScenarioType;
 import works.lysenko.scenarios.Scenario;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static works.lysenko.Common.c;
+
 /**
  * Result record
- * 
+ *
  * @author Sergii Lysenko
  */
+@SuppressWarnings({"LocalVariableHidesMemberVariable", "FieldNotUsedInToString", "ClassWithoutLogger", "PublicMethodWithoutLogging", "ClassWithoutNoArgConstructor", "ClassWithTooManyTransitiveDependents", "ClassWithTooManyTransitiveDependencies", "CyclicClassDependency"})
 public class Result {
 
-	/**
-	 * type of the Scenario
-	 */
-	public ScenarioType type = null;
+    /**
+     * type of the Scenario
+     */
+    @SuppressWarnings("unused")
+    public final ScenarioType type;
+    /**
+     *
+     */
+    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    public final List<Problem> problems = new ArrayList<>();
+    /**
+     * Weight of the Scenario defined in configuration
+     */
+    public final double cWeight;
+    /**
+     * Upstream weight of the Scenario
+     */
+    public final double uWeight;
+    /**
+     * Downstream weight of the Scenario
+     */
+    public final double dWeight;
+    /**
+     * Number of Scenario executions
+     */
+    public int executions = 0;
 
-	/**
-	 * Number of Scenario executions
-	 */
-	public int executions;
+    /**
+     * @param scenario Scenario for this Result
+     */
+    @SuppressWarnings({"FeatureEnvy", "PublicConstructor", "AutoUnboxing"})
+    public Result(Scenario scenario) {
+        type = scenario.type();
+        cWeight = scenario.weight();
+        uWeight = scenario.upstream();
+        dWeight = scenario.downstream();
+    }
 
-	/**
-	 * 
-	 */
-	public List<Problem> problems = new ArrayList<>();
-
-	/**
-	 * Weight of the Scenario defined in configuration
-	 */
-	public double cWeight;
-
-	/**
-	 * Upstream weight of the Scenario
-	 */
-	public double uWeight;
-
-	/**
-	 * Downstream weight of the Scenario
-	 */
-	public double dWeight;
-
-	/**
-	 * @param s Scenario for this Result
-	 */
-	public Result(Scenario s) {
-		type = s.type();
-		cWeight = s.weight();
-		uWeight = s.upstream();
-		dWeight = s.downstream();
-	}
-
-	@Override
-	public String toString() {
-		String weight = (dWeight > 0.0 ? "(" + dWeight + ")" + "\u2192" : "") + "(" + cWeight + ")"
-				+ (uWeight > 0.0 ? "\u2190" + "(" + uWeight + ")" : "");
-		String problems = this.problems != null && this.problems.size() > 0
-				? " (" + this.problems.size() + (this.problems.size() == 1 ? " problem)" : " problems)")
-				: "";
-		return weight + " " + executions + problems;
-	}
+    @SuppressWarnings({"NestedConditionalExpression", "UnnecessaryUnicodeEscape", "FeatureEnvy"})
+    @Override
+    public String toString() {
+        String weight = c((0.0 < dWeight ? c("(", dWeight, ")", "\u2192") : ""), "(", cWeight, ")", (0.0 < uWeight ? c("\u2190", "(", uWeight, ")") : ""));
+        String problems = c(((this.problems.isEmpty()) ? "" : " ("), this.problems.size(), ((1 == this.problems.size() ? " problem)" : " problems)")));
+        return c(weight, " ", executions, problems);
+    }
 }

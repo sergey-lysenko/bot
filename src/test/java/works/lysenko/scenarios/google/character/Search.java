@@ -1,26 +1,10 @@
 package works.lysenko.scenarios.google.character;
 
-import static works.lysenko.bot.Constants.GOOGLE_SEARCH_BUTTON;
-import static works.lysenko.bot.Constants.quoteShortEnough;
-
 import works.lysenko.Execution;
-import works.lysenko.scenarios.AbstractLeafScenario;
 
 @SuppressWarnings("javadoc")
-public class Search extends AbstractLeafScenario {
+public class Search extends works.lysenko.common.Search {
 	public Search(Execution x) {
 		super(x);
-	}
-
-	@Override
-	public void action() {
-		section("Pressing 'Search' button");
-		findThenClick(GOOGLE_SEARCH_BUTTON);
-		makeScreenshot("cycle" + x.currentCycle() + "-" + name());
-	}
-
-	@Override
-	public boolean sufficed() {
-		return quoteShortEnough(x);
 	}
 }

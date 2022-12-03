@@ -1,92 +1,97 @@
 package works.lysenko;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import works.lysenko.logs.LogRecord;
 import works.lysenko.scenarios.Scenario;
 import works.lysenko.utils.SortedResultMap;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import static works.lysenko.Common.c;
 
 /**
  * This class represent results of single bot execution
  *
  * @author Sergii Lysenko
- *
  */
+@SuppressWarnings({"PublicMethodNotExposedInInterface", "ClassHasNoToStringMethod", "ParameterHidesMemberVariable", "ChainedMethodCall", "ClassWithoutLogger", "PublicMethodWithoutLogging", "ClassWithoutNoArgConstructor", "ClassWithTooManyTransitiveDependencies", "ClassWithTooManyTransitiveDependents", "CyclicClassDependency", "MethodWithMultipleLoops"})
 public class Results {
 
-	/**
-	 *
-	 */
-	public Execution x;
-	private Map<Scenario, Result> results;
+    /**
+     *
+     */
+    @SuppressWarnings({"UseOfConcreteClass", "WeakerAccess"})
+    public final Execution x;
+    private final Map<Scenario, Result> results;
 
-	/**
-	 * @param x
-	 */
-	public Results(Execution x) {
-		super();
-		this.x = x;
-		results = new HashMap<>();
-	}
+    /**
+     * @param x instance of {@link Execution} object
+     */
+    @SuppressWarnings({"UseOfConcreteClass", "PublicConstructor", "CollectionWithoutInitialCapacity"})
+    public Results(Execution x) {
+        this.x = x;
+        results = new HashMap<>();
+    }
 
-	/**
-	 * Count in test execution (in later versions there will be collection of more
-	 * execution data then just times of execution)
-	 *
-	 * @param s scenario to count
-	 * @return copy of added test execution data
-	 */
-	public Result count(Scenario s) {
-		Result r = results.getOrDefault(s, new Result(s));
-		++r.executions;
-		results.put(s, r);
-		return r;
-	}
+    @SuppressWarnings({"ChainedMethodCall", "LawOfDemeter"})
+    private static String tagged(Scenario scenario) {
+        return c(scenario.shortName(), " ", scenario.type().tag());
+    }
 
-	/**
-	 * Sort scenario classes ignoring the case which produces more "tree-like" order
-	 * of items and improves readability, excluding not executed scenarios
-	 *
-	 * @return execution counters sorted properly
-	 */
-	protected TreeMap<Scenario, Result> getSorted() {
-		TreeMap<Scenario, Result> sorted = new SortedResultMap();
-		sorted.putAll(results);
-		return sorted;
-	}
+    /**
+     * Count in test execution (in later versions there will be collection of more
+     * execution data than just times of execution)
+     *
+     * @param scenario scenario to count
+     * @return copy of added test execution data
+     */
+    @SuppressWarnings("UseOfConcreteClass")
+    public Result count(Scenario scenario) {
+        Result r = results.getOrDefault(scenario, new Result(scenario));
+        ++r.executions;
+        results.put(scenario, r);
+        return r;
+    }
 
-	/**
-	 * Sort scenario classes ignoring the case which produces more "tree-like" order
-	 * of items and improves readability, including not executed scenarios
-	 *
-	 * @param ignoreCase
-	 * @param shortened
-	 * @return execution counters sorted properly
-	 */
-	public TreeMap<String, Result> getSortedStrings() {
-		TreeMap<String, Result> sorted = new TreeMap<>();
-		// Adding results of executed scenarios
-		for (Entry<Scenario, Result> r : results.entrySet())
-			sorted.put(tagged(r.getKey()), r.getValue());
-		// Adding result stubs of non-executed scenarios
-		for (Scenario s : x.cycles.scenariosList())
-			if (!sorted.containsKey(tagged(s)))
-				sorted.put(tagged(s), new Result(s));
-		return sorted;
-	}
+    /**
+     * Sort scenario classes ignoring the case which produces more "tree-like" order
+     * of items and improves readability, excluding not executed scenarios
+     *
+     * @return execution counters sorted properly
+     */
+    @SuppressWarnings("WeakerAccess")
+    protected SortedMap<Scenario, Result> getSorted() {
+        SortedMap<Scenario, Result> sorted = new SortedResultMap();
+        sorted.putAll(results);
+        return sorted;
+    }
 
-	/**
-	 * This routine stores the information about a problem in the execution results
-	 */
-	protected void problem(LogRecord lr) {
-		if (null != x.currentScenario())
-			results.get(x.currentScenario()).problems.add(new Problem(lr.time(), lr.text()));
-	}
+    /**
+     * Sort scenario classes ignoring the case which produces more "tree-like" order
+     * of items and improves readability, including not executed scenarios
+     *
+     * @return execution counters sorted properly
+     */
+    @SuppressWarnings({"ObjectAllocationInLoop", "LawOfDemeter"})
+    public TreeMap<String, Result> getSortedStrings() {
+        TreeMap<String, Result> sorted = new TreeMap<>();
+        // Adding results of executed scenarios
+        for (Map.Entry<Scenario, Result> r : results.entrySet())
+            sorted.put(tagged(r.getKey()), r.getValue());
+        // Adding result stubs of non-executed scenarios
+        for (Scenario scenario : x.cycles.scenariosList())
+            if (!sorted.containsKey(tagged(scenario))) sorted.put(tagged(scenario), new Result(scenario));
+        return sorted;
+    }
 
-	private String tagged(Scenario s) {
-		return s.shortName() + " " + s.type().tag();
-	}
+    /**
+     * This routine stores the information about a problem in the execution results
+     */
+    @SuppressWarnings({"UseOfConcreteClass", "AutoUnboxing", "WeakerAccess"})
+    protected void problem(LogRecord lr) {
+        if (null != x.currentScenario())
+            results.get(x.currentScenario()).problems.add(new Problem(lr.time(), lr.text()));
+    }
 }

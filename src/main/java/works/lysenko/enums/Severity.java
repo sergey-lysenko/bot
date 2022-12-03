@@ -2,73 +2,75 @@ package works.lysenko.enums;
 
 /**
  * Severity of indicated problems
- * 
+ *
  * @author Sergii Lysenko
  */
+@SuppressWarnings({"PublicMethodNotExposedInInterface", "ClassHasNoToStringMethod", "ParameterHidesMemberVariable", "ReturnOfNull", "PublicMethodWithoutLogging", "ClassWithTooManyDependents", "ClassWithTooManyTransitiveDependents", "CyclicClassDependency", "ClassWithTooManyTransitiveDependencies"})
 public enum Severity {
 
-	/**
-	 * Severe
-	 */
-	S1("[SEVERE]", Ansi.RED),
+    /**
+     * Severe
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection") S1("[SEVERE]", Ansi.RED),
 
-	/**
-	 * Warning
-	 */
-	S2("[WARNING]", Ansi.YELLOW),
+    /**
+     * Warning
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection") S2("[WARNING]", Ansi.YELLOW),
 
-	/**
-	 * Notice
-	 */
-	S3("[NOTICE]", Ansi.CYAN),
+    /**
+     * Notice
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection") S3("[NOTICE]", Ansi.CYAN),
 
-	/**
-	 * Known Issue
-	 */
-	SK("[KNOWN-ISSUE]", Ansi.MAGENTA);
+    /**
+     * Known Issue
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection") SK("[KNOWN-ISSUE]", Ansi.MAGENTA);
 
-	/**
-	 * @param s Code of Severity
-	 * @return Severity for this Code
-	 */
-	public static Severity byCode(String s) {
-		for (Severity e : Severity.values())
-			if (e.tag().equals(s))
-				return e;
-		return null;
-	}
+    private final String tag;
+    private final Ansi color;
 
-	/**
-	 * @param c Color of Severity
-	 * @return Severity for this Color
-	 */
-	public static Severity byColor(Ansi c) {
-		for (Severity e : Severity.values())
-			if (e.color().equals(c))
-				return e;
-		return null;
-	}
+    Severity(String tag, Ansi color) {
+        this.tag = tag;
+        this.color = color;
+    }
 
-	private final String tag;
+    /**
+     * @param s Code of Severity
+     * @return Severity for this Code
+     */
+    @SuppressWarnings({"ChainedMethodCall", "ReturnOfNull", "MethodWithMultipleReturnPoints", "CallToSuspiciousStringMethod"})
+    public static Severity byCode(String s) {
+        for (Severity e : values())
+            if (e.tag().equals(s))
+                return e;
+        return null;
+    }
 
-	private final Ansi color;
+    /**
+     * @param ansi Color of Severity
+     * @return Severity for this Color
+     */
+    @SuppressWarnings({"unused", "ReturnOfNull", "MethodWithMultipleReturnPoints"})
+    public static Severity byColor(Ansi ansi) {
+        for (Severity e : values())
+            if (e.color() == ansi)
+                return e;
+        return null;
+    }
 
-	Severity(String tag, Ansi color) {
-		this.tag = tag;
-		this.color = color;
-	}
+    /**
+     * @return Color of this Severity
+     */
+    public Ansi color() {
+        return color;
+    }
 
-	/**
-	 * @return Color of this Severity
-	 */
-	public Ansi color() {
-		return color;
-	}
-
-	/**
-	 * @return Tag of this Severity
-	 */
-	public String tag() {
-		return tag;
-	}
+    /**
+     * @return Tag of this Severity
+     */
+    public String tag() {
+        return tag;
+    }
 }

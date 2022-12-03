@@ -1,25 +1,18 @@
 package works.lysenko.utils;
 
-import java.util.Comparator;
-
 import works.lysenko.scenarios.Scenario;
+
+import java.util.Comparator;
 
 /**
  * @author Sergii Lysenko
  */
+@SuppressWarnings({"ComparatorNotSerializable", "PublicConstructor", "ClassWithoutLogger", "PublicMethodWithoutLogging", "ClassWithoutConstructor", "ClassWithTooManyTransitiveDependents", "WeakerAccess"})
 public class ScenarioComparator implements Comparator<Scenario> {
 
-	/**
-	 * {@link java.util.Comparator} for sorting of
-	 * {@link works.lysenko.scenarios.Scenario} objects by
-	 * {@link works.lysenko.scenarios.Scenario#name()}
-	 */
-	public ScenarioComparator() {
-		super();
-	}
-
-	@Override
-	public int compare(Scenario s1, Scenario s2) {
-		return s1.name().compareTo(s2.name());
-	}
+    @SuppressWarnings({"ChainedMethodCall", "CallToSuspiciousStringMethod"})
+    @Override
+    public int compare(Scenario o1, Scenario o2) {
+        return o1.name().compareTo(o2.name());
+    }
 }

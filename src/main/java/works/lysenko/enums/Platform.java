@@ -3,63 +3,63 @@ package works.lysenko.enums;
 /**
  * @author Sergii Lysenko
  */
+@SuppressWarnings({"PublicMethodNotExposedInInterface", "ClassHasNoToStringMethod", "ParameterHidesMemberVariable", "PublicMethodWithoutLogging", "ClassWithTooManyTransitiveDependents"})
 public enum Platform {
-	/**
-	 * Chrome
-	 */
-	CHROME("Chrome"),
+    /**
+     * Chrome
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection") CHROME("Chrome"),
 
-	/**
-	 * Firefox
-	 */
-	FIREFOX("Firefox"),
+    /**
+     * Firefox
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection") FIREFOX("Firefox"),
 
-	/**
-	 * Edge
-	 */
-	EDGE("Edge"),
+    /**
+     * Edge
+     */
+    EDGE("Edge"),
 
-	/**
-	 * Android
-	 */
-	ANDROID("Android"),
+    /**
+     * Android
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection") ANDROID("Android"),
 
-	/**
-	 * Safari
-	 */
-	SAFARI("Safari");
+    /**
+     * Safari
+     */
+    @SuppressWarnings("DuplicateStringLiteralInspection") SAFARI("Safari");
 
-	/**
-	 * @param s
-	 * @return Platform by String
-	 */
-	public static Platform get(String s) {
-		switch (s) {
-		case "Firefox":
-			return FIREFOX;
-		case "Edge":
-			return EDGE;
-		case "Safari":
-			return SAFARI;
-		case "Chrome":
-			return CHROME;
-		case "Android":
-			return ANDROID;
-		default:
-			return CHROME;
-		}
-	}
+    private final String title;
 
-	private String title;
+    Platform(String title) {
+        this.title = title;
+    }
 
-	Platform(String title) {
-		this.title = title;
-	}
+    /**
+     * @param string to search by
+     * @return {@link Platform} by {@link String} value
+     */
+    @SuppressWarnings({"SwitchStatement", "QuestionableName", "UnnecessaryJavaDocLink", "MethodWithMultipleReturnPoints", "DuplicateStringLiteralInspection"})
+    public static Platform get(String string) {
+        switch (string) {
+            case "Firefox":
+                return FIREFOX;
+            case "Edge":
+                return EDGE;
+            case "Safari":
+                return SAFARI;
+            case "Android":
+                return ANDROID;
+            default:
+                return CHROME;
+        }
+    }
 
-	/**
-	 * @return title of this Platform
-	 */
-	public String title() {
-		return title;
-	}
+    /**
+     * @return title of this Platform
+     */
+    public String title() {
+        return title;
+    }
 }

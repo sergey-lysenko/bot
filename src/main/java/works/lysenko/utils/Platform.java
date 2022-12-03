@@ -5,36 +5,37 @@ package works.lysenko.utils;
  *
  * @author Sergii Lysenko
  */
-@SuppressWarnings("javadoc")
+@SuppressWarnings({"PublicMethodNotExposedInInterface", "ClassHasNoToStringMethod", "ParameterHidesMemberVariable", "PublicMethodWithoutLogging", "ClassIndependentOfModule"})
 public enum Platform {
-	CHROME("Chrome"), FIREFOX("Firefox"), OPERA("Opera"), EDGE("Edge"), ANDROID("Android"), SAFARI("Safari");
+    @SuppressWarnings("DuplicateStringLiteralInspection") CHROME("Chrome"), @SuppressWarnings("DuplicateStringLiteralInspection") FIREFOX("Firefox"), @SuppressWarnings("DuplicateStringLiteralInspection") OPERA("Opera"), EDGE("Edge"), @SuppressWarnings("DuplicateStringLiteralInspection") ANDROID("Android"), @SuppressWarnings("DuplicateStringLiteralInspection") SAFARI("Safari");
 
-	public static Platform get(String string) {
-		switch (string) {
-		case "Firefox":
-			return FIREFOX;
-		case "Opera":
-			return OPERA;
-		case "Edge":
-			return EDGE;
-		case "Safari":
-			return SAFARI;
-		case "Chrome":
-			return CHROME;
-		case "Android":
-			return ANDROID;
-		default:
-			return CHROME;
-		}
-	}
+    private final String name;
 
-	private String name;
+    @SuppressWarnings("unused")
+    Platform(String name) {
+        this.name = name;
+    }
 
-	Platform(String name) {
-		this.name = name;
-	}
+    @SuppressWarnings({"unused", "SwitchStatement", "QuestionableName", "MethodWithMultipleReturnPoints", "DuplicateStringLiteralInspection"})
+    public static Platform get(String string) {
+        switch (string) {
+            case "Firefox":
+                return FIREFOX;
+            case "Opera":
+                return OPERA;
+            case "Edge":
+                return EDGE;
+            case "Safari":
+                return SAFARI;
+            case "Android":
+                return ANDROID;
+            default:
+                return CHROME;
+        }
+    }
 
-	public String getName() {
-		return name;
-	}
+    @SuppressWarnings("unused")
+    public String getName() {
+        return name;
+    }
 }
